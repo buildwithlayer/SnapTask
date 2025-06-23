@@ -6,6 +6,7 @@ import {OpenAPIHono} from '@hono/zod-openapi';
 import {cors} from 'hono/cors';
 import chatRouter from './routes/chat.js';
 import mcpRouter from './routes/mcp.js';
+import transcribeRouter from './routes/transcribe.js';
 
 const app = new OpenAPIHono();
 
@@ -14,6 +15,7 @@ app.use('*', cors());
 // API routes
 app.route('/api/chat', chatRouter);
 app.route('/api/mcp', mcpRouter);
+app.route('/api/transcribe', transcribeRouter);
 
 // API documentation
 app.doc('/api/doc', {
