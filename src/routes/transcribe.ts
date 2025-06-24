@@ -34,10 +34,10 @@ const transcribeFileRoute = createRoute({
         200: {
             content: {
                 'application/json': {
-                    schema: z.any(),
+                    schema: z.string(),
                 },
             },
-            description: 'Transcription result from AssemblyAI',
+            description: 'Text transcription result from AssemblyAI',
         },
     },
     summary: 'Transcribe an audio file',
@@ -52,7 +52,7 @@ transcribeRouter.openapi(transcribeFileRoute, async (c) => {
         language_code: language || 'en_us',
     });
     
-    return c.json(transcript);
+    return c.json(transcript.text);
 });
 
 export default transcribeRouter;
