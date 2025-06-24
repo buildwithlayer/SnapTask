@@ -19,6 +19,7 @@
         "@hono/zod-validator": "^0.7.0",
         "@modelcontextprotocol/sdk": "^1.12.3",
         "ai": "^4.3.16",
+        "assemblyai": "^4.13.3",
         "dotenv": "^16.5.0",
         "hono": "^4.7.11",
         "openai": "^5.5.1",
