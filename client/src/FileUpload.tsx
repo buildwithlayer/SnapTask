@@ -1,14 +1,15 @@
 import './FileUpload.css';
 import {useCallback} from 'react';
-import {useDropzone} from 'react-dropzone';
+import {type FileWithPath, useDropzone} from 'react-dropzone';
 import logoUrl from './assets/react.svg';
 
 interface FileUploadProps {
     setAudioFile: (file: FileWithPath) => void;
-    setTranscription: (content: string) => void;
+    setError: (error: unknown) => void;
+    setTranscript: (content: string) => void;
 }
 
-function FileUpload({setAudioFile, setTranscription}: FileUploadProps) {
+function FileUpload({setAudioFile, setError, setTranscript}: FileUploadProps) {
     const onDrop = useCallback((acceptedFiles: readonly FileWithPath[]) => {
         acceptedFiles.forEach((file: FileWithPath) => {
             if (file.type.startsWith('audio')) {
@@ -16,17 +17,17 @@ function FileUpload({setAudioFile, setTranscription}: FileUploadProps) {
             } else if (file.type.startsWith('text')) {
                 const reader = new FileReader();
 
-                reader.onabort = () => console.error('file reading was aborted');
-                reader.onerror = () => console.error('file reading was aborted');
+                reader.onabort = () => setError('file reading was aborted');
+                reader.onerror = () => setError('file reading was aborted');
                 reader.onload = () => {
                     const content = reader.result;
-                    setTranscription(content);
+                    if (typeof content === 'string') setTranscript(content);
                 };
 
                 reader.readAsText(file);
             }
         });
-    }, [setAudioFile, setTranscription]);
+    }, [setAudioFile, setError, setTranscript]);
 
     const {getInputProps, getRootProps, isDragActive} = useDropzone({
         accept: {
