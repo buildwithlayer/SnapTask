@@ -1,5 +1,6 @@
 import {createRoute, OpenAPIHono, z} from '@hono/zod-openapi';
 import {AssemblyAI} from 'assemblyai';
+import { File } from 'buffer';
 
 const transcribeRouter = new OpenAPIHono();
 
