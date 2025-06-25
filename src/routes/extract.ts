@@ -30,6 +30,7 @@ const summarizeRoute = createRoute({
             description: 'Summary of the transcript',
         },
     },
+    tags: ['extract'],
 });
 
 extractRouter.openapi(summarizeRoute, async (c) => {

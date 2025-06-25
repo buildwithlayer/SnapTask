@@ -1,17 +1,17 @@
-import {createRoute, OpenAPIHono, z} from '@hono/zod-openapi';
-import {CoreMessage} from 'ai';
-import {chatRequestSchema, errorResponseSchema, toolCallApprovalsRequestSchema} from '../schemas/chat.js';
-import {
-    getToolResultMessages,
-    handleStreamForwarding,
-    streamCompletion,
-} from '../utils/chat.js';
-
+import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
+import OpenAI from 'openai';
+import { ChatCompletion, ChatCompletionChunk, ChatCompletionCreateParams } from 'openai/resources/chat/completions';
+import { Stream } from 'openai/streaming';
+import { chatRequestSchema, errorResponseSchema } from '../schemas/chat.js';
 
 const chatRouter = new OpenAPIHono();
 
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+
 const chatCompletionRoute = createRoute({
-    description: 'Stream a chat completion response using MCP server tools',
+    description: 'Proxy OpenAI chat completion with exact same API',
     method: 'post',
     path: '/',
     request: {
@@ -26,13 +26,18 @@ const chatCompletionRoute = createRoute({
     responses: {
         200: {
             content: {
+                'application/json': {
+                    schema: z.any().openapi({
+                        description: 'Non-streaming chat completion response',
+                    }),
+                },
                 'text/event-stream': {
                     schema: z.string().openapi({
-                        description: 'Server-sent events stream with chat completion data',
+                        description: 'Server-sent events stream with OpenAI chat completion chunks',
                     }),
                 },
             },
-            description: 'Streaming chat completion response',
+            description: 'Chat completion response (exact OpenAI format)',
         },
         500: {
             content: {
@@ -43,88 +48,58 @@ const chatCompletionRoute = createRoute({
             description: 'Internal server error',
         },
     },
-    summary: 'Stream chat completion',
-    tags: ['chat'],
-});
-
-const toolCallApprovalsRoute = createRoute({
-    description: 'Execute approved tool calls and continue the chat completion stream',
-    method: 'post',
-    path: '/tool-call-approvals',
-    request: {
-        body: {
-            content: {
-                'application/json': {
-                    schema: toolCallApprovalsRequestSchema,
-                },
-            },
-        },
-    },
-    responses: {
-        200: {
-            content: {
-                'text/event-stream': {
-                    schema: z.string().openapi({
-                        description: 'Server-sent events stream with chat completion data',
-                    }),
-                },
-            },
-            description: 'Streaming chat completion response with tool results',
-        },
-        500: {
-            content: {
-                'application/json': {
-                    schema: errorResponseSchema,
-                },
-            },
-            description: 'Internal server error',
-        },
-    },
-    summary: 'Process approved tool calls and continue chat',
+    summary: 'Chat completion (OpenAI proxy)',
     tags: ['chat'],
 });
 
 chatRouter.openapi(chatCompletionRoute, async (c) => {
-    const {messages, serverConfig} = c.req.valid('json');
-    c.header('Content-Type', 'text/event-stream');
-    c.header('Transfer-Encoding', 'chunked');
-
     try {
-        return await handleStreamForwarding(
-            c,
-            streamCompletion(messages as CoreMessage[], serverConfig),
-        );
+        const requestBody = c.req.valid('json') as ChatCompletionCreateParams;
+        const completion = await openai.chat.completions.create(requestBody);
+        
+        if (requestBody.stream) {
+            c.header('Content-Type', 'text/event-stream');
+            c.header('Cache-Control', 'no-cache');
+            c.header('Connection', 'keep-alive');
+            
+            const completionStream = completion as Stream<ChatCompletionChunk>;
+            
+            const stream = new ReadableStream({
+                async start(controller) {
+                    const encoder = new TextEncoder();
+                    
+                    try {
+                        for await (const chunk of completionStream) {
+                            const data = `data: ${JSON.stringify(chunk)}\n\n`;
+                            controller.enqueue(encoder.encode(data));
+                        }
+                        
+                        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+                        controller.close();
+                    } catch (error) {
+                        controller.error(error);
+                    }
+                },
+            });
+            
+            return new Response(stream, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Connection': 'keep-alive',
+                    'Content-Type': 'text/event-stream',
+                },
+            });
+        }
+        
+        return c.json(completion as ChatCompletion);
+        
     } catch (error) {
+        console.error('OpenAI API Error:', error);
+        
         return c.json(
-            {
-                error: error instanceof Error ? error.message : 'An error occurred',
-            },
-            500,
-        );
-    }
-});
-
-chatRouter.openapi(toolCallApprovalsRoute, async (c) => {
-    const {approvedToolCallIds, messages, serverConfig} = c.req.valid('json');
-    c.header('Content-Type', 'text/event-stream');
-    c.header('Transfer-Encoding', 'chunked');
-
-    try {
-        const toolResultMessages = await getToolResultMessages(
-            messages as CoreMessage[],
-            serverConfig,
-            approvedToolCallIds,
-        );
-        return await handleStreamForwarding(
-            c,
-            streamCompletion([...messages as CoreMessage[], ...toolResultMessages], serverConfig),
-            {prefixMessages: toolResultMessages},
-        );
-    } catch (error) {
-        return c.json(
-            {
-                error: error instanceof Error ? error.message : 'An error occurred',
-            },
+            { 
+                error: error instanceof Error ? error.message : 'Unknown error occurred', 
+            }, 
             500,
         );
     }
