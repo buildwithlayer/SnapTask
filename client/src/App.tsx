@@ -1,8 +1,11 @@
 import './App.css';
 import {type ReactNode, useEffect, useState} from 'react';
 import type {FileWithPath} from 'react-dropzone';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import Chat from './Chat.tsx';
 import FileUpload from './FileUpload.tsx';
 import MenuBar from './MenuBar.tsx';
+import OAuthCallback from './OAuthCallback.tsx';
 
 
 function App() {
@@ -63,7 +66,6 @@ function App() {
             if (response.ok) {
                 const data = await response.json();
                 setSummary(data.summary);
-                setError(undefined);
             } else {
                 console.error(await response.text());
                 setError('could not summarize transcript');
@@ -73,7 +75,7 @@ function App() {
 
     let active: ReactNode;
     if (summary !== undefined) {
-        active = <h2>{summary}</h2>;
+        active = <Chat summary={summary}/>;
     } else if (transcript !== undefined) {
         active = <h2>Summarizing transcript...</h2>;
     } else if (audioFile !== undefined) {
@@ -85,11 +87,19 @@ function App() {
     return (
         <div id={'app'}>
             <MenuBar/>
-            <div className={'content'}>
-                <h1>Convert a meeting into tasks with AI</h1>
-                {error !== undefined && <h2 className={'error'}>{typeof error === 'string' ? error : JSON.stringify(error, null, 2)}</h2>}
-                {active}
-            </div>
+            <Router>
+                <Routes>
+                    <Route path={'/oauth/callback'} element={<OAuthCallback/>}/>
+                    <Route path={'/'} element={
+                        <div className={'content'}>
+                            <h1>Convert a meeting into tasks with AI</h1>
+                            {error !== undefined &&
+                                <h2 className={'error'}>{typeof error === 'string' ? error : JSON.stringify(error, null, 2)}</h2>}
+                            {active}
+                        </div>
+                    }/>
+                </Routes>
+            </Router>
         </div>
     );
 }
