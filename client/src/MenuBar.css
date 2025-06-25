@@ -1,0 +1,27 @@
+#menu-bar {
+    width: 100%;
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 16px 128px;
+    align-items: center;
+}
+
+#menu-bar .menu-item {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+}
+
+#menu-bar .menu-item img {
+    width: 64px;
+    height: 64px;
+}
+
+#menu-bar .menu-item .company-name {
+    font-size: 24px;
+    font-weight: bold;
+}
