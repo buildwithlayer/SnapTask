@@ -4,16 +4,36 @@ import {type FileWithPath, useDropzone} from 'react-dropzone';
 import logoUrl from './assets/react.svg';
 
 interface FileUploadProps {
-    setAudioFile: (file: FileWithPath) => void;
     setError: (error: unknown) => void;
     setTranscript: (content: string) => void;
 }
 
-function FileUpload({setAudioFile, setError, setTranscript}: FileUploadProps) {
+function FileUpload({setError, setTranscript}: FileUploadProps) {
     const onDrop = useCallback((acceptedFiles: readonly FileWithPath[]) => {
+        setError(undefined);
+
         acceptedFiles.forEach((file: FileWithPath) => {
             if (file.type.startsWith('audio')) {
-                setAudioFile(file);
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch(
+                    `${import.meta.env.VITE_API_URL}/api/transcribe`,
+                    {
+                        body: formData,
+                        method: 'POST',
+                    },
+                ).then(async response => {
+                    if (response.ok) {
+                        const data = await response.json() as string;
+                        setTranscript(data);
+                    } else {
+                        console.error(await response.text());
+                        setError('could not transcribe audio');
+                    }
+                }).catch(err => {
+                    setError(err);
+                });
             } else if (file.type.startsWith('text')) {
                 const reader = new FileReader();
 
@@ -27,7 +47,7 @@ function FileUpload({setAudioFile, setError, setTranscript}: FileUploadProps) {
                 reader.readAsText(file);
             }
         });
-    }, [setAudioFile, setError, setTranscript]);
+    }, [setError, setTranscript]);
 
     const {getInputProps, getRootProps, isDragActive} = useDropzone({
         accept: {

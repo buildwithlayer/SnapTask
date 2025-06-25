@@ -1,6 +1,5 @@
 import './App.css';
 import {type ReactNode, useEffect, useState} from 'react';
-import type {FileWithPath} from 'react-dropzone';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Chat from './Chat.tsx';
 import FileUpload from './FileUpload.tsx';
@@ -9,46 +8,20 @@ import OAuthCallback from './OAuthCallback.tsx';
 
 
 function App() {
-    const [audioFile, setAudioFile] = useState<FileWithPath | undefined>(undefined);
     const [error, setError] = useState<unknown>(undefined);
     const [summary, setSummary] = useState<string | undefined>(undefined);
     const [transcript, setTranscript] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        if (audioFile === undefined) return;
-
-        setError(undefined);
-
-        const formData = new FormData();
-        formData.append('file', audioFile);
-
-        fetch(
-            `${import.meta.env.VITE_API_URL}/api/transcribe`,
-            {
-                body: formData,
-                method: 'POST',
-            },
-        ).then(async response => {
-            if (response.ok) {
-                const data = await response.json();
-                setTranscript(data.text);
-            } else {
-                console.error(await response.text());
-                setError('could not transcribe audio');
-            }
-        }).catch(err => setError(err));
-    }, [audioFile]);
-
-    useEffect(() => {
         if (error === undefined) return;
 
         console.error(error);
-        setAudioFile(undefined);
         setSummary(undefined);
         setTranscript(undefined);
     }, [error]);
 
     useEffect(() => {
+        console.log(`transcript = ${transcript}`);
         if (transcript === undefined) return;
 
         setError(undefined);
@@ -77,11 +50,9 @@ function App() {
     if (summary !== undefined) {
         active = <Chat summary={summary}/>;
     } else if (transcript !== undefined) {
-        active = <h2>Summarizing transcript...</h2>;
-    } else if (audioFile !== undefined) {
-        active = <h2>Processing audio file...</h2>;
+        active = <h2>Processing transcript...</h2>;
     } else {
-        active = <FileUpload setAudioFile={setAudioFile} setError={setError} setTranscript={setTranscript}/>;
+        active = <FileUpload setError={setError} setTranscript={setTranscript}/>;
     }
 
     return (
