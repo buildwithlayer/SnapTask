@@ -13,6 +13,7 @@ interface Step {
   fn: () => void;
   error?: Error;
   complete: boolean;
+  additionalMessage?: string;
 }
 
 const Progress = () => {
@@ -30,6 +31,14 @@ const Progress = () => {
     error: messagesError,
     awaitingResponse,
   } = useMessagesContext();
+
+  const lastMessage = messages[messages.length - 1];
+  const currentlyCallingTool = lastMessage && "tool_calls" in lastMessage;
+  const currentlyCallingString = currentlyCallingTool
+    ? `Calling ${lastMessage.tool_calls
+        ?.map((call) => call.function.name)
+        .join(" & ")}`
+    : undefined;
 
   const [userMessage, setUserMessage] = useState<string>("");
   const [inputFocused, setInputFocused] = useState<boolean>(false);
@@ -66,6 +75,7 @@ const Progress = () => {
           error={messagesError}
           fn={getResponse}
           complete={messages.length > 1 && !messagesError}
+          additionalMessage={currentlyCallingString}
         />
         {awaitingResponse && (
           <div className="flex flex-col h-full w-full justify-between pt-4">
@@ -137,7 +147,15 @@ const Progress = () => {
   );
 };
 
-const Step = ({ label, start, loading, fn, error, complete }: Step) => {
+const Step = ({
+  label,
+  start,
+  loading,
+  fn,
+  error,
+  complete,
+  additionalMessage,
+}: Step) => {
   useEffect(() => {
     if (start && !loading && !error) {
       fn();
@@ -158,6 +176,9 @@ const Step = ({ label, start, loading, fn, error, complete }: Step) => {
             </p>
           </div>
           {error && <p className="text-red-500">{error.message}</p>}
+          {additionalMessage && (
+            <p className="text-gray-500">{additionalMessage}</p>
+          )}
         </div>
       )}
     </>

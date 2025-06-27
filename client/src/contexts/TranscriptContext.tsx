@@ -80,7 +80,10 @@ export const TranscriptProvider = ({ children }: { children: ReactNode }) => {
       };
       reader.onload = () => {
         const content = reader.result;
-        if (typeof content === "string") setTranscript(content);
+        if (typeof content === "string") {
+          localStorage.setItem("transcript", content);
+          setTranscript(content);
+        }
       };
 
       reader.readAsText(file);
