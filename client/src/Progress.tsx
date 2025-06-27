@@ -30,15 +30,24 @@ const Progress = () => {
     loading: messagesLoading,
     error: messagesError,
     awaitingResponse,
+    readToolCallStack,
   } = useMessagesContext();
 
-  const lastMessage = messages[messages.length - 1];
-  const currentlyCallingTool = lastMessage && "tool_calls" in lastMessage;
-  const currentlyCallingString = currentlyCallingTool
-    ? `Calling ${lastMessage.tool_calls
-        ?.map((call) => call.function.name)
-        .join(" & ")}`
+  const currentlyCallingTool = readToolCallStack?.length
+    ? readToolCallStack[readToolCallStack.length - 1]
     : undefined;
+  const currentlyCallingToolArguments = currentlyCallingTool?.function.arguments
+    ? JSON.parse(currentlyCallingTool.function.arguments)
+    : undefined;
+  const currentlyCallingString = currentlyCallingTool
+    ? `Calling ${currentlyCallingTool.function.name}${
+        currentlyCallingTool.function.name === "list_issues" &&
+        currentlyCallingToolArguments &&
+        "query" in currentlyCallingToolArguments
+          ? ` with query ${currentlyCallingToolArguments.query}`
+          : ""
+      }...`
+    : "Thinking...";
 
   const [userMessage, setUserMessage] = useState<string>("");
   const [inputFocused, setInputFocused] = useState<boolean>(false);
