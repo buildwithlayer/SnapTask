@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useIssuesContext } from "./contexts/IssuesContext";
 import Issues from "./Issues";
 import ResetButton from "./components/ResetButton";
-import Comments from "./comments";
+import Comments from "./Comments";
 import IssuesIcon from "./assets/issues.svg?react";
 import CommentsIcon from "./assets/comments.svg?react";
 import { useCommentsContext } from "./contexts/CommentsContext";
