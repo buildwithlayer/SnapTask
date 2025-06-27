@@ -13,6 +13,7 @@ interface Step {
   fn: () => void;
   error?: Error;
   complete: boolean;
+  additionalMessage?: string;
 }
 
 const Progress = () => {
@@ -29,7 +30,24 @@ const Progress = () => {
     loading: messagesLoading,
     error: messagesError,
     awaitingResponse,
+    readToolCallStack,
   } = useMessagesContext();
+
+  const currentlyCallingTool = readToolCallStack?.length
+    ? readToolCallStack[readToolCallStack.length - 1]
+    : undefined;
+  const currentlyCallingToolArguments = currentlyCallingTool?.function.arguments
+    ? JSON.parse(currentlyCallingTool.function.arguments)
+    : undefined;
+  const currentlyCallingString = currentlyCallingTool
+    ? `Calling ${currentlyCallingTool.function.name}${
+        currentlyCallingTool.function.name === "list_issues" &&
+        currentlyCallingToolArguments &&
+        "query" in currentlyCallingToolArguments
+          ? ` with query "${currentlyCallingToolArguments.query}"`
+          : ""
+      }...`
+    : "Thinking...";
 
   const [userMessage, setUserMessage] = useState<string>("");
   const [inputFocused, setInputFocused] = useState<boolean>(false);
@@ -66,6 +84,9 @@ const Progress = () => {
           error={messagesError}
           fn={getResponse}
           complete={messages.length > 1 && !messagesError}
+          additionalMessage={
+            messages.length > 1 ? undefined : currentlyCallingString
+          }
         />
         {awaitingResponse && (
           <div className="flex flex-col h-full w-full justify-between pt-4">
@@ -137,7 +158,15 @@ const Progress = () => {
   );
 };
 
-const Step = ({ label, start, loading, fn, error, complete }: Step) => {
+const Step = ({
+  label,
+  start,
+  loading,
+  fn,
+  error,
+  complete,
+  additionalMessage,
+}: Step) => {
   useEffect(() => {
     if (start && !loading && !error) {
       fn();
@@ -158,6 +187,9 @@ const Step = ({ label, start, loading, fn, error, complete }: Step) => {
             </p>
           </div>
           {error && <p className="text-red-500">{error.message}</p>}
+          {additionalMessage && (
+            <p className="text-gray-500">{additionalMessage}</p>
+          )}
         </div>
       )}
     </>

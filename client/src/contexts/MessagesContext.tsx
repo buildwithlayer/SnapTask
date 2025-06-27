@@ -20,6 +20,7 @@ interface MessagesContextType {
   loading: boolean;
   error?: Error;
   awaitingResponse: boolean;
+  readToolCallStack: OpenAI.ChatCompletionMessageToolCall[];
 }
 
 export const MessagesContext = createContext<MessagesContextType>({
@@ -28,6 +29,7 @@ export const MessagesContext = createContext<MessagesContextType>({
   getResponse: async () => [],
   loading: false,
   awaitingResponse: false,
+  readToolCallStack: [],
 });
 
 const SYSTEM_PROMPT = `
@@ -81,7 +83,48 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const initialMessage: OpenAI.ChatCompletionMessageParam = {
-    content: SYSTEM_PROMPT.replace('{{transcript}}', transcript || 'For some reason an error occured when getting the user\'s transcript.  Exixt by responding with no tool calls and letting the user know there was an error.'),
+    content: `You are SnapLinear, an AI teammate that turns stand-up discussion into tidy Linear issues.
+
+Primary Objective:
+Convert each actionable item from the user’s transcript into a well-scoped Linear issue that lands in the correct team, project, status, and label.
+
+Interaction Phases:
+There are 3 interaction phases, they are the "LEARN phase", "ASK phase" and the "CREATE phase".
+
+LEARN Phase:
+Before creating any issues, familiarize yourself with the project.
+- ALWAYS learn before you do:
+  - Run one or more get/list calls first (e.g., \`list_teams\`, \`list_issue_statuses\`, \`list_issue_labels\`).
+  - Cache the responses in your working memory; cite them when choosing IDs or names.
+- ALWAYS RUN:
+  - \`list_teams\`
+  - \`list_projects\`
+  - \`list_users\`
+  - \`list_issue_statuses\`
+  - \`list_issue_labels\`
+  - \`list_issues\` with different search queries and a limit to search for similar issues in the project.
+
+ASK Phase (Optional):
+If the transcript is ambiguous (missing team, assignee, due date, etc.), ask a follow-up question before creating issues.  You can do this by simply responding with a regular message and NOT including any tool calls.  If you have the information you need, you can skip this phase and go directly to the 
+
+CREATE phase:
+You are now in the create phase.  This phase is triggered the moment you submit a tool that creates or updates any items.  Be sure to ALWAYS submit ALL edits and updates together in the final tool calls.   Your usage of any mutating tool will terminate the loop.
+
+
+Issue Quality Bar:
+- Title: ≤ 60 chars, start with a verb.
+- Description: You do not need to include a description for every issue.  Only include description if there are additional clarifying details needed. Linear philosophy says that descriptions are optionally read. 
+- Apply status = "Todo" unless context dictates otherwise.
+
+Be Idempotent & Safe:
+- Never create duplicate issues (check with \`list_issues\` filtered by title).
+
+Tone:
+- Brief, action-oriented, professional.
+
+Here is the transcript:
+
+${transcript}`,
     role: "user",
   };
 
@@ -89,6 +132,9 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
     []
   );
   const [incompleteToolCalls, setIncompleteToolCalls] = useState<
+    OpenAI.ChatCompletionMessageToolCall[]
+  >([]);
+  const [readToolCallStack, setReadToolCallStack] = useState<
     OpenAI.ChatCompletionMessageToolCall[]
   >([]);
   const [error, setError] = useState<Error | undefined>(undefined);
@@ -131,7 +177,10 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
     respondToUser(
       messagesToSend,
       convertTools(tools as Tool[]),
-      callTool as UseMcpResult["callTool"]
+      callTool as UseMcpResult["callTool"],
+      (toolCall?: OpenAI.ChatCompletionMessageToolCall) => {
+        if (toolCall) setReadToolCallStack((prev) => [...prev, toolCall]);
+      }
     )
       .then((newMessages) => {
         if (newMessages.length === 0) return;
@@ -176,6 +225,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
         loading,
         error,
         awaitingResponse,
+        readToolCallStack,
       }}
     >
       {children}
