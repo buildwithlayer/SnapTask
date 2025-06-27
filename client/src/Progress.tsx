@@ -44,7 +44,7 @@ const Progress = () => {
         currentlyCallingTool.function.name === "list_issues" &&
         currentlyCallingToolArguments &&
         "query" in currentlyCallingToolArguments
-          ? ` with query ${currentlyCallingToolArguments.query}`
+          ? ` with query "${currentlyCallingToolArguments.query}"`
           : ""
       }...`
     : "Thinking...";
@@ -84,7 +84,9 @@ const Progress = () => {
           error={messagesError}
           fn={getResponse}
           complete={messages.length > 1 && !messagesError}
-          additionalMessage={currentlyCallingString}
+          additionalMessage={
+            messages.length > 1 ? undefined : currentlyCallingString
+          }
         />
         {awaitingResponse && (
           <div className="flex flex-col h-full w-full justify-between pt-4">
