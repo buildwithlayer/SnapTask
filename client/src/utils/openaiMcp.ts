@@ -1,9 +1,8 @@
 import {type CallToolResult, McpError, type TextContent} from '@modelcontextprotocol/sdk/types.js';
 import {OpenAI} from 'openai/client';
-import {useEffect, useState} from 'react';
-import {type Tool, useMcp, type UseMcpResult} from 'use-mcp/react';
+import {type Tool, type UseMcpResult} from 'use-mcp/react';
 
-function convertTools(tools: Tool[]): OpenAI.ChatCompletionTool[] {
+export function convertTools(tools: Tool[]): OpenAI.ChatCompletionTool[] {
     return tools.map(tool => {
         const openAITool: OpenAI.ChatCompletionTool = {
             function: {
@@ -22,7 +21,7 @@ function convertTools(tools: Tool[]): OpenAI.ChatCompletionTool[] {
     });
 }
 
-async function getCompletion(messages: OpenAI.ChatCompletionMessageParam[], tools: OpenAI.ChatCompletionTool[]): Promise<OpenAI.ChatCompletionAssistantMessageParam> {
+export async function getCompletion(messages: OpenAI.ChatCompletionMessageParam[], tools: OpenAI.ChatCompletionTool[]): Promise<OpenAI.ChatCompletionAssistantMessageParam> {
     return fetch(
         `${import.meta.env.VITE_API_URL}/api/chat`,
         {
@@ -56,7 +55,7 @@ async function getCompletion(messages: OpenAI.ChatCompletionMessageParam[], tool
     });
 }
 
-async function callTools(message: OpenAI.ChatCompletionMessageParam, callTool: UseMcpResult['callTool']): Promise<OpenAI.ChatCompletionMessageParam[]> {
+export async function callTools(message: OpenAI.ChatCompletionMessageParam, callTool: UseMcpResult['callTool']): Promise<OpenAI.ChatCompletionMessageParam[]> {
     if (message.role !== 'assistant' || message.tool_calls === undefined || message.tool_calls.length === 0) return [];
 
     const toolMessages: OpenAI.ChatCompletionToolMessageParam[] = [];
@@ -86,7 +85,7 @@ async function callTools(message: OpenAI.ChatCompletionMessageParam, callTool: U
     return toolMessages;
 }
 
-async function respondToUser(messages: OpenAI.ChatCompletionMessageParam[], tools: OpenAI.ChatCompletionTool[], callTool: UseMcpResult['callTool']): Promise<OpenAI.ChatCompletionMessageParam[]> {
+export async function respondToUser(messages: OpenAI.ChatCompletionMessageParam[], tools: OpenAI.ChatCompletionTool[], callTool: UseMcpResult['callTool']): Promise<OpenAI.ChatCompletionMessageParam[]> {
     const lastMessage = messages[messages.length - 1];
     if (lastMessage.role !== 'user') return [];
 
@@ -108,82 +107,3 @@ async function respondToUser(messages: OpenAI.ChatCompletionMessageParam[], tool
 
     return newMessages;
 }
-
-interface ChatProps {
-    summary: string;
-}
-
-function Chat({summary}: ChatProps) {
-    const {
-        authenticate,
-        callTool,
-        error,
-        retry,
-        state,
-        tools,
-    } = useMcp({
-        autoReconnect: true,
-        callbackUrl: import.meta.env.VITE_CALLBACK_URL,
-        clientName: 'SnapLinear',
-        url: 'https://mcp.linear.app/sse',
-    });
-
-    const [loading, setLoading] = useState<boolean>(false);
-    const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>([
-        {
-            content: `You are an AI assistant that takes transcripts and/or transcript summaries and creates action-items from them to add to Linear, the project planning platform.
-            
-<transcript-summary>
-${summary}
-</transcript-summary>`,
-            role: 'user',
-        },
-    ]);
-
-    useEffect(() => {
-        if (state !== 'ready' || loading) return;
-
-        setLoading(true);
-        respondToUser(messages, convertTools(tools), callTool)
-            .then(newMessages => {
-                if (newMessages.length === 0) return;
-                setMessages([...messages, ...newMessages]);
-            })
-            .catch(err => console.error(err))
-            .finally(() => setLoading(false));
-    }, [callTool, loading, messages, state, tools]);
-
-    if (state === 'failed') {
-        return (
-            <div>
-                <p>Connection failed: {error}</p>
-                <button onClick={retry}>Retry</button>
-                <button onClick={authenticate}>Authenticate Manually</button>
-            </div>
-        );
-    }
-
-    if (state !== 'ready') {
-        return <div>Connecting...</div>;
-    }
-
-    return (
-        <div>
-            <h2>Available Tools: {tools.length}</h2>
-            <ul>
-                {tools.map(tool => (
-                    <li key={tool.name}>{tool.name}</li>
-                ))}
-            </ul>
-            <h2>Messages:</h2>
-            <ul>
-                {messages.map(message => (
-                    <li>{JSON.stringify(message, null, 2)}</li>
-                ))}
-            </ul>
-            {loading && <p>loading...</p>}
-        </div>
-    );
-}
-
-export default Chat;
