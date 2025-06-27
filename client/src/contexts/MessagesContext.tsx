@@ -5,13 +5,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useSummaryContext } from "./SummaryContext";
 import { OpenAI } from "openai/client";
 import { useMcpContext } from "./McpContext";
 import { convertTools, respondToUser } from "../utils/openaiMcp";
 import type { Tool, UseMcpResult } from "use-mcp/react";
 import toast from "react-hot-toast";
 import type { ChatCompletionAssistantMessageParam } from "openai/resources/index.mjs";
+import { useTranscriptContext } from "./TranscriptContext";
 
 interface MessagesContextType {
   messages: OpenAI.ChatCompletionMessageParam[];
@@ -31,17 +31,17 @@ export const MessagesContext = createContext<MessagesContextType>({
 });
 
 export const MessagesProvider = ({ children }: { children: ReactNode }) => {
-  const { summary } = useSummaryContext();
+  const { transcript } = useTranscriptContext();
   const { tools, callTool } = useMcpContext();
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const initialMessage: OpenAI.ChatCompletionMessageParam = {
-    content: `You are an AI assistant that takes transcripts and/or transcript summaries and creates action-items from them to add to Linear, the project planning platform.
+    content: `You are an AI assistant that takes transcripts and creates action-items from them to add to Linear, the project planning platform.
                     
-        <transcript-summary>
-        ${summary}
-        </transcript-summary>`,
+        <transcript>
+        ${transcript}
+        </transcript>`,
     role: "user",
   };
 
@@ -55,14 +55,15 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
 
   const lastMessage = messages[messages.length - 1];
   const awaitingResponse =
-    lastMessage?.role === "assistant" && !lastMessage?.tool_calls;
+    (lastMessage?.role === "assistant" && !lastMessage?.tool_calls) ||
+    (lastMessage?.role === "user" && messages.length > 1);
 
   useEffect(() => {
-    if (summary && messages.length === 0) {
+    if (transcript && messages.length === 0) {
       setMessages([initialMessage]);
       localStorage.setItem("messages", JSON.stringify([initialMessage]));
     }
-  }, [summary, messages.length]);
+  }, [transcript, messages.length]);
 
   useEffect(() => {
     const storedMessages = localStorage.getItem("messages");
@@ -86,6 +87,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
       };
       messagesToSend = [...messages, userMessage];
     }
+    setMessages(messagesToSend);
     respondToUser(
       messagesToSend,
       convertTools(tools as Tool[]),
