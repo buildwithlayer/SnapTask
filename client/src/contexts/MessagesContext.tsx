@@ -21,7 +21,7 @@ interface MessagesContextType {
   awaitingResponse: boolean;
 }
 
-const MessagesContext = createContext<MessagesContextType>({
+export const MessagesContext = createContext<MessagesContextType>({
   messages: [],
   incompleteToolCalls: [],
   getResponse: async () => [],

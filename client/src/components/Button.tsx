@@ -26,11 +26,11 @@ const Button = ({
         "bg-primary text-white hover:bg-primary-dark disabled:bg-gray-500 disabled:text-gray-700"
       } ${
         style === "outlined" &&
-        "border border-primary text-primary hover:bg-gray-100 disabled:border-gray-200 disabled:text-gray-200"
+        "border border-primary text-primary hover:bg-primary/10 disabled:border-gray-200 disabled:text-gray-200"
       } ${
         style === "text" &&
         "text-primary hover:bg-gray-100 disabled:text-gray-200"
-      } ${additionalClasses} flex items-center justify-center gap-4 px-4 py-2 rounded transition-all duration-200 cursor-pointer disabled:cursor-not-allowed`}
+      } flex items-center justify-center gap-4 px-4 py-2 rounded transition-all duration-200 cursor-pointer disabled:cursor-not-allowed ${additionalClasses}`}
     >
       {loading && <ClipLoader size={16} color="white" />}
       {children}

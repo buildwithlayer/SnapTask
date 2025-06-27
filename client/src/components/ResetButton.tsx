@@ -15,7 +15,15 @@ const ResetButton = () => {
     window.location.reload();
   };
 
-  return <Button onClick={handleReset}>Upload another meeting</Button>;
+  return (
+    <Button
+      onClick={handleReset}
+      style="outlined"
+      additionalClasses="px-2 py-1"
+    >
+      Restart
+    </Button>
+  );
 };
 
 export default ResetButton;

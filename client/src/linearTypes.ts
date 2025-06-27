@@ -50,6 +50,12 @@ export interface UpdateIssue {
   estimate?: number;
 }
 
+export function isUpdateIssue(
+  issueCreateOrUpdate: CreateIssue | UpdateIssue
+): issueCreateOrUpdate is UpdateIssue {
+  return (issueCreateOrUpdate as UpdateIssue).id !== undefined;
+}
+
 export interface IssueStatus {
   id: string;
   type: string;

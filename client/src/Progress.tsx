@@ -40,63 +40,65 @@ const Progress = () => {
   const [userMessage, setUserMessage] = useState<string>("");
 
   return (
-    <div className="flex flex-col gap-4 items-center justify-center w-full h-full py-10">
-      <Step
-        label={"Transcribing File"}
-        loading={transcriptLoading}
-        start={
-          file !== undefined &&
-          !transcript &&
-          !localStorage.getItem("transcript")
-        }
-        error={transcriptError}
-        fn={transcribeFile}
-        complete={transcript !== undefined && !transcriptError}
-      />
-      <Step
-        label={"Summarizing Transcript"}
-        loading={summaryLoading}
-        start={
-          transcript !== undefined &&
-          !summary &&
-          !localStorage.getItem("summary")
-        }
-        error={summaryError}
-        fn={summarizeTranscript}
-        complete={summary !== undefined && !summaryError}
-      />
-      <Step
-        label={"Generating Linear Action Items"}
-        loading={messagesLoading}
-        start={summary !== undefined && messages.length === 1}
-        error={messagesError}
-        fn={getResponse}
-        complete={messages.length > 1 && !messagesError}
-      />
-      {awaitingResponse && (
-        // TODO: Style this
-        <div className="flex flex-col h-full w-full justify-between">
-          <pre className="max-w-full max-h-[400px] overflow-y-auto bg-gray-800">
-            {JSON.stringify(messages[messages.length - 1].content, null, 2)}
-          </pre>
-          <div className="flex items-center">
-            <input
-              type="text"
-              value={userMessage}
-              onChange={(e) => setUserMessage(e.target.value)}
-              className="w-full p-2 bg-gray-700 text-white"
-            />
-            <Button
-              onClick={() => {
-                getResponse(userMessage);
-                setUserMessage("");
-              }}
-            >
-              Send Message
-            </Button>
+    <div className="w-full h-full max-w-content-max-width px-4">
+      <div className="flex flex-col gap-4 items-center justify-center w-full h-full py-10">
+        <Step
+          label={"Transcribing File"}
+          loading={transcriptLoading}
+          start={
+            file !== undefined &&
+            !transcript &&
+            !localStorage.getItem("transcript")
+          }
+          error={transcriptError}
+          fn={transcribeFile}
+          complete={transcript !== undefined && !transcriptError}
+        />
+        <Step
+          label={"Summarizing Transcript"}
+          loading={summaryLoading}
+          start={
+            transcript !== undefined &&
+            !summary &&
+            !localStorage.getItem("summary")
+          }
+          error={summaryError}
+          fn={summarizeTranscript}
+          complete={summary !== undefined && !summaryError}
+        />
+        <Step
+          label={"Generating Linear Action Items"}
+          loading={messagesLoading}
+          start={summary !== undefined && messages.length === 1}
+          error={messagesError}
+          fn={getResponse}
+          complete={messages.length > 1 && !messagesError}
+        />
+        {awaitingResponse && (
+          // TODO: Style this
+          <div className="flex flex-col h-full w-full justify-between">
+            <pre className="max-w-full max-h-[400px] overflow-y-auto bg-gray-800">
+              {JSON.stringify(messages[messages.length - 1].content, null, 2)}
+            </pre>
+            <div className="flex items-center">
+              <input
+                type="text"
+                value={userMessage}
+                onChange={(e) => setUserMessage(e.target.value)}
+                className="w-full p-2 bg-gray-700 text-white"
+              />
+              <Button
+                onClick={() => {
+                  getResponse(userMessage);
+                  setUserMessage("");
+                }}
+              >
+                Send Message
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

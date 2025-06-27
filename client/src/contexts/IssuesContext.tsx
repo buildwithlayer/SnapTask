@@ -19,7 +19,7 @@ interface IssuesContextType {
   rejectIssue: (toolCallId: string) => void;
 }
 
-export const IssuesContext = createContext<IssuesContextType>({
+const IssuesContext = createContext<IssuesContextType>({
   issues: {},
   unreviewedIssues: {},
   approveIssue: async () => {},
