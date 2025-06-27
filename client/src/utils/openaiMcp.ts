@@ -27,7 +27,7 @@ export async function getCompletion(messages: OpenAI.ChatCompletionMessageParam[
         {
             body: JSON.stringify({
                 messages,
-                model: 'o3',
+                model: 'gpt-4o',
                 tools: tools,
             }),
             headers: {

@@ -5,13 +5,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useSummaryContext } from "./SummaryContext";
 import { OpenAI } from "openai/client";
 import { useMcpContext } from "./McpContext";
 import { convertTools, respondToUser } from "../utils/openaiMcp";
 import type { Tool, UseMcpResult } from "use-mcp/react";
 import toast from "react-hot-toast";
 import type { ChatCompletionAssistantMessageParam } from "openai/resources/index.mjs";
+import { useTranscriptContext } from "./TranscriptContext";
 
 interface MessagesContextType {
   messages: OpenAI.ChatCompletionMessageParam[];
@@ -36,29 +36,31 @@ You are SnapLinear, an AI teammate that turns stand-up discussion into tidy Line
 Primary Objective:
 Convert each actionable item from the user’s transcript into a well-scoped Linear issue that lands in the correct team, project, status, and label.
 
-Interaction Rules:
+Interaction Phases:
+There are 3 interaction phases, they are the "LEARN phase", "ASK phase" and the "CREATE phase".
+
+LEARN Phase:
+Before creating any issues, familiarize yourself with the project.
 - ALWAYS learn before you do:
   - Run one or more get/list calls first (e.g., \`list_teams\`, \`list_issue_statuses\`, \`list_issue_labels\`).
   - Cache the responses in your working memory; cite them when choosing IDs or names.
-
 - ALWAYS RUN:
   - \`list_teams\`
   - \`list_projects\`
   - \`list_users\`
   - \`list_issue_statuses\`
   - \`list_issue_labels\`
-
-- USE:
   - \`list_issues\` with different search queries and a limit to search for similar issues in the project.
 
-- Before creating any issues, familiarize yourself with the project.
+ASK Phase (Optional):
+If the transcript is ambiguous (missing team, assignee, due date, etc.), ask a follow-up question before creating issues.  You can do this by simply responding with a regular message and NOT including any tool calls.  If you have the information you need, you can skip this phase and go directly to the 
 
-- Ask when uncertain:
-  - If the transcript is ambiguous (missing team, assignee, due date, etc.), ask a follow-up question before creating issues.
+CREATE phase:
+You are now in the create phase.  This phase is triggered the moment you submit a tool that creates or updates any items.  Be sure to ALWAYS submit ALL edits and updates together in the final tool calls.   Your usage of any mutating tool will terminate the loop.
 
 Issue Quality Bar:
 - Title: ≤ 60 chars, start with a verb.
-- Description: single-sentence summary + bullet list of acceptance criteria.
+- Description: You do not need to include a description for every issue.  Only include description if there are additional clarifying details needed. Linear philosophy says that descriptions are optionally read. 
 - Apply status = "Todo" unless context dictates otherwise.
 
 Be Idempotent & Safe:
@@ -67,23 +69,19 @@ Be Idempotent & Safe:
 Tone:
 - Brief, action-oriented, professional.
 
-Try your best to assign issues to the relevant users if possible. If you don't know who they are because the transcript does not contain that information, ask.
-
-When running any \`create\` or \`update\` routes, ALWAYS submit all those tool calls at the same time. Your usage of any mutating tool will terminate the loop.
-
 Here is the transcript:
 
 {{transcript}}
 `;
 
 export const MessagesProvider = ({ children }: { children: ReactNode }) => {
-  const { summary } = useSummaryContext();
+  const { transcript } = useTranscriptContext();
   const { tools, callTool } = useMcpContext();
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const initialMessage: OpenAI.ChatCompletionMessageParam = {
-    content: SYSTEM_PROMPT.replace('{{transcript}}', summary || ''),
+    content: SYSTEM_PROMPT.replace('{{transcript}}', transcript || 'For some reason an error occured when getting the user\'s transcript.  Exixt by responding with no tool calls and letting the user know there was an error.'),
     role: "user",
   };
 
@@ -97,14 +95,15 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
 
   const lastMessage = messages[messages.length - 1];
   const awaitingResponse =
-    lastMessage?.role === "assistant" && !lastMessage?.tool_calls;
+    (lastMessage?.role === "assistant" && !lastMessage?.tool_calls) ||
+    (lastMessage?.role === "user" && messages.length > 1);
 
   useEffect(() => {
-    if (summary && messages.length === 0) {
+    if (transcript && messages.length === 0) {
       setMessages([initialMessage]);
       localStorage.setItem("messages", JSON.stringify([initialMessage]));
     }
-  }, [summary, messages.length]);
+  }, [transcript, messages.length]);
 
   useEffect(() => {
     const storedMessages = localStorage.getItem("messages");
@@ -128,6 +127,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
       };
       messagesToSend = [...messages, userMessage];
     }
+    setMessages(messagesToSend);
     respondToUser(
       messagesToSend,
       convertTools(tools as Tool[]),

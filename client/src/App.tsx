@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import MenuBar from "./MenuBar.tsx";
 import OAuthCallback from "./OAuthCallback.tsx";
 import { TranscriptProvider } from "./contexts/TranscriptContext.tsx";
-import { SummaryProvider } from "./contexts/SummaryContext.tsx";
 import Content from "./Content.tsx";
 import { Toaster } from "react-hot-toast";
 import { FileProvider } from "./contexts/FileContext.tsx";
@@ -19,9 +18,7 @@ function App() {
             element={
               <FileProvider>
                 <TranscriptProvider>
-                  <SummaryProvider>
-                    <Content />
-                  </SummaryProvider>
+                  <Content />
                 </TranscriptProvider>
               </FileProvider>
             }

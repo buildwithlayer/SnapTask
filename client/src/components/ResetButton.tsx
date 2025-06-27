@@ -4,7 +4,6 @@ const ResetButton = () => {
   const handleReset = () => {
     [
       "transcript",
-      "summary",
       "messages",
       "incompleteToolCalls",
       "issueToolCalls",

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useFileContext } from "./contexts/FileContext";
 import { ClipLoader } from "react-spinners";
-import { useSummaryContext } from "./contexts/SummaryContext";
 import { useTranscriptContext } from "./contexts/TranscriptContext";
 import { useMessagesContext } from "./contexts/MessagesContext";
 import Button from "./components/Button";
+import UpArrowIcon from "./assets/uparrow.svg?react";
 
 interface Step {
   label: string;
@@ -24,12 +24,6 @@ const Progress = () => {
     error: transcriptError,
   } = useTranscriptContext();
   const {
-    summarizeTranscript,
-    summary,
-    loading: summaryLoading,
-    error: summaryError,
-  } = useSummaryContext();
-  const {
     messages,
     getResponse,
     loading: messagesLoading,
@@ -38,6 +32,17 @@ const Progress = () => {
   } = useMessagesContext();
 
   const [userMessage, setUserMessage] = useState<string>("");
+  const [inputFocused, setInputFocused] = useState<boolean>(false);
+
+  const sendDisabled =
+    userMessage.trim() === "" || messages[messages.length - 1]?.role === "user";
+
+  function handleSendMessage() {
+    if (!sendDisabled) {
+      getResponse(userMessage);
+      setUserMessage("");
+    }
+  }
 
   return (
     <div className="w-full h-full max-w-content-max-width px-4">
@@ -55,45 +60,74 @@ const Progress = () => {
           complete={transcript !== undefined && !transcriptError}
         />
         <Step
-          label={"Summarizing Transcript"}
-          loading={summaryLoading}
-          start={
-            transcript !== undefined &&
-            !summary &&
-            !localStorage.getItem("summary")
-          }
-          error={summaryError}
-          fn={summarizeTranscript}
-          complete={summary !== undefined && !summaryError}
-        />
-        <Step
           label={"Generating Linear Action Items"}
           loading={messagesLoading}
-          start={summary !== undefined && messages.length === 1}
+          start={transcript !== undefined && messages.length === 1}
           error={messagesError}
           fn={getResponse}
           complete={messages.length > 1 && !messagesError}
         />
         {awaitingResponse && (
-          // TODO: Style this
-          <div className="flex flex-col h-full w-full justify-between">
-            <pre className="max-w-full max-h-[400px] overflow-y-auto bg-gray-800">
-              {JSON.stringify(messages[messages.length - 1].content, null, 2)}
-            </pre>
-            <div className="flex items-center">
+          <div className="flex flex-col h-full w-full justify-between pt-4">
+            <div className="flex flex-col gap-4 w-full max-h-full overflow-y-auto">
+              {messages
+                .filter(
+                  (message, index) =>
+                    index > 0 &&
+                    (typeof message.content === "string" ||
+                      message.content?.some(
+                        (content) => content.type === "text"
+                      )) &&
+                    (message.role === "assistant" || message.role === "user")
+                )
+                .map((message, index) => {
+                  return (
+                    <div
+                      className={`max-w-full w-fit overflow-y-auto rounded-md p-4 ${
+                        message.role === "assistant"
+                          ? "bg-gray-800 self-start"
+                          : "bg-primary self-end"
+                      }`}
+                      key={index}
+                    >
+                      {typeof message.content === "string" ? (
+                        <p key={index}>{message.content}</p>
+                      ) : (
+                        message.content
+                          ?.filter((content) => content.type === "text")
+                          .map((content, idx) => (
+                            <p key={idx}>{content.text}</p>
+                          ))
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+            <div
+              className={`flex items-center p-2 pr-3 rounded-full bg-gray-900 border ${
+                inputFocused ? "border-primary" : "border-gray-700"
+              }`}
+            >
               <input
                 type="text"
                 value={userMessage}
                 onChange={(e) => setUserMessage(e.target.value)}
-                className="w-full p-2 bg-gray-700 text-white"
+                className="w-full text-white px-4 outline-none"
+                placeholder="Send Message..."
+                onFocus={() => setInputFocused(true)}
+                onBlur={() => setInputFocused(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSendMessage();
+                  }
+                }}
               />
               <Button
-                onClick={() => {
-                  getResponse(userMessage);
-                  setUserMessage("");
-                }}
+                onClick={handleSendMessage}
+                additionalClasses="!p-2 rounded-full"
+                disabled={sendDisabled}
               >
-                Send Message
+                <UpArrowIcon className="w-6 h-6 fill-white" />
               </Button>
             </div>
           </div>
