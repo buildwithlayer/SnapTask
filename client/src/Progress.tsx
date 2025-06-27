@@ -66,7 +66,7 @@ const Progress = () => {
         />
         {awaitingResponse && (
           <div className="flex flex-col h-full w-full justify-between pt-4">
-            <div className="flex flex-col gap-4 w-full">
+            <div className="flex flex-col gap-4 w-full max-h-full overflow-y-auto">
               {messages
                 .filter(
                   (message, index) =>
