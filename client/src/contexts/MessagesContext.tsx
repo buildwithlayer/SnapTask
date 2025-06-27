@@ -11,6 +11,7 @@ import { useMcpContext } from "./McpContext";
 import { convertTools, respondToUser } from "../utils/openaiMcp";
 import type { Tool, UseMcpResult } from "use-mcp/react";
 import toast from "react-hot-toast";
+import type { ChatCompletionAssistantMessageParam } from "openai/resources/index.mjs";
 
 interface MessagesContextType {
   messages: OpenAI.ChatCompletionMessageParam[];
@@ -98,14 +99,23 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
         );
         setMessages([...messagesToSend, ...newMessages]);
 
-        const lastMessage = newMessages[newMessages.length - 1];
-        const toolCalls =
-          lastMessage.role === "assistant" ? lastMessage.tool_calls : [];
+        const assistantMessages: ChatCompletionAssistantMessageParam[] =
+          newMessages.filter((msg) => msg.role === "assistant");
+        const toolCallMessages: ChatCompletionAssistantMessageParam[] =
+          assistantMessages.filter((msg) => msg.tool_calls);
+        const toolCalls: OpenAI.ChatCompletionMessageToolCall[] =
+          toolCallMessages.flatMap((msg) => msg.tool_calls || []);
+        const incompleteToolCalls = toolCalls.filter(
+          (tc) =>
+            !newMessages.some(
+              (msg) => msg.role === "tool" && msg.tool_call_id === tc?.id
+            )
+        );
         localStorage.setItem(
           "incompleteToolCalls",
-          JSON.stringify(toolCalls || [])
+          JSON.stringify(incompleteToolCalls || [])
         );
-        setIncompleteToolCalls(toolCalls || []);
+        setIncompleteToolCalls(incompleteToolCalls || []);
       })
       .catch((err) => {
         console.error(err);
