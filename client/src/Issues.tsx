@@ -36,7 +36,7 @@ const Issue = ({ toolCallId, issue }: IssueProps) => {
   const { approveIssue, rejectIssue, approveLoading } = useIssuesContext();
 
   return (
-    <div className="bg-gray-900 border border-gray-850 p-4 rounded-lg w-full overflow-x-auto flex flex-col gap-4">
+    <div className="bg-gray-900 border border-gray-850 p-4 rounded-lg w-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
         {isUpdateIssue(issue) ? (
           <ToolTypeBadge type="Update" />

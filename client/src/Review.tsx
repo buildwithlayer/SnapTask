@@ -14,7 +14,7 @@ const Review = () => {
   const [activeTab, setActiveTab] = useState<"issues" | "comments">("issues");
 
   return (
-    <div className="flex flex-col items-center w-full h-full">
+    <div className="flex flex-col items-center w-full h-full max-h-full">
       <div className="flex justify-center items-center w-full border-b border-gray-900 px-4">
         <div className="flex justify-between items-center w-full h-full max-w-content-max-width py-4">
           <div className="flex gap-3">
@@ -36,8 +36,8 @@ const Review = () => {
           <ResetButton />
         </div>
       </div>
-      <div className="flex justify-center items-center w-full h-full px-4">
-        <div className="flex w-full h-full max-w-content-max-width py-8 overflow-y-auto">
+      <div className="flex justify-center items-center w-full h-full max-h-full px-4 overflow-y-auto">
+        <div className="flex w-full h-full max-h-full max-w-content-max-width py-8">
           {activeTab === "issues" && <Issues />}
           {activeTab === "comments" && <Comments />}
         </div>

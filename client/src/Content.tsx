@@ -15,7 +15,7 @@ const Content = () => {
   const { summary } = useSummaryContext();
 
   return (
-    <div className="w-full h-full flex justify-center bg-gray-950 text-white">
+    <div className="w-full h-full flex justify-center bg-gray-950 text-white overflow-hidden">
       {!file && !transcript && !summary && <FileUpload />}
       {(file || transcript || summary) && (
         <McpProvider>
