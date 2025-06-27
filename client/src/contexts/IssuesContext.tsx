@@ -9,10 +9,11 @@ import { useMessagesContext } from "./MessagesContext";
 import { useMcpContext } from "./McpContext";
 import toast from "react-hot-toast";
 import type { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
+import type { CreateIssue, UpdateIssue } from "../linearTypes";
 
 interface IssuesContextType {
-  issues: Record<string, any>;
-  unreviewedIssues: Record<string, any>;
+  issues: Record<string, CreateIssue | UpdateIssue>;
+  unreviewedIssues: Record<string, CreateIssue | UpdateIssue>;
   approveIssue: (toolCallId: string) => Promise<void>;
   approveLoading: string[];
   rejectIssue: (toolCallId: string) => void;
