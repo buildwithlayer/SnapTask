@@ -5,14 +5,16 @@ import ResetButton from "./components/ResetButton";
 import Comments from "./comments";
 import IssuesIcon from "./assets/issues.svg?react";
 import CommentsIcon from "./assets/comments.svg?react";
+import { useCommentsContext } from "./contexts/CommentsContext";
 
 const Review = () => {
   const { unreviewedIssues } = useIssuesContext();
+  const { unreviewedComments } = useCommentsContext();
 
   const [activeTab, setActiveTab] = useState<"issues" | "comments">("issues");
 
   return (
-    <div className="flex flex-col gap-4 items-center w-full h-full">
+    <div className="flex flex-col items-center w-full h-full">
       <div className="flex justify-center items-center w-full border-b border-gray-900 px-4">
         <div className="flex justify-between items-center w-full h-full max-w-content-max-width py-4">
           <div className="flex gap-3">
@@ -27,7 +29,7 @@ const Review = () => {
               label="Comments"
               onClick={() => setActiveTab("comments")}
               active={activeTab === "comments"}
-              count={0}
+              count={Object.keys(unreviewedComments).length}
               icon={<CommentsIcon className="w-6 h-6 fill-gray-300" />}
             />
           </div>
@@ -35,7 +37,7 @@ const Review = () => {
         </div>
       </div>
       <div className="flex justify-center items-center w-full h-full px-4">
-        <div className="flex w-full h-full max-w-content-max-width">
+        <div className="flex w-full h-full max-w-content-max-width py-8 overflow-y-auto">
           {activeTab === "issues" && <Issues />}
           {activeTab === "comments" && <Comments />}
         </div>

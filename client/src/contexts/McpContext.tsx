@@ -19,8 +19,32 @@ export const McpProvider = ({ children }: { children: ReactNode }) => {
     url: "https://mcp.linear.app/sse",
   });
 
+  const includedTools = [
+    "list_comments",
+    "create_comment",
+    "get_issue",
+    "list_issues",
+    "create_issue",
+    "update_issue",
+    "list_issue_statuses",
+    "get_issue_status",
+    "list_my_issues",
+    "list_issue_labels",
+    "list_projects",
+    "get_project",
+    "list_teams",
+    "get_team",
+    "list_users",
+    "get_user",
+    "search_documentation",
+  ];
+
+  const filteredTools = tools?.filter((tool) => {
+    return includedTools.includes(tool.name);
+  });
+
   return (
-    <McpContext.Provider value={{ callTool, tools, state }}>
+    <McpContext.Provider value={{ callTool, tools: filteredTools, state }}>
       {state === "failed" && (
         <div className="flex flex-col items-center justify-center text-center h-full w-full gap-8">
           <div className="flex flex-col items-center gap-1">

@@ -1,3 +1,4 @@
+import { CommentsProvider } from "./contexts/CommentsContext";
 import { useFileContext } from "./contexts/FileContext";
 import { IssuesProvider } from "./contexts/IssuesContext";
 import { McpProvider } from "./contexts/McpContext";
@@ -24,7 +25,9 @@ const Content = () => {
                 <>
                   {incompleteToolCalls.length > 0 ? (
                     <IssuesProvider>
-                      <Review />
+                      <CommentsProvider>
+                        <Review />
+                      </CommentsProvider>
                     </IssuesProvider>
                   ) : (
                     <Progress />

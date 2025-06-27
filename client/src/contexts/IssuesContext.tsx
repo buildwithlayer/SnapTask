@@ -56,7 +56,9 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (incompleteToolCalls && Object.entries(issues).length === 0) {
       const createIssueToolCalls = incompleteToolCalls.filter(
-        (toolCall) => toolCall.function.name === "create_issue"
+        (toolCall) =>
+          toolCall.function.name === "create_issue" ||
+          toolCall.function.name === "update_issue"
       );
 
       setCreateIssueToolCalls(createIssueToolCalls);
