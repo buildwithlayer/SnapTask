@@ -7,9 +7,12 @@ const ResetButton = () => {
       "summary",
       "messages",
       "incompleteToolCalls",
-      "create-issue-tool-calls",
+      "issueToolCalls",
       "approvedIssues",
       "rejectedIssues",
+      "commentToolCalls",
+      "approvedComments",
+      "rejectedComments",
     ].forEach((k) => localStorage.removeItem(k));
 
     window.location.reload();

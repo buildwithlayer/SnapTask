@@ -31,7 +31,7 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
   const { callTool } = useMcpContext();
   const { incompleteToolCalls } = useMessagesContext();
 
-  const [createCommentToolCalls, setCreateCommentToolCalls] = useState<
+  const [commentToolCalls, setCommentToolCalls] = useState<
     ChatCompletionMessageToolCall[]
   >([]);
   const [approvedComments, setApprovedComments] = useState<Record<string, any>>(
@@ -42,7 +42,7 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
     {}
   );
 
-  const comments: Record<string, any> = createCommentToolCalls.reduce(
+  const comments: Record<string, any> = commentToolCalls.reduce(
     (acc, toolCall) => {
       const commentData = JSON.parse(toolCall.function.arguments);
       acc[toolCall.id] = commentData;
@@ -59,28 +59,26 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (incompleteToolCalls && Object.entries(comments).length === 0) {
-      const createCommentToolCalls = incompleteToolCalls.filter(
+      const commentToolCalls = incompleteToolCalls.filter(
         (toolCall) => toolCall.function.name === "create_comment"
       );
 
-      setCreateCommentToolCalls(createCommentToolCalls);
+      setCommentToolCalls(commentToolCalls);
       localStorage.setItem(
-        "create-comment-tool-calls",
-        JSON.stringify(createCommentToolCalls)
+        "commentToolCalls",
+        JSON.stringify(commentToolCalls)
       );
     }
   }, [incompleteToolCalls, comments.length]);
 
   useEffect(() => {
-    const storedCreateCommentToolCalls = localStorage.getItem(
-      "create-comment-tool-calls"
-    );
+    const storedCommentToolCalls = localStorage.getItem("commentToolCalls");
     const storedApprovedComments = localStorage.getItem("approvedComments");
     const storedRejectedComments = localStorage.getItem("rejectedComments");
 
-    if (storedCreateCommentToolCalls) {
-      const parsedComments = JSON.parse(storedCreateCommentToolCalls);
-      setCreateCommentToolCalls(parsedComments);
+    if (storedCommentToolCalls) {
+      const parsedComments = JSON.parse(storedCommentToolCalls);
+      setCommentToolCalls(parsedComments);
     }
     if (storedApprovedComments) {
       setApprovedComments(JSON.parse(storedApprovedComments));
@@ -94,7 +92,7 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
     if (approveLoading.includes(toolCallId)) return;
     setApproveLoading((prev) => [...prev, toolCallId]);
     if (comments[toolCallId] && callTool) {
-      const toolCall = createCommentToolCalls.find(
+      const toolCall = commentToolCalls.find(
         (toolCall) => toolCall.id === toolCallId
       );
       if (toolCall) {

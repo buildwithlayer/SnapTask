@@ -31,21 +31,18 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
   const { callTool } = useMcpContext();
   const { incompleteToolCalls } = useMessagesContext();
 
-  const [createIssueToolCalls, setCreateIssueToolCalls] = useState<
+  const [issueToolCalls, setIssueToolCalls] = useState<
     ChatCompletionMessageToolCall[]
   >([]);
   const [approvedIssues, setApprovedIssues] = useState<Record<string, any>>({});
   const [approveLoading, setApproveLoading] = useState<string[]>([]);
   const [rejectedIssues, setRejectedIssues] = useState<Record<string, any>>({});
 
-  const issues: Record<string, any> = createIssueToolCalls.reduce(
-    (acc, toolCall) => {
-      const issueData = JSON.parse(toolCall.function.arguments);
-      acc[toolCall.id] = issueData;
-      return acc;
-    },
-    {} as Record<string, any>
-  );
+  const issues: Record<string, any> = issueToolCalls.reduce((acc, toolCall) => {
+    const issueData = JSON.parse(toolCall.function.arguments);
+    acc[toolCall.id] = issueData;
+    return acc;
+  }, {} as Record<string, any>);
 
   const unreviewedIssues = Object.fromEntries(
     Object.entries(issues).filter(([toolCallId]) => {
@@ -55,30 +52,25 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (incompleteToolCalls && Object.entries(issues).length === 0) {
-      const createIssueToolCalls = incompleteToolCalls.filter(
+      const issueToolCalls = incompleteToolCalls.filter(
         (toolCall) =>
           toolCall.function.name === "create_issue" ||
           toolCall.function.name === "update_issue"
       );
 
-      setCreateIssueToolCalls(createIssueToolCalls);
-      localStorage.setItem(
-        "create-issue-tool-calls",
-        JSON.stringify(createIssueToolCalls)
-      );
+      setIssueToolCalls(issueToolCalls);
+      localStorage.setItem("issueToolCalls", JSON.stringify(issueToolCalls));
     }
   }, [incompleteToolCalls, issues.length]);
 
   useEffect(() => {
-    const storedCreateIssueToolCalls = localStorage.getItem(
-      "create-issue-tool-calls"
-    );
+    const storedIssueToolCalls = localStorage.getItem("issueToolCalls");
     const storedApprovedIssues = localStorage.getItem("approvedIssues");
     const storedRejectedIssues = localStorage.getItem("rejectedIssues");
 
-    if (storedCreateIssueToolCalls) {
-      const parsedIssues = JSON.parse(storedCreateIssueToolCalls);
-      setCreateIssueToolCalls(parsedIssues);
+    if (storedIssueToolCalls) {
+      const parsedIssues = JSON.parse(storedIssueToolCalls);
+      setIssueToolCalls(parsedIssues);
     }
     if (storedApprovedIssues) {
       setApprovedIssues(JSON.parse(storedApprovedIssues));
@@ -92,7 +84,7 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
     if (approveLoading.includes(toolCallId)) return;
     setApproveLoading((prev) => [...prev, toolCallId]);
     if (issues[toolCallId] && callTool) {
-      const toolCall = createIssueToolCalls.find(
+      const toolCall = issueToolCalls.find(
         (toolCall) => toolCall.id === toolCallId
       );
       if (toolCall) {
