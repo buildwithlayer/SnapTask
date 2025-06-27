@@ -8,7 +8,6 @@ import {
 import { useMessagesContext } from "./MessagesContext";
 import { useMcpContext } from "./McpContext";
 import toast from "react-hot-toast";
-import { set } from "zod";
 import type { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 
 interface IssuesContextType {
