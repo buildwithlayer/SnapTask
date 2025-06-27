@@ -34,8 +34,11 @@ const Progress = () => {
   const [userMessage, setUserMessage] = useState<string>("");
   const [inputFocused, setInputFocused] = useState<boolean>(false);
 
+  const sendDisabled =
+    userMessage.trim() === "" || messages[messages.length - 1]?.role === "user";
+
   function handleSendMessage() {
-    if (userMessage.trim() !== "") {
+    if (!sendDisabled) {
       getResponse(userMessage);
       setUserMessage("");
     }
@@ -122,7 +125,7 @@ const Progress = () => {
               <Button
                 onClick={handleSendMessage}
                 additionalClasses="!p-2 rounded-full"
-                disabled={userMessage.trim() === ""}
+                disabled={sendDisabled}
               >
                 <UpArrowIcon className="w-6 h-6 fill-white" />
               </Button>
