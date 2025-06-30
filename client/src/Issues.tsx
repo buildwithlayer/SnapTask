@@ -355,7 +355,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
         ))}
       {/* TODO: Add parent tasks, estimate (only on update) */}
       {/* Debug Info */}
-      <div className="flex flex-col gap-2">
+      {/* <div className="flex flex-col gap-2">
         <h3>Issue:</h3>
         <pre className="overflow-x-auto">{JSON.stringify(issue, null, 2)}</pre>
         <h3>Changes:</h3>
@@ -364,7 +364,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
         </pre>
         <h3>Team:</h3>
         <pre className="overflow-x-auto">{JSON.stringify(team, null, 2)}</pre>
-      </div>
+      </div> */}
     </div>
   );
 };
