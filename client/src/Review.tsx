@@ -6,10 +6,11 @@ import Comments from "./Comments";
 import IssuesIcon from "./assets/issues.svg?react";
 import CommentsIcon from "./assets/comments.svg?react";
 import { useCommentsContext } from "./contexts/CommentsContext";
+import { ClipLoader } from "react-spinners";
 
 const Review = () => {
-  const { unreviewedIssues } = useIssuesContext();
-  const { unreviewedComments } = useCommentsContext();
+  const { unreviewedIssues, issuesLoading } = useIssuesContext();
+  const { unreviewedComments, commentsLoading } = useCommentsContext();
 
   const [activeTab, setActiveTab] = useState<"issues" | "comments">("issues");
 
@@ -24,6 +25,7 @@ const Review = () => {
               active={activeTab === "issues"}
               count={Object.keys(unreviewedIssues).length}
               icon={<IssuesIcon className="w-6 h-6 fill-gray-300" />}
+              loading={issuesLoading}
             />
             <TabButton
               label="Comments"
@@ -31,6 +33,7 @@ const Review = () => {
               active={activeTab === "comments"}
               count={Object.keys(unreviewedComments).length}
               icon={<CommentsIcon className="w-6 h-6 fill-gray-300" />}
+              loading={commentsLoading}
             />
           </div>
           <ResetButton />
@@ -52,9 +55,17 @@ interface TabButtonProps {
   active: boolean;
   count: number;
   icon: React.ReactNode;
+  loading: boolean;
 }
 
-const TabButton = ({ label, onClick, active, count, icon }: TabButtonProps) => {
+const TabButton = ({
+  label,
+  onClick,
+  active,
+  count,
+  icon,
+  loading,
+}: TabButtonProps) => {
   return (
     <div
       onClick={onClick}
@@ -66,7 +77,11 @@ const TabButton = ({ label, onClick, active, count, icon }: TabButtonProps) => {
         <div className="hidden md:block">{icon}</div>
         <p>{label}</p>
       </div>
-      <p className="font-mono text-gray-500">{count}</p>
+      {loading ? (
+        <ClipLoader size={12} color={"white"} />
+      ) : (
+        <p className="font-mono text-gray-500">{count}</p>
+      )}
     </div>
   );
 };
