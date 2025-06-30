@@ -39,9 +39,9 @@ const Issue = ({ toolCallId, issue }: IssueProps) => {
     <div className="bg-gray-900 border border-gray-850 p-4 rounded-lg w-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
         {isUpdateIssue(issue) ? (
-          <ToolTypeBadge type="Update" />
+          <ToolTypeBadge type="Updated" />
         ) : (
-          <ToolTypeBadge type="Create" />
+          <ToolTypeBadge type="New" />
         )}
         <div className="flex gap-3">
           <Button

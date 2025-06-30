@@ -35,7 +35,7 @@ const Comment = ({ toolCallId, comment }: CommentProps) => {
   return (
     <div className="bg-gray-900 border border-gray-850 p-4 rounded-lg w-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
-        <ToolTypeBadge type="Create" />
+        <ToolTypeBadge type="New" />
         <div className="flex gap-3">
           <Button
             onClick={() => {
