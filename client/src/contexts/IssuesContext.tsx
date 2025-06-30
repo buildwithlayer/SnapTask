@@ -14,6 +14,7 @@ import {
   type CreateIssue,
   type UpdateIssue,
 } from "../linearTypes";
+import { useLinearContext } from "./LinearContext";
 
 interface IssuesContextType {
   issues: Record<string, CreateIssue | UpdateIssue>;
@@ -36,6 +37,7 @@ const IssuesContext = createContext<IssuesContextType>({
 export const IssuesProvider = ({ children }: { children: ReactNode }) => {
   const { callTool } = useMcpContext();
   const { incompleteToolCalls } = useMessagesContext();
+  const { teams } = useLinearContext();
 
   const [issueToolCalls, setIssueToolCalls] = useState<
     ChatCompletionMessageToolCall[]
@@ -137,6 +139,21 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
             description:
               args.description +
               `\n\nCreated with [SnapLinear](https://www.snaplinear.app/?utm_source=snaplinear-tasklink&utm_medium=linear+task&utm_campaign=snaplinear)`,
+            stateId: args.stateId
+              ? teams
+                  ?.find((team) => team.id === args.teamId)
+                  ?.issueStatuses?.find((status) => status.id === args.stateId)
+                ? args.stateId
+                : undefined
+              : undefined,
+            labelIds: args.labelIds
+              ? args.labelIds.map(
+                  (labelId: string) =>
+                    teams
+                      ?.find((team) => team.id === args.teamId)
+                      ?.issueLabels.find((label) => label.id === labelId)?.id
+                )
+              : [],
           });
           if (toolResponse.isError) {
             throw new Error(toolResponse.content[0].text);
