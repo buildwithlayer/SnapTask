@@ -115,21 +115,35 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
       </div>
       <div className="flex flex-col gap-1">
         {/* Title */}
-        <h3
-          className={`text-xl font-medium ${
-            changes?.title ? "text-yellow-500" : ""
-          }`}
-        >
-          {changes?.title || issue.title}
-        </h3>
+        <div className="inline-flex gap-2">
+          <h3
+            className={`text-xl font-medium ${
+              changes?.title && "line-through"
+            }`}
+          >
+            {issue.title}
+          </h3>
+          {changes?.title && (
+            <h3 className={`text-xl font-medium text-yellow-600`}>
+              {changes.title}
+            </h3>
+          )}
+        </div>
         {/* Description */}
-        <p
-          className={`${
-            changes?.description ? "text-yellow-500" : "text-gray-300"
-          }`}
-        >
-          {changes?.description || issue.description}
-        </p>
+        <div className="inline-flex gap-2">
+          {issue.description && issue.description.length > 0 && (
+            <p
+              className={`text-gray-300 ${
+                changes?.description && "line-through"
+              }`}
+            >
+              {issue.description}
+            </p>
+          )}
+          {changes?.description && (
+            <p className={` text-yellow-600`}>{changes.description}</p>
+          )}
+        </div>
       </div>
       <div className="flex gap-2 flex-wrap">
         {/* Priority */}
@@ -167,19 +181,19 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
               <>
                 <>
                   {changes.priority === 0 && (
-                    <PriorityNoneIcon className="fill-yellow-500 w-5 h-5" />
+                    <PriorityNoneIcon className="fill-yellow-600 w-5 h-5" />
                   )}
                   {changes.priority === 1 && (
-                    <PriorityUrgentIcon className="fill-yellow-500 w-5 h-5" />
+                    <PriorityUrgentIcon className="fill-yellow-600 w-5 h-5" />
                   )}
                   {changes.priority === 2 && (
-                    <PriorityHighIcon className="fill-yellow-500 w-5 h-5" />
+                    <PriorityHighIcon className="fill-yellow-600 w-5 h-5" />
                   )}
                   {changes.priority === 3 && (
-                    <PriorityMediumIcon className="fill-yellow-500 w-5 h-5" />
+                    <PriorityMediumIcon className="fill-yellow-600 w-5 h-5" />
                   )}
                   {changes.priority === 4 && (
-                    <PriorityLowIcon className="fill-yellow-500 w-5 h-5" />
+                    <PriorityLowIcon className="fill-yellow-600 w-5 h-5" />
                   )}
                 </>
               </>
@@ -201,7 +215,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             icon={
               <PersonIcon
                 className={`w-4 h-4 ${
-                  updatedAssignee ? "fill-yellow-500" : "fill-gray-200"
+                  updatedAssignee ? "fill-yellow-600" : "fill-gray-200"
                 }`}
               />
             }
@@ -215,7 +229,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             icon={
               <ProjectIcon
                 className={`w-4 h-4 ${
-                  updatedAssignee ? "fill-yellow-500" : "fill-gray-200"
+                  updatedAssignee ? "fill-yellow-600" : "fill-gray-200"
                 }`}
               />
             }
@@ -260,6 +274,9 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             updated
           />
         ))}
+      {/* TODO: Add parent tasks, due date, estimate (only on update) */}
+      {/* <pre className="overflow-x-auto">{JSON.stringify(issue, null, 2)}</pre>
+      <pre className="overflow-x-auto">{JSON.stringify(changes, null, 2)}</pre> */}
     </div>
   );
 };
@@ -277,7 +294,7 @@ const AttributeTag = ({
     <div
       className={`flex items-center gap-2 py-1 border rounded-md text-sm ${
         updated
-          ? "text-yellow-500 border-yellow-500"
+          ? "text-yellow-600 border-yellow-600"
           : "text-gray-400 border-gray-700"
       } ${!label ? "px-1" : "px-2"}`}
     >
