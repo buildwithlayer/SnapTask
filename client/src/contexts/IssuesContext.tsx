@@ -9,7 +9,11 @@ import { useMessagesContext } from "./MessagesContext";
 import { useMcpContext } from "./McpContext";
 import toast from "react-hot-toast";
 import type { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
-import type { CreateIssue, UpdateIssue } from "../linearTypes";
+import {
+  isUpdateIssue,
+  type CreateIssue,
+  type UpdateIssue,
+} from "../linearTypes";
 
 interface IssuesContextType {
   issues: Record<string, CreateIssue | UpdateIssue>;
@@ -38,11 +42,44 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
   const [approveLoading, setApproveLoading] = useState<string[]>([]);
   const [rejectedIssues, setRejectedIssues] = useState<Record<string, any>>({});
 
-  const issues: Record<string, any> = issueToolCalls.reduce((acc, toolCall) => {
-    const issueData = JSON.parse(toolCall.function.arguments);
-    acc[toolCall.id] = issueData;
-    return acc;
-  }, {} as Record<string, any>);
+  const [issues, setIssues] = useState<
+    Record<string, CreateIssue | UpdateIssue>
+  >({});
+
+  useEffect(() => {
+    if (Object.keys(issues).length > 0) return;
+
+    async function fetchIssues() {
+      const resolvedIssues = await Promise.all(
+        issueToolCalls.map(async (toolCall) => {
+          const issueData = JSON.parse(toolCall.function.arguments);
+          if (isUpdateIssue(issueData)) {
+            const getIssueResponse = await callTool?.("get_issue", {
+              id: issueData.id,
+            });
+            if (getIssueResponse) {
+              issueData.originalIssue = JSON.parse(
+                getIssueResponse.content[0].text
+              );
+            }
+          }
+          return { [toolCall.id]: issueData };
+        })
+      );
+
+      const issuesObject = Object.assign({}, ...resolvedIssues);
+      setIssues(issuesObject);
+    }
+
+    fetchIssues().catch((error) => {
+      console.error("Error fetching issues:", error);
+      toast.error("Could not fetch issues");
+    });
+  }, [issueToolCalls, callTool]);
+
+  useEffect(() => {
+    console.log("Issues updated:", issues);
+  }, [issues]);
 
   const unreviewedIssues = Object.fromEntries(
     Object.entries(issues).filter(([toolCallId]) => {

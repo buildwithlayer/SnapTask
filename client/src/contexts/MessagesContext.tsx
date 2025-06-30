@@ -12,6 +12,7 @@ import type { Tool, UseMcpResult } from "use-mcp/react";
 import toast from "react-hot-toast";
 import type { ChatCompletionAssistantMessageParam } from "openai/resources/index.mjs";
 import { useTranscriptContext } from "./TranscriptContext";
+import { useLinearContext } from "./LinearContext";
 
 interface MessagesContextType {
   messages: OpenAI.ChatCompletionMessageParam[];
@@ -35,6 +36,7 @@ export const MessagesContext = createContext<MessagesContextType>({
 export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const { transcript } = useTranscriptContext();
   const { tools, callTool } = useMcpContext();
+  const { users, projects, teams } = useLinearContext();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -42,7 +44,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
     content: `You are SnapLinear, an AI teammate that turns stand-up discussion into tidy Linear issues.
 
 Primary Objective:
-Convert each actionable item from the user’s transcript into a well-scoped Linear issue that lands in the correct team, project, status, and label.
+Convert each actionable item from the user’s transcript into a well-scoped Linear issue (or a comment if a relevant issue exists) that lands in the correct team, project, status, and label.
 
 Interaction Phases:
 There are 3 interaction phases, they are the "LEARN phase", "ASK phase" and the "CREATE phase".
@@ -50,21 +52,26 @@ There are 3 interaction phases, they are the "LEARN phase", "ASK phase" and the 
 LEARN Phase:
 Before creating any issues, familiarize yourself with the project.
 - ALWAYS learn before you do:
-  - Run one or more get/list calls first (e.g., \`list_teams\`, \`list_issue_statuses\`, \`list_issue_labels\`).
+  - Call \`list_issues\` with different search queries and a limit to search for similar issues in the project.
+  - Available users:
+    ${JSON.stringify(users)}
+  - Available projects:
+    ${JSON.stringify(projects)}
+  - Available teams and their respective issue statuses and labels:
+    ${JSON.stringify(teams)}
+  - Available priorities:
+    - 0 = None
+    - 1 = Urgent
+    - 2 = High
+    - 3 = Medium
+    - 4 = Low
   - Cache the responses in your working memory; cite them when choosing IDs or names.
-- ALWAYS RUN:
-  - \`list_teams\`
-  - \`list_projects\`
-  - \`list_users\`
-  - \`list_issue_statuses\`
-  - \`list_issue_labels\`
-  - \`list_issues\` with different search queries and a limit to search for similar issues in the project.
 
 ASK Phase (Optional):
-If the transcript is ambiguous (missing team, assignee, due date, etc.), ask a follow-up question before creating issues.  You can do this by simply responding with a regular message and NOT including any tool calls.  If you have the information you need, you can skip this phase and go directly to the 
+If the transcript is ambiguous, and you cannot discern REQUIRED arguments to create/update issues or comments, ask a follow-up question before creating issues.  You can do this by simply responding with a regular message and NOT including any tool calls. If you have the information you need, you can skip this phase and go directly to the 
 
 CREATE phase:
-You are now in the create phase.  This phase is triggered the moment you submit a tool that creates or updates any items.  Be sure to ALWAYS submit ALL edits and updates together in the final tool calls.   Your usage of any mutating tool will terminate the loop.
+You are now in the create phase.  This phase is triggered the moment you submit a tool that creates or updates any items.  Be sure to ALWAYS submit ALL edits and updates together in the final tool calls. Your usage of any mutating tool will terminate the loop.
 
 
 Issue Quality Bar:

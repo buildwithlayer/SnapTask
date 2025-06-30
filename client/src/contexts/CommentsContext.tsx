@@ -42,20 +42,49 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
     {}
   );
 
-  const comments: Record<string, any> = commentToolCalls.reduce(
-    (acc, toolCall) => {
-      const commentData = JSON.parse(toolCall.function.arguments);
-      acc[toolCall.id] = commentData;
-      return acc;
-    },
-    {} as Record<string, any>
-  );
+  const [comments, setComments] = useState<Record<string, CreateComment>>({});
+
+  // const comments: Record<string, any> = commentToolCalls.reduce(
+  //   (acc, toolCall) => {
+  //     const commentData = JSON.parse(toolCall.function.arguments);
+  //     acc[toolCall.id] = commentData;
+  //     return acc;
+  //   },
+  //   {} as Record<string, any>
+  // );
 
   const unreviewedComments = Object.fromEntries(
     Object.entries(comments).filter(([toolCallId]) => {
       return !approvedComments[toolCallId] && !rejectedComments[toolCallId];
     })
   );
+
+  useEffect(() => {
+    if (Object.keys(comments).length > 0) return;
+
+    async function fetchComments() {
+      const resolvedComments = await Promise.all(
+        commentToolCalls.map(async (toolCall) => {
+          const commentData = JSON.parse(toolCall.function.arguments);
+          const getIssueResponse = await callTool?.("get_issue", {
+            id: commentData.issueId,
+          });
+          if (getIssueResponse) {
+            commentData.issue = JSON.parse(getIssueResponse.content[0].text);
+          }
+          return { [toolCall.id]: commentData };
+        })
+      );
+
+      const commentsObject = Object.assign({}, ...resolvedComments);
+      setComments(commentsObject);
+    }
+
+    fetchComments().catch((error) => {
+      console.error("Error fetching comments:", error);
+      toast.error("Could not fetch comments");
+    });
+  }, [commentToolCalls, callTool]);
 
   useEffect(() => {
     if (incompleteToolCalls && Object.entries(comments).length === 0) {
