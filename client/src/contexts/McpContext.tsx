@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 import { useMcp, type Tool, type UseMcpResult } from "use-mcp/react";
 import { ClipLoader } from "react-spinners";
 import Button from "../components/Button";
@@ -18,6 +18,22 @@ export const McpProvider = ({ children }: { children: ReactNode }) => {
     clientName: "SnapLinear",
     url: "https://mcp.linear.app/sse",
   });
+
+
+  // TODO: FINISH EMAIL COLLECTION
+  useEffect(() => {
+    const fetchIssues = async () => {
+      if (state === "ready" && callTool) {
+        const issues = await callTool?.("list_my_issues", {
+          limit: 50,
+        });
+        issues?.data?.forEach((issue: any) => {
+          console.log("Issue",issue.assigneeId);
+        });
+      }
+    };
+  fetchIssues();
+  }, [state, callTool]);
 
   const includedTools = [
     "list_comments",
