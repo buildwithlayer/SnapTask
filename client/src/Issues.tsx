@@ -133,33 +133,33 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
       </div>
       <div className="flex flex-col gap-1">
         {/* Title */}
-        <div className="inline-flex gap-2">
-          <h3
+        <div className="inline gap-2">
+          <span
             className={`text-xl font-medium ${
               changes?.title && "line-through"
             }`}
           >
             {issue.title}
-          </h3>
+          </span>
           {changes?.title && (
-            <h3 className={`text-xl font-medium text-yellow-600`}>
+            <span className={`text-xl font-medium text-yellow-600`}>
               {changes.title}
-            </h3>
+            </span>
           )}
         </div>
         {/* Description */}
-        <div className="inline-flex gap-2">
+        <div className="inline gap-2">
           {issue.description && issue.description.length > 0 && (
-            <p
+            <span
               className={`text-gray-300 ${
                 changes?.description && "line-through"
               }`}
             >
               {issue.description}
-            </p>
+            </span>
           )}
           {changes?.description && (
-            <p className={` text-yellow-600`}>{changes.description}</p>
+            <span className={`text-yellow-600`}>{changes.description}</span>
           )}
         </div>
       </div>
