@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Project, Team, User } from "../linearTypes";
+import type { BaseTeam, Project, Team, User } from "../linearTypes";
 import { useMcpContext } from "./McpContext";
 import toast from "react-hot-toast";
 
@@ -60,8 +60,27 @@ export const LinearProvider = ({ children }: { children: ReactNode }) => {
       }
       if (teamsResponse) {
         const teamsContent = JSON.parse(teamsResponse.content[0].text);
-        localStorage.setItem("linear_teams", JSON.stringify(teamsContent));
-        setTeams(teamsContent);
+        const teams = await Promise.all(
+          teamsContent.map(async (baseTeam: BaseTeam) => {
+            let team: Team = {
+              ...baseTeam,
+              issueLabels: [],
+              issueStatuses: [],
+            };
+            const getIssueLabels = await callTool("list_issue_labels", {
+              teamId: team.id,
+            });
+            const getIssueStatuses = await callTool("list_issue_statuses", {
+              teamId: team.id,
+            });
+            team.issueLabels = JSON.parse(getIssueLabels.content[0].text);
+            team.issueStatuses = JSON.parse(getIssueStatuses.content[0].text);
+
+            return team;
+          })
+        );
+        localStorage.setItem("linear_teams", JSON.stringify(teams));
+        setTeams(teams);
       }
     } catch (error) {
       console.error("Error fetching Linear data:", error);

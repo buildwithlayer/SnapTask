@@ -12,11 +12,17 @@ import CheckIcon from "./assets/check.svg?react";
 import PersonIcon from "./assets/person.svg?react";
 import GroupIcon from "./assets/group.svg?react";
 import ProjectIcon from "./assets/project.svg?react";
+import CalendarIcon from "./assets/calendar.svg?react";
 import PriorityNoneIcon from "./assets/priority-none.svg?react";
 import PriorityLowIcon from "./assets/priority-low.svg?react";
 import PriorityMediumIcon from "./assets/priority-medium.svg?react";
 import PriorityHighIcon from "./assets/priority-high.svg?react";
 import PriorityUrgentIcon from "./assets/priority-urgent.svg?react";
+import StatusBacklogIcon from "./assets/status-backlog.svg?react";
+import StatusUnstartedIcon from "./assets/status-unstarted.svg?react";
+import StatusStartedIcon from "./assets/status-started.svg?react";
+import StatusCompletedIcon from "./assets/status-completed.svg?react";
+import StatusCancelledIcon from "./assets/status-cancelled.svg?react";
 import { useLinearContext } from "./contexts/LinearContext";
 
 const Issues = () => {
@@ -83,6 +89,18 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
     changes && team && team.issueLabels
       ? team.issueLabels.filter((label) => changes.labelIds?.includes(label.id))
       : [];
+  const dueDate = issue.dueDate
+    ? new Date(issue.dueDate + "T00:00:00").toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      })
+    : undefined;
+  const updatedDueDate = changes?.dueDate
+    ? new Date(changes.dueDate + "T00:00:00").toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      })
+    : undefined;
 
   return (
     <div className="bg-gray-900 border border-gray-850 p-4 rounded-lg w-full flex flex-col gap-4">
@@ -201,6 +219,70 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             updated
           />
         )}
+        {/* State */}
+        {state && !updatedState && (
+          <AttributeTag
+            label={state.name}
+            icon={
+              <>
+                {state.type === "backlog" && (
+                  <StatusBacklogIcon className="fill-gray-200 w-4 h-4" />
+                )}
+                {state.type === "unstarted" && (
+                  <StatusUnstartedIcon className="fill-gray-200 w-4 h-4" />
+                )}
+                {state.type === "started" && (
+                  <StatusStartedIcon className="fill-gray-200 w-4 h-4" />
+                )}
+                {state.type === "completed" && (
+                  <StatusCompletedIcon className="fill-gray-200 w-4 h-4" />
+                )}
+                {state.type === "cancelled" && (
+                  <StatusCancelledIcon className="fill-gray-200 w-4 h-4" />
+                )}
+              </>
+            }
+          />
+        )}
+        {updatedState && (
+          <AttributeTag
+            label={updatedState.name}
+            icon={
+              <>
+                {updatedState.type === "backlog" && (
+                  <StatusBacklogIcon className="fill-yellow-600 w-4 h-4" />
+                )}
+                {updatedState.type === "unstarted" && (
+                  <StatusUnstartedIcon className="fill-yellow-600 w-4 h-4" />
+                )}
+                {updatedState.type === "started" && (
+                  <StatusStartedIcon className="fill-yellow-600 w-4 h-4" />
+                )}
+                {updatedState.type === "completed" && (
+                  <StatusCompletedIcon className="fill-yellow-600 w-4 h-4" />
+                )}
+                {updatedState.type === "cancelled" && (
+                  <StatusCancelledIcon className="fill-yellow-600 w-4 h-4" />
+                )}
+              </>
+            }
+            updated
+          />
+        )}
+        {/* Due Date */}
+        {dueDate && !updatedDueDate && (
+          <AttributeTag
+            label={dueDate}
+            icon={<CalendarIcon className="fill-gray-200 w-4 h-4" />}
+          />
+        )}
+        {updatedDueDate && (
+          <AttributeTag
+            label={updatedDueDate}
+            icon={<CalendarIcon className="fill-yellow-600 w-4 h-4" />}
+            updated
+          />
+        )}
         {/* Team */}
         {team && (
           <AttributeTag
@@ -236,14 +318,6 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             updated={!!updatedProject}
           />
         )}
-        {/* State */}
-        {(state || updatedState) && (
-          <AttributeTag
-            label={updatedState?.name || state?.name}
-            icon={<></>}
-            updated={!!updatedState}
-          />
-        )}
       </div>
       {/* Labels */}
       {labels.length > 0 &&
@@ -274,9 +348,18 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             updated
           />
         ))}
-      {/* TODO: Add parent tasks, due date, estimate (only on update) */}
-      {/* <pre className="overflow-x-auto">{JSON.stringify(issue, null, 2)}</pre>
-      <pre className="overflow-x-auto">{JSON.stringify(changes, null, 2)}</pre> */}
+      {/* TODO: Add parent tasks, estimate (only on update) */}
+      {/* Debug Info */}
+      {/* <div className="flex flex-col gap-2">
+        <h3>Issue:</h3>
+        <pre className="overflow-x-auto">{JSON.stringify(issue, null, 2)}</pre>
+        <h3>Changes:</h3>
+        <pre className="overflow-x-auto">
+          {JSON.stringify(changes, null, 2)}
+        </pre>
+        <h3>Team:</h3>
+        <pre className="overflow-x-auto">{JSON.stringify(team, null, 2)}</pre>
+      </div> */}
     </div>
   );
 };
