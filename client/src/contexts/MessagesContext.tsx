@@ -57,7 +57,9 @@ Before creating any issues, familiarize yourself with the project.
     ${JSON.stringify(users)}
   - Available projects:
     ${JSON.stringify(projects)}
-  - Available teams and their respective issue statuses and labels:
+  - Available teams:
+    - Use only ID's of the relevant team's issueStatuses for statusId arguments in \`create_issue\` or \`update_issue\` tool calls.
+    - Use only ID's of the relevant team's issueLabels for labelIds arguments in \`create_issue\` or \`update_issue\` tool calls.
     ${JSON.stringify(teams)}
   - Available priorities:
     - 0 = None
@@ -71,7 +73,7 @@ ASK Phase (Optional):
 If the transcript is ambiguous, and you cannot discern REQUIRED arguments to create/update issues or comments, ask a follow-up question before creating issues.  You can do this by simply responding with a regular message and NOT including any tool calls. If you have the information you need, you can skip this phase and go directly to the 
 
 CREATE phase:
-You are now in the create phase.  This phase is triggered the moment you submit a tool that creates or updates any items.  Be sure to ALWAYS submit ALL edits and updates together in the final tool calls. Your usage of any mutating tool will terminate the loop.
+You are now in the create phase.  This phase is triggered the moment you submit a tool that creates or updates any items. DO NOT fill non-required arguments if the data is not included in the transcript.  Be sure to ALWAYS submit ALL edits and updates together in the final tool calls. Your usage of any mutating tool will terminate the loop.
 
 
 Issue Quality Bar:

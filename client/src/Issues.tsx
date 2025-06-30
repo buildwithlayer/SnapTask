@@ -24,9 +24,10 @@ import StatusStartedIcon from "./assets/status-started.svg?react";
 import StatusCompletedIcon from "./assets/status-completed.svg?react";
 import StatusCancelledIcon from "./assets/status-cancelled.svg?react";
 import { useLinearContext } from "./contexts/LinearContext";
+import { ClipLoader } from "react-spinners";
 
 const Issues = () => {
-  const { unreviewedIssues } = useIssuesContext();
+  const { unreviewedIssues, issuesLoading } = useIssuesContext();
   const { teams } = useLinearContext();
 
   return (
@@ -44,6 +45,10 @@ const Issues = () => {
             changes={isUpdateIssue(issue) ? issue : undefined}
           />
         ))
+      ) : issuesLoading ? (
+        <div className="flex items-center justify-center w-full h-full">
+          <ClipLoader size={56} color="white" />
+        </div>
       ) : (
         <div className="flex flex-col gap-8 items-center justify-center w-full h-full">
           <p>All issues reviewed</p>
@@ -350,7 +355,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
         ))}
       {/* TODO: Add parent tasks, estimate (only on update) */}
       {/* Debug Info */}
-      {/* <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         <h3>Issue:</h3>
         <pre className="overflow-x-auto">{JSON.stringify(issue, null, 2)}</pre>
         <h3>Changes:</h3>
@@ -359,7 +364,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
         </pre>
         <h3>Team:</h3>
         <pre className="overflow-x-auto">{JSON.stringify(team, null, 2)}</pre>
-      </div> */}
+      </div>
     </div>
   );
 };

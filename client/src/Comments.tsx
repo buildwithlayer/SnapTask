@@ -5,9 +5,10 @@ import { type CreateComment } from "./linearTypes";
 import DeleteIcon from "./assets/delete.svg?react";
 import CheckIcon from "./assets/check.svg?react";
 import IssuesIcon from "./assets/issues.svg?react";
+import { ClipLoader } from "react-spinners";
 
 const Comments = () => {
-  const { unreviewedComments } = useCommentsContext();
+  const { unreviewedComments, commentsLoading } = useCommentsContext();
 
   return (
     <div className="flex flex-col gap-4 items-center w-full h-full">
@@ -15,6 +16,10 @@ const Comments = () => {
         Object.entries(unreviewedComments).map(([toolCallId, comment]) => (
           <Comment key={toolCallId} toolCallId={toolCallId} comment={comment} />
         ))
+      ) : commentsLoading ? (
+        <div className="flex items-center justify-center w-full h-full">
+          <ClipLoader size={56} color="white" />
+        </div>
       ) : (
         <div className="flex flex-col gap-8 items-center justify-center w-full h-full">
           <p>All comments reviewed</p>

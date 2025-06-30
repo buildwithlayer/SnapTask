@@ -17,6 +17,7 @@ import {
 
 interface IssuesContextType {
   issues: Record<string, CreateIssue | UpdateIssue>;
+  issuesLoading: boolean;
   unreviewedIssues: Record<string, CreateIssue | UpdateIssue>;
   approveIssue: (toolCallId: string) => Promise<void>;
   approveLoading: string[];
@@ -25,6 +26,7 @@ interface IssuesContextType {
 
 const IssuesContext = createContext<IssuesContextType>({
   issues: {},
+  issuesLoading: false,
   unreviewedIssues: {},
   approveIssue: async () => {},
   approveLoading: [],
@@ -45,9 +47,12 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
   const [issues, setIssues] = useState<
     Record<string, CreateIssue | UpdateIssue>
   >({});
+  const [issuesLoading, setIssuesLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (Object.keys(issues).length > 0) return;
+
+    setIssuesLoading(true);
 
     async function fetchIssues() {
       const resolvedIssues = await Promise.all(
@@ -71,15 +76,15 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
       setIssues(issuesObject);
     }
 
-    fetchIssues().catch((error) => {
-      console.error("Error fetching issues:", error);
-      toast.error("Could not fetch issues");
-    });
+    fetchIssues()
+      .catch((error) => {
+        console.error("Error fetching issues:", error);
+        toast.error("Could not fetch issues");
+      })
+      .finally(() => {
+        setIssuesLoading(false);
+      });
   }, [issueToolCalls, callTool]);
-
-  useEffect(() => {
-    console.log("Issues updated:", issues);
-  }, [issues]);
 
   const unreviewedIssues = Object.fromEntries(
     Object.entries(issues).filter(([toolCallId]) => {
@@ -126,10 +131,16 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
       );
       if (toolCall) {
         try {
-          await callTool(
-            toolCall.function.name,
-            JSON.parse(toolCall.function.arguments)
-          );
+          const args = JSON.parse(toolCall.function.arguments);
+          const toolResponse = await callTool(toolCall.function.name, {
+            ...args,
+            description:
+              args.description +
+              `\n\nCreated with [SnapLinear](https://www.snaplinear.app/?utm_source=snaplinear-tasklink&utm_medium=linear+task&utm_campaign=snaplinear)`,
+          });
+          if (toolResponse.isError) {
+            throw new Error(toolResponse.content[0].text);
+          }
           setApprovedIssues((prev) => ({
             ...prev,
             [toolCallId]: issues[toolCallId],
@@ -170,6 +181,7 @@ export const IssuesProvider = ({ children }: { children: ReactNode }) => {
     <IssuesContext.Provider
       value={{
         issues,
+        issuesLoading,
         unreviewedIssues,
         approveIssue,
         approveLoading,

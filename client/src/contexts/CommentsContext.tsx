@@ -13,6 +13,7 @@ import type { CreateComment } from "../linearTypes";
 
 interface CommentsContextType {
   comments: Record<string, CreateComment>;
+  commentsLoading: boolean;
   unreviewedComments: Record<string, CreateComment>;
   approveComment: (toolCallId: string) => Promise<void>;
   approveLoading: string[];
@@ -21,6 +22,7 @@ interface CommentsContextType {
 
 const CommentsContext = createContext<CommentsContextType>({
   comments: {},
+  commentsLoading: false,
   unreviewedComments: {},
   approveComment: async () => {},
   approveLoading: [],
@@ -43,15 +45,7 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const [comments, setComments] = useState<Record<string, CreateComment>>({});
-
-  // const comments: Record<string, any> = commentToolCalls.reduce(
-  //   (acc, toolCall) => {
-  //     const commentData = JSON.parse(toolCall.function.arguments);
-  //     acc[toolCall.id] = commentData;
-  //     return acc;
-  //   },
-  //   {} as Record<string, any>
-  // );
+  const [commentsLoading, setCommentsLoading] = useState<boolean>(false);
 
   const unreviewedComments = Object.fromEntries(
     Object.entries(comments).filter(([toolCallId]) => {
@@ -61,6 +55,8 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (Object.keys(comments).length > 0) return;
+
+    setCommentsLoading(true);
 
     async function fetchComments() {
       const resolvedComments = await Promise.all(
@@ -80,10 +76,14 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
       setComments(commentsObject);
     }
 
-    fetchComments().catch((error) => {
-      console.error("Error fetching comments:", error);
-      toast.error("Could not fetch comments");
-    });
+    fetchComments()
+      .catch((error) => {
+        console.error("Error fetching comments:", error);
+        toast.error("Could not fetch comments");
+      })
+      .finally(() => {
+        setCommentsLoading(false);
+      });
   }, [commentToolCalls, callTool]);
 
   useEffect(() => {
@@ -126,10 +126,13 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
       );
       if (toolCall) {
         try {
-          await callTool(
+          const toolResponse = await callTool(
             toolCall.function.name,
             JSON.parse(toolCall.function.arguments)
           );
+          if (toolResponse.isError) {
+            throw new Error(toolResponse.content[0].text);
+          }
           setApprovedComments((prev) => ({
             ...prev,
             [toolCallId]: comments[toolCallId],
@@ -170,6 +173,7 @@ export const CommentsProvider = ({ children }: { children: ReactNode }) => {
     <CommentsContext.Provider
       value={{
         comments,
+        commentsLoading,
         unreviewedComments,
         approveComment,
         approveLoading,
