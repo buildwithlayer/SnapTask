@@ -5,6 +5,7 @@ import { useTranscriptContext } from "./contexts/TranscriptContext";
 import { useMessagesContext } from "./contexts/MessagesContext";
 import Button from "./components/Button";
 import UpArrowIcon from "./assets/uparrow.svg?react";
+import { useLinearContext } from "./contexts/LinearContext";
 
 interface Step {
   label: string;
@@ -24,6 +25,14 @@ const Progress = () => {
     loading: transcriptLoading,
     error: transcriptError,
   } = useTranscriptContext();
+  const {
+    users,
+    projects,
+    teams,
+    fetchLinearData,
+    loading: linearLoading,
+    error: linearError,
+  } = useLinearContext();
   const {
     messages,
     getResponse,
@@ -78,9 +87,27 @@ const Progress = () => {
           complete={transcript !== undefined && !transcriptError}
         />
         <Step
+          label={"Getting Linear Workspace Data"}
+          loading={linearLoading}
+          start={transcript !== undefined && messages.length === 1}
+          error={linearError}
+          fn={fetchLinearData}
+          complete={
+            users !== undefined &&
+            projects !== undefined &&
+            teams !== undefined &&
+            !linearError
+          }
+        />
+        <Step
           label={"Generating Linear Action Items"}
           loading={messagesLoading}
-          start={transcript !== undefined && messages.length === 1}
+          start={
+            users !== undefined &&
+            projects !== undefined &&
+            teams !== undefined &&
+            messages.length === 1
+          }
           error={messagesError}
           fn={getResponse}
           complete={messages.length > 1 && !messagesError}
@@ -168,7 +195,7 @@ const Step = ({
   additionalMessage,
 }: Step) => {
   useEffect(() => {
-    if (start && !loading && !error) {
+    if (start && !loading && !error && !complete) {
       fn();
     }
   }, [start, loading, error]);

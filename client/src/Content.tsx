@@ -1,6 +1,7 @@
 import { CommentsProvider } from "./contexts/CommentsContext";
 import { useFileContext } from "./contexts/FileContext";
 import { IssuesProvider } from "./contexts/IssuesContext";
+import { LinearProvider } from "./contexts/LinearContext";
 import { McpProvider } from "./contexts/McpContext";
 import { MessagesContext, MessagesProvider } from "./contexts/MessagesContext";
 import { useTranscriptContext } from "./contexts/TranscriptContext";
@@ -17,23 +18,25 @@ const Content = () => {
       {!file && !transcript && <FileUpload />}
       {(file || transcript) && (
         <McpProvider>
-          <MessagesProvider>
-            <MessagesContext.Consumer>
-              {({ incompleteToolCalls }) => (
-                <>
-                  {incompleteToolCalls.length > 0 ? (
-                    <IssuesProvider>
-                      <CommentsProvider>
-                        <Review />
-                      </CommentsProvider>
-                    </IssuesProvider>
-                  ) : (
-                    <Progress />
-                  )}
-                </>
-              )}
-            </MessagesContext.Consumer>
-          </MessagesProvider>
+          <LinearProvider>
+            <MessagesProvider>
+              <MessagesContext.Consumer>
+                {({ incompleteToolCalls }) => (
+                  <>
+                    {incompleteToolCalls.length > 0 ? (
+                      <IssuesProvider>
+                        <CommentsProvider>
+                          <Review />
+                        </CommentsProvider>
+                      </IssuesProvider>
+                    ) : (
+                      <Progress />
+                    )}
+                  </>
+                )}
+              </MessagesContext.Consumer>
+            </MessagesProvider>
+          </LinearProvider>
         </McpProvider>
       )}
     </div>

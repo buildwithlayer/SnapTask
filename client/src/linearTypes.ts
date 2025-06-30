@@ -1,4 +1,4 @@
-export interface Issue {
+export interface BaseIssue {
   id: string;
   identifier: string;
   title: string;
@@ -14,6 +14,8 @@ export interface Issue {
   createdById: string;
   project?: string;
   projectId?: string;
+  assignee?: string;
+  assigneeId?: string;
   parentId?: string;
   team: string;
   teamId: string;
@@ -62,6 +64,12 @@ export interface IssueStatus {
   name: string;
 }
 
+export interface IssueLabel {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface Comment {
   id: string;
   body: string;
@@ -78,11 +86,16 @@ export interface CreateComment {
   body: string;
 }
 
-export interface Team {
+export interface BaseTeam {
   id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Team extends BaseTeam {
+  issueStatuses: IssueStatus[];
+  issueLabels: IssueLabel[];
 }
 
 export interface User {
