@@ -316,7 +316,7 @@ const Issue = ({ toolCallId, issue, changes }: IssueProps) => {
             icon={
               <ProjectIcon
                 className={`w-4 h-4 ${
-                  updatedAssignee ? "fill-yellow-600" : "fill-gray-200"
+                  updatedProject ? "fill-yellow-600" : "fill-gray-200"
                 }`}
               />
             }
