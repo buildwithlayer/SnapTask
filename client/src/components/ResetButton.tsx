@@ -28,7 +28,7 @@ const ResetButton = () => {
       additionalClasses="px-2 py-1 !gap-2"
     >
       <RestartIcon className="w-5 h-5 fill-primary" />
-      <p className="hidden md:block">Restart</p>
+      <span className="hidden md:block">Restart</span>
     </Button>
   );
 };
