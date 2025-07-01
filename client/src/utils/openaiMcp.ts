@@ -83,7 +83,6 @@ export async function callTools(
       tool_call.function.name.startsWith("search")
     ) {
       updateReadToolCallStack?.(tool_call);
-      console.log(`Calling tool: ${tool_call.function.name}`);
       const result = await callTool(
         tool_call.function.name,
         JSON.parse(tool_call.function.arguments)
@@ -109,8 +108,6 @@ export async function callTools(
         role: "tool",
         tool_call_id: tool_call.id,
       });
-      // updateReadToolCallStack?.(undefined);
-      console.log(`Tool call result: ${result.content}`);
     }
   }
   return toolMessages;

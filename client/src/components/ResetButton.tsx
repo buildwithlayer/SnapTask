@@ -1,4 +1,5 @@
 import Button from "./Button";
+import RestartIcon from "../assets/restart.svg?react";
 
 const ResetButton = () => {
   const handleReset = () => {
@@ -12,6 +13,9 @@ const ResetButton = () => {
       "commentToolCalls",
       "approvedComments",
       "rejectedComments",
+      "linear_users",
+      "linear_projects",
+      "linear_teams",
     ].forEach((k) => localStorage.removeItem(k));
 
     window.location.reload();
@@ -21,9 +25,10 @@ const ResetButton = () => {
     <Button
       onClick={handleReset}
       style="outlined"
-      additionalClasses="px-2 py-1"
+      additionalClasses="px-2 py-1 !gap-2"
     >
-      Restart
+      <RestartIcon className="w-5 h-5 fill-primary" />
+      <span className="hidden md:block">Restart</span>
     </Button>
   );
 };

@@ -6,17 +6,18 @@ import Comments from "./Comments";
 import IssuesIcon from "./assets/issues.svg?react";
 import CommentsIcon from "./assets/comments.svg?react";
 import { useCommentsContext } from "./contexts/CommentsContext";
+import { ClipLoader } from "react-spinners";
 
 const Review = () => {
-  const { unreviewedIssues } = useIssuesContext();
-  const { unreviewedComments } = useCommentsContext();
+  const { unreviewedIssues, issuesLoading } = useIssuesContext();
+  const { unreviewedComments, commentsLoading } = useCommentsContext();
 
   const [activeTab, setActiveTab] = useState<"issues" | "comments">("issues");
 
   return (
     <div className="flex flex-col items-center w-full h-full max-h-full">
       <div className="flex justify-center items-center w-full border-b border-gray-900 px-4">
-        <div className="flex justify-between items-center w-full h-full max-w-content-max-width py-4">
+        <div className="flex justify-between gap-3 items-center w-full h-full max-w-content-max-width py-4">
           <div className="flex gap-3">
             <TabButton
               label="Issues"
@@ -24,6 +25,7 @@ const Review = () => {
               active={activeTab === "issues"}
               count={Object.keys(unreviewedIssues).length}
               icon={<IssuesIcon className="w-6 h-6 fill-gray-300" />}
+              loading={issuesLoading}
             />
             <TabButton
               label="Comments"
@@ -31,6 +33,7 @@ const Review = () => {
               active={activeTab === "comments"}
               count={Object.keys(unreviewedComments).length}
               icon={<CommentsIcon className="w-6 h-6 fill-gray-300" />}
+              loading={commentsLoading}
             />
           </div>
           <ResetButton />
@@ -52,21 +55,33 @@ interface TabButtonProps {
   active: boolean;
   count: number;
   icon: React.ReactNode;
+  loading: boolean;
 }
 
-const TabButton = ({ label, onClick, active, count, icon }: TabButtonProps) => {
+const TabButton = ({
+  label,
+  onClick,
+  active,
+  count,
+  icon,
+  loading,
+}: TabButtonProps) => {
   return (
     <div
       onClick={onClick}
-      className={`w-fit cursor-pointer px-3 py-2 rounded-md flex items-center gap-5 border border-gray-850 ${
+      className={`w-fit cursor-pointer px-3 py-2 rounded-md flex items-center gap-3 md:gap-5 border border-gray-850 ${
         active ? "bg-gray-900 text-white" : "text-gray-300"
       }`}
     >
       <div className="flex gap-2 items-center">
-        {icon}
+        <div className="hidden md:block">{icon}</div>
         <p>{label}</p>
       </div>
-      <p className="font-mono text-gray-500">{count}</p>
+      {loading ? (
+        <ClipLoader size={12} color={"white"} />
+      ) : (
+        <p className="font-mono text-gray-500">{count}</p>
+      )}
     </div>
   );
 };

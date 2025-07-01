@@ -26,16 +26,8 @@ export const McpProvider = ({ children }: { children: ReactNode }) => {
     "list_issues",
     "create_issue",
     "update_issue",
-    "list_issue_statuses",
     "get_issue_status",
     "list_my_issues",
-    "list_issue_labels",
-    "list_projects",
-    "get_project",
-    "list_teams",
-    "get_team",
-    "list_users",
-    "get_user",
     "search_documentation",
   ];
 

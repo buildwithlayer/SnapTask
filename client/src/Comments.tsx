@@ -4,9 +4,11 @@ import { useCommentsContext } from "./contexts/CommentsContext";
 import { type CreateComment } from "./linearTypes";
 import DeleteIcon from "./assets/delete.svg?react";
 import CheckIcon from "./assets/check.svg?react";
+import IssuesIcon from "./assets/issues.svg?react";
+import { ClipLoader } from "react-spinners";
 
 const Comments = () => {
-  const { unreviewedComments } = useCommentsContext();
+  const { unreviewedComments, commentsLoading } = useCommentsContext();
 
   return (
     <div className="flex flex-col gap-4 items-center w-full h-full">
@@ -14,6 +16,10 @@ const Comments = () => {
         Object.entries(unreviewedComments).map(([toolCallId, comment]) => (
           <Comment key={toolCallId} toolCallId={toolCallId} comment={comment} />
         ))
+      ) : commentsLoading ? (
+        <div className="flex items-center justify-center w-full h-full">
+          <ClipLoader size={56} color="white" />
+        </div>
       ) : (
         <div className="flex flex-col gap-8 items-center justify-center w-full h-full">
           <p>All comments reviewed</p>
@@ -35,7 +41,7 @@ const Comment = ({ toolCallId, comment }: CommentProps) => {
   return (
     <div className="bg-gray-900 border border-gray-850 p-4 rounded-lg w-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
-        <ToolTypeBadge type="Create" />
+        <ToolTypeBadge type="New" />
         <div className="flex gap-3">
           <Button
             onClick={() => {
@@ -57,12 +63,18 @@ const Comment = ({ toolCallId, comment }: CommentProps) => {
           </Button>
         </div>
       </div>
-      {Object.entries(comment).map(([key, value]) => (
-        <div key={key} className="flex flex-col gap-1">
-          <p className="font-bold">{key}</p>
-          <p>{value}</p>
-        </div>
-      ))}
+      <div className="flex flex-col gap-1">
+        <a
+          className="flex gap-2 items-center hover:underline"
+          href={comment.issue.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <IssuesIcon className="w-5 h-5 fill-gray-200" />
+          <h3 className="text-xl font-medium">{comment.issue.title}</h3>
+        </a>
+        <p className="text-gray-300">{comment.body}</p>
+      </div>
     </div>
   );
 };

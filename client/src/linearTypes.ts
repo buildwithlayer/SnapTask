@@ -1,4 +1,4 @@
-export interface Issue {
+export interface BaseIssue {
   id: string;
   identifier: string;
   title: string;
@@ -14,6 +14,8 @@ export interface Issue {
   createdById: string;
   project?: string;
   projectId?: string;
+  assignee?: string;
+  assigneeId?: string;
   parentId?: string;
   team: string;
   teamId: string;
@@ -21,6 +23,7 @@ export interface Issue {
     value: number;
     name: string;
   };
+  dueDate?: string;
 }
 
 export interface CreateIssue {
@@ -36,7 +39,7 @@ export interface CreateIssue {
   dueDate?: string;
 }
 
-export interface UpdateIssue {
+export interface BaseUpdateIssue {
   id: string;
   title?: string;
   description?: string;
@@ -48,6 +51,23 @@ export interface UpdateIssue {
   labelIds?: string[];
   dueDate?: string;
   estimate?: number;
+}
+
+export interface UpdateIssue extends BaseUpdateIssue {
+  originalIssue: BaseIssue;
+}
+
+export function baseIssueToCreateIssue(
+  issue: BaseIssue,
+  teams: Team[]
+): CreateIssue {
+  return {
+    ...issue,
+    priority: issue.priority?.value,
+    stateId: teams
+      ?.find((team) => team.id === issue.teamId)
+      ?.issueStatuses?.find((status) => status.name === issue.status)?.id,
+  };
 }
 
 export function isUpdateIssue(
@@ -62,6 +82,12 @@ export interface IssueStatus {
   name: string;
 }
 
+export interface IssueLabel {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface Comment {
   id: string;
   body: string;
@@ -73,16 +99,25 @@ export interface Comment {
   };
 }
 
-export interface CreateComment {
+export interface BaseCreateComment {
   issueId: string;
   body: string;
 }
 
-export interface Team {
+export interface CreateComment extends BaseCreateComment {
+  issue: BaseIssue;
+}
+
+export interface BaseTeam {
   id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Team extends BaseTeam {
+  issueStatuses: IssueStatus[];
+  issueLabels: IssueLabel[];
 }
 
 export interface User {
