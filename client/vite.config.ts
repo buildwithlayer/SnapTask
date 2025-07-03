@@ -7,6 +7,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     build: {
         outDir: '../dist',
+        sourcemap: true,
+    },
+    css: {
+        devSourcemap: true,
     },
     plugins: [react(), tailwindcss(), svgr()],
     server: {
@@ -17,5 +21,8 @@ export default defineConfig({
             },
         },
         // allowedHosts: ["1b03-185-199-103-83.ngrok-free.app"],
+    },
+    define: {
+        __DEV__: JSON.stringify(true),
     },
 });

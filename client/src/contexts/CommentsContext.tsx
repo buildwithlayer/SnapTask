@@ -56,7 +56,7 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
     );
 
     useEffect(() => {
-        if (Object.keys(comments).length > 0) return;
+        if (Object.keys(comments).length > 0 || commentToolCalls.length === 0) return;
 
         setCommentsLoading(true);
 
@@ -86,7 +86,7 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
             .finally(() => {
                 setCommentsLoading(false);
             });
-    }, [commentToolCalls, callTool, comments]);
+    }, [commentToolCalls, callTool]);
 
     useEffect(() => {
         if (incompleteToolCalls && Object.entries(comments).length === 0) {
@@ -100,7 +100,7 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
                 JSON.stringify(commentToolCalls),
             );
         }
-    }, [incompleteToolCalls, comments]);
+    }, [incompleteToolCalls]);
 
     useEffect(() => {
         const storedCommentToolCalls = localStorage.getItem('commentToolCalls');
