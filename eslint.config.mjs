@@ -18,6 +18,8 @@ export default tseslint.config(
                 {'argsIgnorePattern': '^_'},
             ],
             'comma-dangle': ['error', 'always-multiline'],
+            indent: ['error', 4],
+            'object-curly-spacing': ['error', 'never'],
             quotes: ['error', 'single'],
             semi: ['error', 'always'],
             'sort/destructuring-properties': ['error'],

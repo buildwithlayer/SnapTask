@@ -1,6 +1,6 @@
 import {createRoute, OpenAPIHono, z} from '@hono/zod-openapi';
 import {AssemblyAI} from 'assemblyai';
-import { File } from 'buffer';
+import {File} from 'buffer';
 
 const transcribeRouter = new OpenAPIHono();
 
@@ -52,7 +52,7 @@ transcribeRouter.openapi(transcribeFileRoute, async (c) => {
         audio: await file.arrayBuffer(),
         language_code: language || 'en_us',
     });
-    
+
     return c.json(transcript.text);
 });
 

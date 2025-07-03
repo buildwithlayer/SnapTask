@@ -1,47 +1,47 @@
+import {OpenAI} from 'openai/client';
+import type {ChatCompletionAssistantMessageParam} from 'openai/resources/index.mjs';
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-import { OpenAI } from "openai/client";
-import { useMcpContext } from "./McpContext";
-import { convertTools, respondToUser } from "../utils/openaiMcp";
-import type { Tool, UseMcpResult } from "use-mcp/react";
-import toast from "react-hot-toast";
-import type { ChatCompletionAssistantMessageParam } from "openai/resources/index.mjs";
-import { useTranscriptContext } from "./TranscriptContext";
-import { useLinearContext } from "./LinearContext";
+    createContext,
+    type ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
+import toast from 'react-hot-toast';
+import type {Tool, UseMcpResult} from 'use-mcp/react';
+import {convertTools, respondToUser} from '../utils/openaiMcp';
+import {useLinearContext} from './LinearContext';
+import {useMcpContext} from './McpContext';
+import {useTranscriptContext} from './TranscriptContext';
 
 interface MessagesContextType {
-  messages: OpenAI.ChatCompletionMessageParam[];
-  incompleteToolCalls: OpenAI.ChatCompletionMessageToolCall[];
-  getResponse: (additionalUserMessage?: string) => void;
-  loading: boolean;
-  error?: Error;
-  awaitingResponse: boolean;
-  readToolCallStack: OpenAI.ChatCompletionMessageToolCall[];
+    awaitingResponse: boolean;
+    error?: Error;
+    getResponse: (additionalUserMessage?: string) => void;
+    incompleteToolCalls: OpenAI.ChatCompletionMessageToolCall[];
+    loading: boolean;
+    messages: OpenAI.ChatCompletionMessageParam[];
+    readToolCallStack: OpenAI.ChatCompletionMessageToolCall[];
 }
 
 export const MessagesContext = createContext<MessagesContextType>({
-  messages: [],
-  incompleteToolCalls: [],
-  getResponse: async () => [],
-  loading: false,
-  awaitingResponse: false,
-  readToolCallStack: [],
+    awaitingResponse: false,
+    getResponse: async () => [],
+    incompleteToolCalls: [],
+    loading: false,
+    messages: [],
+    readToolCallStack: [],
 });
 
-export const MessagesProvider = ({ children }: { children: ReactNode }) => {
-  const { transcript } = useTranscriptContext();
-  const { tools, callTool } = useMcpContext();
-  const { users, projects, teams } = useLinearContext();
+export const MessagesProvider = ({children}: { children: ReactNode }) => {
+    const {transcript} = useTranscriptContext();
+    const {callTool, tools} = useMcpContext();
+    const {projects, teams, users} = useLinearContext();
 
-  const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
-  const initialMessage: OpenAI.ChatCompletionMessageParam = {
-    content: `You are SnapLinear, an AI teammate that turns stand-up discussion into tidy Linear issues.
+    const initialMessage: OpenAI.ChatCompletionMessageParam = {
+        content: `You are SnapLinear, an AI teammate that turns stand-up discussion into tidy Linear issues.
 
 Primary Objective:
 Convert each actionable item from the user’s transcript into a well-scoped Linear issue (or a comment if a relevant issue exists) that lands in the correct team, project, status, and label.
@@ -75,13 +75,13 @@ Arguments for \`create_issue\` or \`update_issue\`:
 - \`title\`: ≤ 60 chars, start with a verb.
 - \`description\`: You do not need to include a description for every issue.  Only include description if there are additional clarifying details needed. Linear philosophy says that descriptions are optionally read. 
 - \`projectId\`: Options include id field of the following \`${JSON.stringify(
-      projects
+        projects,
     )}\`. Do not include this argument if not specified in the transcript.
 - \`assigneeId\`: Options include id field of the following \`${JSON.stringify(
-      users
+        users,
     )}\`. Do not include this argument if not specified in the transcript.
 - \`teamId\`: Options include id field of the following \`${JSON.stringify(
-      teams
+        teams,
     )}\`.
 - \`stateId\`: Use the \`id\` of the relevant team's \`issueStatuses\`. MUST BE A UUID. Do not include this argument if not specified in the transcript.
 - \`labelIds\`: Use the \`id\`s of the relevant team's \`issueLabels\`. MUST BE A UUID. Do not include this argument if not specified in the transcript.
@@ -95,115 +95,122 @@ Be Idempotent & Safe:
 Tone:
 - Brief, action-oriented, professional.
 
+Extra Context:
+- Today's date is ${new Date().toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    })}.
+
 Here is the transcript:
 
 ${transcript}`,
-    role: "user",
-  };
+        role: 'user',
+    };
 
-  const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>(
-    []
-  );
-  const [incompleteToolCalls, setIncompleteToolCalls] = useState<
-    OpenAI.ChatCompletionMessageToolCall[]
-  >([]);
-  const [readToolCallStack, setReadToolCallStack] = useState<
-    OpenAI.ChatCompletionMessageToolCall[]
-  >([]);
-  const [error, setError] = useState<Error | undefined>(undefined);
+    const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>(
+        [],
+    );
+    const [incompleteToolCalls, setIncompleteToolCalls] = useState<
+        OpenAI.ChatCompletionMessageToolCall[]
+    >([]);
+    const [readToolCallStack, setReadToolCallStack] = useState<
+        OpenAI.ChatCompletionMessageToolCall[]
+    >([]);
+    const [error, setError] = useState<Error | undefined>(undefined);
 
-  const lastMessage = messages[messages.length - 1];
-  const awaitingResponse =
-    (lastMessage?.role === "assistant" && !lastMessage?.tool_calls) ||
-    (lastMessage?.role === "user" && messages.length > 1);
+    const lastMessage = messages[messages.length - 1];
+    const awaitingResponse =
+        (lastMessage?.role === 'assistant' && !lastMessage?.tool_calls) ||
+        (lastMessage?.role === 'user' && messages.length > 1);
 
-  useEffect(() => {
-    if (transcript && messages.length === 0) {
-      setMessages([initialMessage]);
-      localStorage.setItem("messages", JSON.stringify([initialMessage]));
+    useEffect(() => {
+        if (transcript && messages.length === 0) {
+            setMessages([initialMessage]);
+            localStorage.setItem('messages', JSON.stringify([initialMessage]));
+        }
+    }, [transcript, messages, initialMessage]);
+
+    useEffect(() => {
+        const storedMessages = localStorage.getItem('messages');
+        if (storedMessages) {
+            setMessages(JSON.parse(storedMessages));
+        }
+
+        const storedToolCalls = localStorage.getItem('incompleteToolCalls');
+        if (storedToolCalls) {
+            setIncompleteToolCalls(JSON.parse(storedToolCalls));
+        }
+    }, []);
+
+    async function getResponse(additionalUserMessage?: string): Promise<void> {
+        setLoading(true);
+        let messagesToSend = messages;
+        if (additionalUserMessage) {
+            const userMessage: OpenAI.ChatCompletionMessageParam = {
+                content: additionalUserMessage,
+                role: 'user',
+            };
+            messagesToSend = [...messages, userMessage];
+        }
+        setMessages(messagesToSend);
+        respondToUser(
+            messagesToSend,
+            convertTools(tools as Tool[]),
+            callTool as UseMcpResult['callTool'],
+            (toolCall?: OpenAI.ChatCompletionMessageToolCall) => {
+                if (toolCall) setReadToolCallStack((prev) => [...prev, toolCall]);
+            },
+        )
+            .then((newMessages) => {
+                if (newMessages.length === 0) return;
+                localStorage.setItem(
+                    'messages',
+                    JSON.stringify([...messagesToSend, ...newMessages]),
+                );
+                setMessages([...messagesToSend, ...newMessages]);
+
+                const assistantMessages: ChatCompletionAssistantMessageParam[] =
+                    newMessages.filter((msg) => msg.role === 'assistant');
+                const toolCallMessages: ChatCompletionAssistantMessageParam[] =
+                    assistantMessages.filter((msg) => msg.tool_calls);
+                const toolCalls: OpenAI.ChatCompletionMessageToolCall[] =
+                    toolCallMessages.flatMap((msg) => msg.tool_calls || []);
+                const incompleteToolCalls = toolCalls.filter(
+                    (tc) =>
+                        !newMessages.some(
+                            (msg) => msg.role === 'tool' && msg.tool_call_id === tc?.id,
+                        ),
+                );
+                localStorage.setItem(
+                    'incompleteToolCalls',
+                    JSON.stringify(incompleteToolCalls || []),
+                );
+                setIncompleteToolCalls(incompleteToolCalls || []);
+            })
+            .catch((err) => {
+                console.error(err);
+                toast.error(err.message);
+                setError(err);
+            })
+            .finally(() => setLoading(false));
     }
-  }, [transcript, messages.length]);
 
-  useEffect(() => {
-    const storedMessages = localStorage.getItem("messages");
-    if (storedMessages) {
-      setMessages(JSON.parse(storedMessages));
-    }
-
-    const storedToolCalls = localStorage.getItem("incompleteToolCalls");
-    if (storedToolCalls) {
-      setIncompleteToolCalls(JSON.parse(storedToolCalls));
-    }
-  }, []);
-
-  async function getResponse(additionalUserMessage?: string): Promise<void> {
-    setLoading(true);
-    let messagesToSend = messages;
-    if (additionalUserMessage) {
-      const userMessage: OpenAI.ChatCompletionMessageParam = {
-        content: additionalUserMessage,
-        role: "user",
-      };
-      messagesToSend = [...messages, userMessage];
-    }
-    setMessages(messagesToSend);
-    respondToUser(
-      messagesToSend,
-      convertTools(tools as Tool[]),
-      callTool as UseMcpResult["callTool"],
-      (toolCall?: OpenAI.ChatCompletionMessageToolCall) => {
-        if (toolCall) setReadToolCallStack((prev) => [...prev, toolCall]);
-      }
-    )
-      .then((newMessages) => {
-        if (newMessages.length === 0) return;
-        localStorage.setItem(
-          "messages",
-          JSON.stringify([...messagesToSend, ...newMessages])
-        );
-        setMessages([...messagesToSend, ...newMessages]);
-
-        const assistantMessages: ChatCompletionAssistantMessageParam[] =
-          newMessages.filter((msg) => msg.role === "assistant");
-        const toolCallMessages: ChatCompletionAssistantMessageParam[] =
-          assistantMessages.filter((msg) => msg.tool_calls);
-        const toolCalls: OpenAI.ChatCompletionMessageToolCall[] =
-          toolCallMessages.flatMap((msg) => msg.tool_calls || []);
-        const incompleteToolCalls = toolCalls.filter(
-          (tc) =>
-            !newMessages.some(
-              (msg) => msg.role === "tool" && msg.tool_call_id === tc?.id
-            )
-        );
-        localStorage.setItem(
-          "incompleteToolCalls",
-          JSON.stringify(incompleteToolCalls || [])
-        );
-        setIncompleteToolCalls(incompleteToolCalls || []);
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error(err.message);
-        setError(err);
-      })
-      .finally(() => setLoading(false));
-  }
-
-  return (
-    <MessagesContext.Provider
-      value={{
-        messages,
-        incompleteToolCalls,
-        getResponse,
-        loading,
-        error,
-        awaitingResponse,
-        readToolCallStack,
-      }}
-    >
-      {children}
-    </MessagesContext.Provider>
-  );
+    return (
+        <MessagesContext.Provider
+            value={{
+                awaitingResponse,
+                error,
+                getResponse,
+                incompleteToolCalls,
+                loading,
+                messages,
+                readToolCallStack,
+            }}
+        >
+            {children}
+        </MessagesContext.Provider>
+    );
 };
 
 export const useMessagesContext = () => useContext(MessagesContext);
