@@ -54,7 +54,7 @@ const Comment = ({comment, toolCallId}: CommentProps) => {
                     </Button>
                     <Button
                         onClick={() => {
-                            approveComment(toolCallId);
+                            approveComment(toolCallId).catch((err) => console.error(err));
                         }}
                         loading={approveLoading.includes(toolCallId)}
                         additionalClasses="!p-2"

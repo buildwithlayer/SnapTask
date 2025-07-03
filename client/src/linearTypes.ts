@@ -86,17 +86,6 @@ export interface IssueLabel {
     name: string;
 }
 
-export interface Comment {
-    author: {
-        id: string;
-        name: string;
-    };
-    body: string;
-    createdAt: string;
-    id: string;
-    updatedAt: string;
-}
-
 export interface BaseCreateComment {
     body: string;
     issueId: string;
@@ -140,13 +129,4 @@ export interface Project {
     targetDate?: string;
     updatedAt: string;
     url: string;
-}
-
-export interface CreateProject {
-    description?: string;
-    name: string;
-    startDate?: string;
-    summary?: string;
-    targetDate?: string;
-    teamId: string;
 }

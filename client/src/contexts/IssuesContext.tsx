@@ -162,7 +162,9 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
                             : undefined,
                     });
                     if (toolResponse.isError) {
-                        throw new Error(toolResponse.content[0].text);
+                        console.error('Error approving issue:', toolResponse.content[0].text);
+                        toast.error('Could not approve issue');
+                        return;
                     }
                     setApprovedIssues((prev) => ({
                         ...prev,

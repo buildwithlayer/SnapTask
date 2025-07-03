@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {ClipLoader} from 'react-spinners';
 import CalendarIcon from './assets/calendar.svg?react';
 import CheckIcon from './assets/check.svg?react';
@@ -127,7 +128,7 @@ const Issue = ({changes, issue, toolCallId}: IssueProps) => {
                     </Button>
                     <Button
                         onClick={() => {
-                            approveIssue(toolCallId);
+                            approveIssue(toolCallId).catch((err) => console.error(err));
                         }}
                         loading={approveLoading.includes(toolCallId)}
                         additionalClasses="!p-2"
@@ -374,7 +375,7 @@ const AttributeTag = ({
     label,
     updated,
 }: {
-    icon: React.ReactNode;
+    icon: ReactNode;
     label?: string;
     updated?: boolean;
 }) => {

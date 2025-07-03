@@ -133,7 +133,9 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
                         JSON.parse(toolCall.function.arguments),
                     );
                     if (toolResponse.isError) {
-                        throw new Error(toolResponse.content[0].text);
+                        console.error('Error approving comment:', toolResponse.content[0].text);
+                        toast.error('Could not approve comment');
+                        return;
                     }
                     setApprovedComments((prev) => ({
                         ...prev,

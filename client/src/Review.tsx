@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {type ReactNode, useState} from 'react';
 import {ClipLoader} from 'react-spinners';
 import CommentsIcon from './assets/comments.svg?react';
 import IssuesIcon from './assets/issues.svg?react';
@@ -52,7 +52,7 @@ const Review = () => {
 interface TabButtonProps {
     active: boolean;
     count: number;
-    icon: React.ReactNode;
+    icon: ReactNode;
     label: string;
     loading: boolean;
     onClick: () => void;

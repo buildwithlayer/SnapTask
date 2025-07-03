@@ -1,8 +1,9 @@
+import type {ReactNode} from 'react';
 import {ClipLoader} from 'react-spinners';
 
 interface ButtonProps {
     additionalClasses?: string;
-    children?: React.ReactNode;
+    children?: ReactNode;
     disabled?: boolean;
     loading?: boolean;
     onClick?: () => void;
