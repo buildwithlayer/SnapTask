@@ -129,7 +129,7 @@ ${transcript}`,
             setMessages([initialMessage]);
             localStorage.setItem('messages', JSON.stringify([initialMessage]));
         }
-    }, [transcript, messages.length]);
+    }, [transcript, messages, initialMessage]);
 
     useEffect(() => {
         const storedMessages = localStorage.getItem('messages');
