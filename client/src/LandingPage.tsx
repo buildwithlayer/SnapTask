@@ -45,11 +45,11 @@ const LandingPage = () => {
                                 </div>
                                 <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
                                     <h3 className="font-semibold whitespace-pre">
-                                        🔐{'  '}Private & Secure
+                                        ⚡{'  '}Ready in Seconds
                                     </h3>
                                     <p className="text-gray-300">
-                                        Your audio and text data stay private. We never train on
-                                        your inputs, and everything is encrypted in transit.
+                                        No setup, no onboarding. Just upload or record, and get structured,
+                                        ready-to-use action items instantly.
                                     </p>
                                 </div>
                                 <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
