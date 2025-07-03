@@ -1,5 +1,5 @@
 import {createRoute, OpenAPIHono, z} from '@hono/zod-openapi';
-import { extractSummary } from '../utils/extract.js';
+import {extractSummary} from '../utils/extract.js';
 
 const extractRouter = new OpenAPIHono();
 
