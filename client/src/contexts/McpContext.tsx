@@ -41,7 +41,7 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
         if (state === 'ready' && callTool) {
             const getCurrentUser = async () => {
                 try {
-                    const myIssuesResponse = await callTool('list_my_issues', { limit: 1 });
+                    const myIssuesResponse = await callTool('list_my_issues', {limit: 1});
                     
                     if (!myIssuesResponse || myIssuesResponse.isError) {
                         console.warn('⚠️ Could not fetch user issues');
@@ -62,7 +62,7 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
                         return;
                     }
 
-                    const userResponse = await callTool('get_user', { query: userId });
+                    const userResponse = await callTool('get_user', {query: userId});
                     
                     if (!userResponse || userResponse.isError) {
                         console.warn('⚠️ Could not fetch user details');
@@ -88,8 +88,8 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
                         // Track successful Linear connection
                         (window as any).amplitude.track('Linear Connected', {
                             user_email: user.email,
+                            user_id: user.id,
                             user_name: user.name,
-                            user_id: user.id
                         });
                     } else {
                         console.warn('⚠️ window.amplitude not available or user has no email');
