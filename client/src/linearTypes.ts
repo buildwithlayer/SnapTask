@@ -130,3 +130,8 @@ export interface Project {
     updatedAt: string;
     url: string;
 }
+export interface MyIssue {
+    id: string;
+    assignee: string;
+    assigneeId: string;
+}
