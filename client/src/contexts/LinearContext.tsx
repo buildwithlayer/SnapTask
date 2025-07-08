@@ -25,7 +25,7 @@ const LinearContext = createContext<LinearContextType>({
 });
 
 export const LinearProvider = ({children}: { children: ReactNode }) => {
-    const {callTool} = useMcpContext();
+    const {callTool, state} = useMcpContext();
 
     const [users, setUsers] = useState<User[] | undefined>(undefined);
     const [projects, setProjects] = useState<Project[] | undefined>(undefined);
@@ -34,7 +34,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
     const [error, setError] = useState<Error | undefined>(undefined);
 
     async function fetchLinearData() {
-        if (!callTool) return;
+        if (!callTool || state !== "ready") return;
 
         setLoading(true);
 

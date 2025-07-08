@@ -118,7 +118,7 @@ const Progress = () => {
                     }
                 />
                 {awaitingResponse && (
-                    <div className="flex flex-col h-full w-full justify-between pt-4">
+                    <div className="flex flex-col h-full w-full justify-between pt-4 overflow-hidden gap-4">
                         <div className="flex flex-col gap-4 w-full max-h-full overflow-y-auto">
                             {messages
                                 .filter(
@@ -133,7 +133,7 @@ const Progress = () => {
                                 .map((message, index) => {
                                     return (
                                         <div
-                                            className={`max-w-full w-fit overflow-y-auto rounded-md p-4 ${
+                                            className={`max-w-full w-fit rounded-md p-4 ${
                                                 message.role === 'assistant'
                                                     ? 'bg-gray-800 self-start'
                                                     : 'bg-primary self-end'
