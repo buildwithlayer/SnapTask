@@ -5,6 +5,7 @@ import {
     type ReactNode,
     useContext,
     useEffect,
+    useMemo,
     useState,
 } from 'react';
 import toast from 'react-hot-toast';
@@ -40,7 +41,7 @@ export const MessagesProvider = ({children}: { children: ReactNode }) => {
 
     const [loading, setLoading] = useState<boolean>(false);
 
-    const initialMessage: OpenAI.ChatCompletionMessageParam = {
+    const initialMessage: OpenAI.ChatCompletionMessageParam = useMemo(() => ({
         content: `You are SnapLinear, an AI teammate that turns stand-up discussion into tidy Linear issues.
 
 Primary Objective:
@@ -106,7 +107,7 @@ Here is the transcript:
 
 ${transcript}`,
         role: 'user',
-    };
+    }), [transcript, projects, teams, users]);
 
     const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>(
         [],
