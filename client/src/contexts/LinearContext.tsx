@@ -34,7 +34,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
     const [error, setError] = useState<Error | undefined>(undefined);
 
     async function fetchLinearData() {
-        if (!callTool || state !== "ready") return;
+        if (!callTool || state !== 'ready') return;
 
         setLoading(true);
 
@@ -44,7 +44,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                     callTool('list_users', {}),
                     callTool('list_projects', {}),
                     callTool('list_teams', {}),
-                    callTool('list_my_issues', { limit: 1 }),
+                    callTool('list_my_issues', {limit: 1}),
                 ]);
 
             if (usersResponse) {
@@ -52,6 +52,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 localStorage.setItem('linear_users', JSON.stringify(usersContent));
                 setUsers(usersContent);
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const amplitude = (window as any).amplitude;
                 if (!amplitude) {
                     console.warn('⚠️ Amplitude not found');

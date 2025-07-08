@@ -86,7 +86,7 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
             .finally(() => {
                 setCommentsLoading(false);
             });
-    }, [commentToolCalls, callTool]);
+    }, [commentToolCalls, callTool, comments]);
 
     useEffect(() => {
         if (incompleteToolCalls && Object.entries(comments).length === 0) {
@@ -100,7 +100,7 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
                 JSON.stringify(commentToolCalls),
             );
         }
-    }, [incompleteToolCalls]);
+    }, [incompleteToolCalls, comments]);
 
     useEffect(() => {
         const storedCommentToolCalls = localStorage.getItem('commentToolCalls');

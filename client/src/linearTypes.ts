@@ -131,7 +131,7 @@ export interface Project {
     url: string;
 }
 export interface MyIssue {
-    id: string;
     assignee: string;
     assigneeId: string;
+    id: string;
 }

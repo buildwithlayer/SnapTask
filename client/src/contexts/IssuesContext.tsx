@@ -92,7 +92,7 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
             .finally(() => {
                 setIssuesLoading(false);
             });
-    }, [issueToolCalls, callTool]);
+    }, [issueToolCalls, callTool, issues]);
 
     const unreviewedIssues = Object.fromEntries(
         Object.entries(issues).filter(([toolCallId]) => {
@@ -111,7 +111,7 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
             setIssueToolCalls(issueToolCalls);
             localStorage.setItem('issueToolCalls', JSON.stringify(issueToolCalls));
         }
-    }, [incompleteToolCalls]);
+    }, [incompleteToolCalls, issues]);
 
     useEffect(() => {
         const storedIssueToolCalls = localStorage.getItem('issueToolCalls');
