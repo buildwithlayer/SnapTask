@@ -34,7 +34,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
     const [error, setError] = useState<Error | undefined>(undefined);
 
     async function fetchLinearData() {
-        if (!callTool || state !== "ready") return;
+        if (!callTool || state !== 'ready') return;
 
         setLoading(true);
 
