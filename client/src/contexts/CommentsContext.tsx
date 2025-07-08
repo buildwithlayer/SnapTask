@@ -56,7 +56,7 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
     );
 
     useEffect(() => {
-        if (Object.keys(comments).length > 0) return;
+        if (Object.keys(comments).length > 0 || commentToolCalls.length === 0) return;
 
         setCommentsLoading(true);
 
