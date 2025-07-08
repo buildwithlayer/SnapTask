@@ -17,6 +17,7 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
         callbackUrl: import.meta.env.VITE_CALLBACK_URL,
         clientName: 'SnapLinear',
         url: 'https://mcp.linear.app/sse',
+        debug: import.meta.env.DEV
     });
 
     const includedTools = [
