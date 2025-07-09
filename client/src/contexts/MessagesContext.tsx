@@ -76,14 +76,14 @@ Arguments for \`create_issue\` or \`update_issue\`:
 - \`title\`: ≤ 60 chars, start with a verb.
 - \`description\`: You do not need to include a description for every issue.  Only include description if there are additional clarifying details needed. Linear philosophy says that descriptions are optionally read. 
 - \`projectId\`: Options include id field of the following \`${JSON.stringify(
-        projects,
-    )}\`. Do not include this argument if not specified in the transcript.
+            projects,
+        )}\`. Do not include this argument if not specified in the transcript.
 - \`assigneeId\`: Options include id field of the following \`${JSON.stringify(
-        users,
-    )}\`. Do not include this argument if not specified in the transcript.
+            users,
+        )}\`. Do not include this argument if not specified in the transcript.
 - \`teamId\`: Options include id field of the following \`${JSON.stringify(
-        teams,
-    )}\`.
+            teams,
+        )}\`.
 - \`stateId\`: Use the \`id\` of the relevant team's \`issueStatuses\`. MUST BE A UUID. Do not include this argument if not specified in the transcript.
 - \`labelIds\`: Use the \`id\`s of the relevant team's \`issueLabels\`. MUST BE A UUID. Do not include this argument if not specified in the transcript.
 - \`priority\`: Use the \`value\` of the priority (0 = None, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low). Do not include this argument if not specified in the transcript.
@@ -98,10 +98,10 @@ Tone:
 
 Extra Context:
 - Today's date is ${new Date().toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-    })}.
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        })}.
 
 Here is the transcript:
 
