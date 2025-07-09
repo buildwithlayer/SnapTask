@@ -62,23 +62,25 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 if (myIssuesResponse) {
                     const myIssue = (JSON.parse(myIssuesResponse.content[0].text) as BaseIssue[]).pop();
 
-                    if (!myIssue) return;
+                    if (myIssue) {
+                        const user: User = usersContent.filter((user: User) => user.id === myIssue.assigneeId).pop();
 
-                    const user: User = usersContent.filter((user: User) => user.id === myIssue.assigneeId).pop();
+                        if (!user) console.warn('⚠️ User not found');
 
-                    if (!user) { console.warn('⚠️ User not found'); return; }
+                        else {
+                            amplitude.setUserId(user.email);
 
-                    amplitude.setUserId(user.email);
+                            const identify = new amplitude.Identify();
+                            identify.set('email', user.email);
+                            identify.set('name', user.name);
+                            identify.set('displayName', user.displayName);
+                            identify.set('isAdmin', user.isAdmin);
+                            identify.set('linear_user_id', user.id);
+                            identify.set('team_emails', usersContent.map((user: User) => user.email).join(','));
 
-                    const identify = new amplitude.Identify();
-                    identify.set('email', user.email);
-                    identify.set('name', user.name);
-                    identify.set('displayName', user.displayName);
-                    identify.set('isAdmin', user.isAdmin);
-                    identify.set('linear_user_id', user.id);
-                    identify.set('team_emails', usersContent.map((user: User) => user.email).join(','));
-
-                    amplitude.identify(identify);
+                            amplitude.identify(identify);
+                        }
+                    }
                 }
             }
             if (projectsResponse) {
