@@ -5,8 +5,15 @@ import {FileProvider} from './contexts/FileContext.tsx';
 import {TranscriptProvider} from './contexts/TranscriptContext.tsx';
 import MenuBar from './MenuBar.tsx';
 import OAuthCallback from './OAuthCallback.tsx';
+import * as amplitude from '@amplitude/analytics-browser';
 
 function App() {
+    amplitude.init('5cc5c6e8863745ef94f222901951ead6', {
+        autocapture: {
+            elementInteractions: true
+        }
+    });
+
     return (
         <div className="flex flex-col h-screen w-screen">
             <MenuBar/>

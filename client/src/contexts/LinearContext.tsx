@@ -8,6 +8,7 @@ import {
 import toast from 'react-hot-toast';
 import type {BaseIssue, BaseTeam, Project, Team, User} from '../linearTypes';
 import {useMcpContext} from './McpContext';
+import * as amplitude from '@amplitude/analytics-browser';
 
 interface LinearContextType {
     error?: Error;
@@ -51,13 +52,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 const usersContent = JSON.parse(usersResponse.content[0].text);
                 localStorage.setItem('linear_users', JSON.stringify(usersContent));
                 setUsers(usersContent);
-
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const amplitude = (window as any).amplitude;
-                if (!amplitude) {
-                    console.warn('⚠️ Amplitude not found');
-                    return;
-                }
 
                 if (myIssuesResponse) {
                     const myIssue = (JSON.parse(myIssuesResponse.content[0].text) as BaseIssue[]).pop();
