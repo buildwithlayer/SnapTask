@@ -9,6 +9,9 @@ function MenuBar() {
                     <Logo className="w-8 h-8 fill-white"/>
                     <div className="font-bold text-xl">SnapLinear</div>
                 </div>
+                <a href="mailto:support@buildwithlayer.com" className='py-2 hover:border-b-2 border-gray-300'>
+                    Contact Support
+                </a>
             </div>
         </div>
     );
