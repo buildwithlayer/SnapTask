@@ -1,5 +1,7 @@
 import {useEffect, useState} from 'react';
+import Markdown from 'react-markdown';
 import {ClipLoader} from 'react-spinners';
+import remarkGfm from 'remark-gfm';
 import UpArrowIcon from './assets/uparrow.svg?react';
 import Button from './components/Button';
 import ResetButton from './components/ResetButton';
@@ -141,7 +143,7 @@ const Progress = () => {
                                             key={index}
                                         >
                                             {typeof message.content === 'string' ? (
-                                                <p key={index}>{message.content}</p>
+                                                <Markdown remarkPlugins={[remarkGfm]} key={index}>{message.content}</Markdown>
                                             ) : (
                                                 message.content
                                                     ?.filter((content) => content.type === 'text')

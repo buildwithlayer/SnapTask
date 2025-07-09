@@ -3,8 +3,49 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="title"
+      content="SnapLinear - Convert a meeting into tasks with AI"
+    />
+    <meta
+      property="og:title"
+      content="SnapLinear - Convert a meeting into tasks with AI"
+    />
+    <meta
+      property="og:site_name"
+      content="SnapLinear"
+    />
+    <meta
+      name="description"
+      content="AI-powered meeting automation for Linear users. SnapLinear converts recordings into tasks and issues, streamlining your workflow and enhancing productivity."
+    />
+    <meta
+      property="og:description"
+      content="AI-powered meeting automation for Linear users. SnapLinear converts recordings into tasks and issues, streamlining your workflow and enhancing productivity."
+    />
+    <meta
+      name="keywords"
+      content="AI, Linear, meeting automation, tasks, project management, productivity, SnapLinear"
+    />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "SnapLinear",
+        "url": "https://www.snaplinear.app/"
+      }
+    </script>
     <title>SnapLinear - Convert a meeting into tasks with AI</title>
+
+    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script>
+    <script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz"></script>
+    <script>
+      window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
+      window.amplitude.init("5cc5c6e8863745ef94f222901951ead6", {
+        autocapture: { elementInteractions: true },
+      });
+    </script>
   </head>
 
   <body>

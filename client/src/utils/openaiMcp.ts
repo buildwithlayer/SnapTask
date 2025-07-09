@@ -33,6 +33,7 @@ export async function getCompletion(
         body: JSON.stringify({
             messages,
             model: 'gpt-4o',
+            temperature: 0.15,
             tools: tools,
         }),
         headers: {
