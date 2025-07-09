@@ -9,7 +9,7 @@ import MenuBar from './MenuBar.tsx';
 import OAuthCallback from './OAuthCallback.tsx';
 
 function App() {
-    const sessionReplayTracking = sessionReplayPlugin();
+    const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
     amplitude.add(sessionReplayTracking);
 
     amplitude.init('5cc5c6e8863745ef94f222901951ead6', {
