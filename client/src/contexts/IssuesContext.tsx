@@ -58,7 +58,7 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
     const [issuesLoading, setIssuesLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        if (Object.keys(issues).length > 0) return;
+        if (Object.keys(issues).length > 0 || issueToolCalls.length === 0) return;
 
         setIssuesLoading(true);
 

@@ -3,6 +3,7 @@ import {ClipLoader} from 'react-spinners';
 import {type Tool, useMcp, type UseMcpResult} from 'use-mcp/react';
 import Button from '../components/Button';
 
+
 interface McpContextType {
     callTool?: UseMcpResult['callTool'];
     state?: UseMcpResult['state'];

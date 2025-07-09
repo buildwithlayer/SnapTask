@@ -1,3 +1,4 @@
+import * as amplitude from '@amplitude/analytics-browser';
 import {
     createContext,
     type ReactNode,
@@ -6,7 +7,7 @@ import {
     useState,
 } from 'react';
 import toast from 'react-hot-toast';
-import type {BaseTeam, Project, Team, User} from '../linearTypes';
+import type {BaseIssue, BaseTeam, Project, Team, User} from '../linearTypes';
 import {useMcpContext} from './McpContext';
 
 interface LinearContextType {
@@ -39,17 +40,42 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
         setLoading(true);
 
         try {
-            const [usersResponse, projectsResponse, teamsResponse] =
+            const [usersResponse, projectsResponse, teamsResponse, myIssuesResponse] =
                 await Promise.all([
                     callTool('list_users', {}),
                     callTool('list_projects', {}),
                     callTool('list_teams', {}),
+                    callTool('list_my_issues', {limit: 1}),
                 ]);
 
             if (usersResponse) {
                 const usersContent = JSON.parse(usersResponse.content[0].text);
                 localStorage.setItem('linear_users', JSON.stringify(usersContent));
                 setUsers(usersContent);
+
+                if (myIssuesResponse) {
+                    const myIssue = (JSON.parse(myIssuesResponse.content[0].text) as BaseIssue[]).pop();
+
+                    if (myIssue) {
+                        const user: User = usersContent.filter((user: User) => user.id === myIssue.assigneeId).pop();
+
+                        if (!user) console.warn('⚠️ User not found');
+
+                        else {
+                            amplitude.setUserId(user.email);
+
+                            const identify = new amplitude.Identify();
+                            identify.set('email', user.email);
+                            identify.set('name', user.name);
+                            identify.set('displayName', user.displayName);
+                            identify.set('isAdmin', user.isAdmin);
+                            identify.set('linear_user_id', user.id);
+                            identify.set('team_emails', usersContent.map((user: User) => user.email).join(','));
+
+                            amplitude.identify(identify);
+                        }
+                    }
+                }
             }
             if (projectsResponse) {
                 const projectsContent = JSON.parse(projectsResponse.content[0].text);

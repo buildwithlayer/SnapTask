@@ -1,3 +1,5 @@
+import * as amplitude from '@amplitude/analytics-browser';
+import {sessionReplayPlugin} from '@amplitude/plugin-session-replay-browser';
 import {Toaster} from 'react-hot-toast';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Content from './Content.tsx';
@@ -7,6 +9,15 @@ import MenuBar from './MenuBar.tsx';
 import OAuthCallback from './OAuthCallback.tsx';
 
 function App() {
+    const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
+    amplitude.add(sessionReplayTracking);
+
+    amplitude.init('5cc5c6e8863745ef94f222901951ead6', {
+        autocapture: {
+            elementInteractions: true,
+        },
+    });
+
     return (
         <div className="flex flex-col h-screen w-screen">
             <MenuBar/>
