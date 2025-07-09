@@ -7,6 +7,7 @@ import ResetButton from './components/ResetButton';
 import {useCommentsContext} from './contexts/CommentsContext';
 import {useIssuesContext} from './contexts/IssuesContext';
 import Issues from './Issues';
+import Survey from './Survey';
 
 const Review = () => {
     const {issuesLoading, unreviewedIssues} = useIssuesContext();
@@ -14,48 +15,60 @@ const Review = () => {
 
     const [activeTab, setActiveTab] = useState<'comments' | 'issues'>('issues');
 
+    const allReviewed =
+    !issuesLoading &&
+    Object.keys(unreviewedIssues).length === 0 &&
+    !commentsLoading &&
+    Object.keys(unreviewedComments).length === 0;
+
     return (
         <div className="flex flex-col items-center w-full h-full max-h-full">
-            <div className="flex justify-center items-center w-full border-b border-gray-900 px-4">
-                <div className="flex justify-between gap-3 items-center w-full h-full max-w-content-max-width py-4">
-                    <div className="flex gap-3">
-                        <TabButton
-                            label="Issues"
-                            onClick={() => setActiveTab('issues')}
-                            active={activeTab === 'issues'}
-                            count={Object.keys(unreviewedIssues).length}
-                            icon={<IssuesIcon className="w-6 h-6 fill-gray-300"/>}
-                            loading={issuesLoading}
-                        />
-                        <TabButton
-                            label="Comments"
-                            onClick={() => setActiveTab('comments')}
-                            active={activeTab === 'comments'}
-                            count={Object.keys(unreviewedComments).length}
-                            icon={<CommentsIcon className="w-6 h-6 fill-gray-300"/>}
-                            loading={commentsLoading}
-                        />
+            {allReviewed ? (
+                <Survey />
+            ) : (
+                <>
+                    <div className="flex justify-center items-center w-full border-b border-gray-900 px-4">
+                        <div className="flex justify-between gap-3 items-center w-full h-full max-w-content-max-width py-4">
+                            <div className="flex gap-3">
+                                <TabButton
+                                    label="Issues"
+                                    onClick={() => setActiveTab('issues')}
+                                    active={activeTab === 'issues'}
+                                    count={Object.keys(unreviewedIssues).length}
+                                    icon={<IssuesIcon className="w-6 h-6 fill-gray-300" />}
+                                    loading={issuesLoading}
+                                />
+                                <TabButton
+                                    label="Comments"
+                                    onClick={() => setActiveTab('comments')}
+                                    active={activeTab === 'comments'}
+                                    count={Object.keys(unreviewedComments).length}
+                                    icon={<CommentsIcon className="w-6 h-6 fill-gray-300" />}
+                                    loading={commentsLoading}
+                                />
+                            </div>
+                            <ResetButton />
+                        </div>
                     </div>
-                    <ResetButton/>
-                </div>
-            </div>
-            <div className="flex justify-center items-center w-full h-full max-h-full px-4 overflow-y-auto">
-                <div className="flex w-full h-full max-h-full max-w-content-max-width py-8">
-                    {activeTab === 'issues' && <Issues/>}
-                    {activeTab === 'comments' && <Comments/>}
-                </div>
-            </div>
+                    <div className="flex justify-center items-center w-full h-full max-h-full px-4 overflow-y-auto">
+                        <div className="flex w-full h-full max-h-full max-w-content-max-width py-8">
+                            {activeTab === 'issues' && <Issues />}
+                            {activeTab === 'comments' && <Comments />}
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
 
 interface TabButtonProps {
-    active: boolean;
-    count: number;
-    icon: ReactNode;
-    label: string;
-    loading: boolean;
-    onClick: () => void;
+  active: boolean;
+  count: number;
+  icon: ReactNode;
+  label: string;
+  loading: boolean;
+  onClick: () => void;
 }
 
 const TabButton = ({
@@ -78,7 +91,7 @@ const TabButton = ({
                 <p>{label}</p>
             </div>
             {loading ? (
-                <ClipLoader size={12} color={'white'}/>
+                <ClipLoader size={12} color={'white'} />
             ) : (
                 <p className="font-mono text-gray-500">{count}</p>
             )}
