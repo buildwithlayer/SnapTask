@@ -7,13 +7,6 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     build: {
         outDir: '../dist',
-        sourcemap: true,
-    },
-    css: {
-        devSourcemap: true,
-    },
-    define: {
-        __DEV__: JSON.stringify(true),
     },
     plugins: [react(), tailwindcss(), svgr()],
     server: {
