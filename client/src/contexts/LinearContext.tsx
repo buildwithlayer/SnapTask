@@ -1,3 +1,4 @@
+import * as amplitude from '@amplitude/analytics-browser';
 import {
     createContext,
     type ReactNode,
@@ -8,7 +9,6 @@ import {
 import toast from 'react-hot-toast';
 import type {BaseIssue, BaseTeam, Project, Team, User} from '../linearTypes';
 import {useMcpContext} from './McpContext';
-import * as amplitude from '@amplitude/analytics-browser';
 
 interface LinearContextType {
     error?: Error;
