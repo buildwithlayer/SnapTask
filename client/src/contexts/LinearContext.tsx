@@ -62,7 +62,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 if (myIssuesResponse) {
                     const myIssue = (JSON.parse(myIssuesResponse.content[0].text) as BaseIssue[]).pop();
 
-                    if (!myIssue) { console.warn('⚠️ My issue not found'); return; }
+                    if (!myIssue) return;
 
                     const user: User = usersContent.filter((user: User) => user.id === myIssue.assigneeId).pop();
 
