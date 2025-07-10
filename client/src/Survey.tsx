@@ -3,10 +3,27 @@ import {useState} from 'react';
 import Button from './components/Button';
 import {handleReset} from './components/ResetButton';
 
+interface SurveyQuestion {
+    responseElement?: React.ReactNode;
+    responseOptions?: { label: string; value: string | number }[];
+    text: string;
+}
+
 const Survey = () => {
     const [currentQuestion, setCurrentQuestion] = useState<number>(0);
 
-    const questions = [
+    const [freeTextResponse, setFreeTextResponse] = useState<string>('');
+
+    function handleFreeTextResponse() {
+        amplitude.track('survey_response', {
+            question: 'What could we add or improve to make SnapLinear more useful for you?',
+            response: freeTextResponse,
+        });
+        setCurrentQuestion((prev) => prev + 1);
+        setFreeTextResponse('');
+    }
+
+    const questions: SurveyQuestion[] = [
         {
             responseOptions: [
                 {label: '1', value: 1},
@@ -24,13 +41,6 @@ const Survey = () => {
         },
         {
             responseOptions: [
-                {label: 'Yes', value: 'yes'},
-                {label: 'No', value: 'no'},
-            ],
-            text: 'Did this save you time compared to how you normally handle meeting notes?',
-        },
-        {
-            responseOptions: [
                 {label: 'Not Accurate', value: 'not_accurate'},
                 {label: 'Somewhat Accurate', value: 'somewhat_accurate'},
                 {label: 'Accurate', value: 'accurate'},
@@ -39,11 +49,13 @@ const Survey = () => {
             text: 'How accurate were the tasks we generated?',
         },
         {
-            responseOptions: [
-                {label: 'Yes', value: 'yes'},
-                {label: 'No', value: 'no'},
-            ],
-            text: 'Would you trust this to replace your current meeting follow-up workflow?',
+            responseElement: (
+                <div className='w-full flex flex-col gap-2'>
+                    <textarea className='w-full p-2 border border-gray-700 rounded-md bg-white text-gray-900 min-h-[100px]' value={freeTextResponse} onChange={(e) => setFreeTextResponse(e.target.value)} />
+                    <Button onClick={handleFreeTextResponse}>Submit Feedback</Button>
+                </div>
+            ),
+            text: 'What could we add or improve to make SnapLinear more useful for you?',
         },
     ];
 
@@ -59,28 +71,10 @@ const Survey = () => {
                         survey.
                             </p>
                         </div>
-                        <div className='flex flex-col gap-6 items-center bg-gray-900 p-4 rounded-md border border-gray-800 w-full'>
-                            <p className='text-lg'>{questions[currentQuestion].text}</p>
-                            <div className="flex gap-4 w-full flex-wrap">
-                                {questions[currentQuestion].responseOptions.map(
-                                    (option, index) => (
-                                        <Button
-                                            key={index}
-                                            onClick={() => {
-                                                amplitude.track('survey_response', {
-                                                    question: questions[currentQuestion].text,
-                                                    response: option.value,
-                                                });
-                                                setCurrentQuestion(currentQuestion + 1);
-                                            }}
-                                            additionalClasses='grow'
-                                        >
-                                            {option.label}
-                                        </Button>
-                                    ),
-                                )}
-                            </div>
-                        </div>
+                        <SurveyQuestion
+                            question={questions[currentQuestion]}
+                            setCurrentQuestion={setCurrentQuestion}
+                        />
                         <Button onClick={handleReset} additionalClasses='w-full' style='outlined'>Return to Home Page</Button>
                     </div>
                 ) : (
@@ -89,6 +83,32 @@ const Survey = () => {
                         <Button onClick={handleReset} additionalClasses='w-full'>Return to Home Page</Button>
                     </div>
                 )}
+            </div>
+        </div>
+    );
+};
+
+const SurveyQuestion = ({question, setCurrentQuestion}: { question: SurveyQuestion, setCurrentQuestion: React.Dispatch<React.SetStateAction<number>> }) => {
+    return (
+        <div className='flex flex-col gap-6 items-center bg-gray-900 p-4 rounded-md border border-gray-800 w-full'>
+            <p className='text-lg'>{question.text}</p>
+            <div className="flex gap-4 w-full flex-wrap">
+                {question.responseOptions?.map((option, index) => (
+                    <Button
+                        key={index}
+                        onClick={() => {
+                            amplitude.track('survey_response', {
+                                question: question.text,
+                                response: option.value,
+                            });
+                            setCurrentQuestion((prev) => prev + 1);
+                        }}
+                        additionalClasses='grow'
+                    >
+                        {option.label}
+                    </Button>
+                ))}
+                {question.responseElement}
             </div>
         </div>
     );
