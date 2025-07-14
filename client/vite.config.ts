@@ -10,12 +10,12 @@ export default defineConfig({
     },
     plugins: [react(), tailwindcss(), svgr()],
     server: {
+        allowedHosts: ['158fbfd3a5d7.ngrok-free.app'],
         proxy: {
             '/api': {
                 changeOrigin: true,
                 target: 'http://localhost:3001',
             },
         },
-        // allowedHosts: ["1b03-185-199-103-83.ngrok-free.app"],
     },
 });

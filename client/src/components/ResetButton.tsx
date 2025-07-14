@@ -17,7 +17,7 @@ export const handleReset = () => {
         'linear_teams',
     ].forEach((k) => localStorage.removeItem(k));
 
-    window.location.reload();
+    window.location.pathname = '/';
 };
 
 

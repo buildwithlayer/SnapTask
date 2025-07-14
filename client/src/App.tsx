@@ -29,11 +29,16 @@ function App() {
                         element={
                             <FileProvider>
                                 <TranscriptProvider>
-                                    <Content/>
+                                    <Content demo={false} />
                                 </TranscriptProvider>
                             </FileProvider>
                         }
                     />
+                    <Route path={'/demo'} element={<FileProvider>
+                        <TranscriptProvider>
+                            <Content demo={true} />
+                        </TranscriptProvider>
+                    </FileProvider>} />
                 </Routes>
             </Router>
             <Toaster
