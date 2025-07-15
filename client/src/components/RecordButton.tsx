@@ -33,7 +33,7 @@ const RecordButton = ({handleRecordingComplete, isRecording, setIsRecording}: Re
                 audio: true,
                 video: false,
             });
-        } catch (error) {
+        } catch {
             toast.error('Failed to access microphone. Please check your permissions and try again.');
             return;
         }
