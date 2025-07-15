@@ -27,10 +27,16 @@ const RecordButton = ({handleRecordingComplete, isRecording, setIsRecording}: Re
             return;
         }
 
-        const audioStream = await navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: false,
-        });
+        let audioStream;
+        try {
+            audioStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: false,
+            });
+        } catch (error) {
+            toast.error('Failed to access microphone. Please check your permissions and try again.');
+            return;
+        }
 
         const mediaRecorder = new MediaRecorder(audioStream);
 
