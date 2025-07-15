@@ -5,17 +5,18 @@ import {LinearProvider} from './contexts/LinearContext';
 import {McpProvider} from './contexts/McpContext';
 import {MessagesContext, MessagesProvider} from './contexts/MessagesContext';
 import {useTranscriptContext} from './contexts/TranscriptContext';
+import DemoPage from './DemoPage';
 import LandingPage from './LandingPage';
 import Progress from './Progress';
 import Review from './Review';
 
-const Content = () => {
+const Content = ({demo}: {demo: boolean}) => {
     const {file} = useFileContext();
     const {transcript} = useTranscriptContext();
 
     return (
         <div className="w-full h-full flex justify-center bg-gray-950 text-white overflow-hidden">
-            {!file && !transcript && <LandingPage/>}
+            {!file && !transcript && (demo ? <DemoPage /> : <LandingPage />)}
             {(file || transcript) && (
                 <McpProvider>
                     <LinearProvider>

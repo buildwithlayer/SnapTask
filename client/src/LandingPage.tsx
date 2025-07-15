@@ -9,7 +9,7 @@ const LandingPage = () => {
                     <div className="max-w-content-max-width w-full flex flex-col gap-12 py-[72px]">
                         {/* Hero Section */}
                         <div className="flex flex-col gap-4">
-                            <h1 className="text-4xl font-bold">
+                            <h1 className='font-bold text-4xl'>
                                 Convert Meetings to Actions With AI
                             </h1>
                             <h2 className="text-xl text-gray-300">
@@ -23,7 +23,7 @@ const LandingPage = () => {
                     <div className="w-full h-full flex flex-col justify-center items-center px-4">
                         <div
                             className="max-w-content-max-width w-full h-full flex flex-col items-center gap-16 text-center py-[56px]">
-                            <FileUpload/>
+                            <FileUpload demo={false} />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full text-left pb-1">
                                 <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
                                     <h3 className="font-semibold whitespace-pre">

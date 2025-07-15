@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {
     type FileRejection,
     type FileWithPath,
@@ -7,14 +7,13 @@ import {
 import toast from 'react-hot-toast';
 import DeleteIcon from './assets/delete.svg?react';
 import FileIcon from './assets/file.svg?react';
-import MicrophoneIcon from './assets/microphone.svg?react';
-import StopRecordingIcon from './assets/stop-recording.svg?react';
 import UploadIcon from './assets/upload.svg?react';
 import WarningIcon from './assets/warning.svg?react';
 import Button from './components/Button';
+import RecordButton from './components/RecordButton';
 import {useFileContext} from './contexts/FileContext';
 
-function FileUpload() {
+function FileUpload({demo}: {demo: boolean}) {
     const {setFile} = useFileContext();
 
     const browserSupportsRecording = Boolean(
@@ -23,10 +22,6 @@ function FileUpload() {
 
     const [localFile, setLocalFile] = useState<FileWithPath>();
     const [recording, setRecording] = useState<boolean>(false);
-    const [elapsedTime, setElapsedTime] = useState<number>(0);
-    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-        null,
-    );
 
     const {getInputProps, getRootProps, isDragActive} = useDropzone({
         accept: {
@@ -56,82 +51,6 @@ function FileUpload() {
         if (!localFile) return;
         setFile(localFile);
     }
-
-    async function handleRecord() {
-        if (!browserSupportsRecording) {
-            toast.error('Your browser does not support audio recording.');
-            return;
-        }
-
-        const screenStream = await navigator.mediaDevices.getDisplayMedia({
-            audio: {
-                // @ts-expect-error This isn't included in the type definition
-                suppressLocalAudioPlayback: false,
-            },
-            systemAudio: 'include',
-            video: true,
-        });
-
-        const audioStream = await navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: false,
-        });
-
-        const audioContext = new AudioContext();
-        const screenSource = audioContext.createMediaStreamSource(screenStream);
-        const audioSource = audioContext.createMediaStreamSource(audioStream);
-        const destination = audioContext.createMediaStreamDestination();
-        screenSource.connect(destination);
-        audioSource.connect(destination);
-
-        const combinedStream = new MediaStream([
-            ...destination.stream.getAudioTracks(),
-        ]);
-
-        const mediaRecorder = new MediaRecorder(combinedStream);
-
-        mediaRecorder.ondataavailable = (event) => {
-            console.log('Audio data available:', event);
-            const audioBlob = new Blob([event.data], {
-                type: 'audio/weba',
-            });
-            const audioFile = new File([audioBlob], 'recorded-audio.weba', {
-                type: 'audio/weba',
-            });
-            setLocalFile(audioFile);
-            toast.success('Audio recorded successfully!');
-        };
-
-        setMediaRecorder(mediaRecorder);
-        setRecording(true);
-        mediaRecorder.start();
-    }
-
-    async function handleStopRecording() {
-        if (mediaRecorder) {
-            mediaRecorder.stop();
-            setRecording(false);
-            setMediaRecorder(null);
-        }
-    }
-
-    useEffect(() => {
-        let timer: NodeJS.Timeout | null = null;
-
-        if (recording) {
-            timer = setInterval(() => {
-                setElapsedTime((prev) => prev + 1);
-            }, 1000);
-        } else {
-            setElapsedTime(0);
-        }
-
-        return () => {
-            if (timer) {
-                clearInterval(timer);
-            }
-        };
-    }, [recording]);
 
     return (
         <>
@@ -165,63 +84,55 @@ function FileUpload() {
                 ) : (
                     <>
                         <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4">
-                            {browserSupportsRecording && (
-                                <Button
-                                    additionalClasses="!gap-1.5 !py-3 w-full"
-                                    onClick={recording ? handleStopRecording : handleRecord}
-                                >
-                                    {recording ? (
-                                        <>
-                                            <StopRecordingIcon fill="white"/>
-                                            <span>Recording</span>
-                                            <span className="ml-2 text-gray-200">
-                                                {String(Math.floor(elapsedTime / 60)).padStart(2, '0')}:
-                                                {String(elapsedTime % 60).padStart(2, '0')}
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <MicrophoneIcon fill="white"/>
-                                            <span>Record Audio</span>
-                                        </>
-                                    )}
-                                </Button>
-                            )}
-                            <div
-                                {...getRootProps()}
-                                className="w-full flex items-center justify-center"
-                            >
-                                <input {...getInputProps()} />
-                                <Button
-                                    additionalClasses="!gap-1.5 !py-3 w-full"
-                                    disabled={recording}
-                                >
-                                    <UploadIcon
-                                        className={`w-6 h-6 ${
-                                            recording ? 'fill-gray-800' : 'fill-white'
-                                        }`}
+                            <div className="w-full flex flex-col gap-4">
+                                {demo && recording && (<p className='text-xl text-center px-2 py-4 rounded-sm bg-gray-900 border border-gray-800'>Try saying <span className='text-emerald-300'>"Create me a task called try out SnapLinear"</span></p>)}
+                                {browserSupportsRecording && (
+                                    <RecordButton
+                                        isRecording={recording}
+                                        setIsRecording={setRecording}
+                                        handleRecordingComplete={setLocalFile}
                                     />
-                                    <span>
-                                        {isDragActive
-                                            ? 'Drop the file here'
-                                            : 'Upload Audio or Transcript'}
-                                    </span>
-                                </Button>
+                                )}
                             </div>
+                            {!demo && (
+                                <div
+                                    {...getRootProps()}
+                                    className="w-full flex items-center justify-center"
+                                >
+                                    <input {...getInputProps()} />
+                                    <Button
+                                        additionalClasses="!gap-1.5 !py-3 w-full"
+                                        disabled={recording}
+                                    >
+                                        <UploadIcon
+                                            className={`w-6 h-6 ${
+                                                recording ? 'fill-gray-800' : 'fill-white'
+                                            }`}
+                                        />
+                                        <span>
+                                            {isDragActive
+                                                ? 'Drop the file here'
+                                                : 'Upload Audio or Transcript'}
+                                        </span>
+                                    </Button>
+                                </div>)}
                         </div>
                         {/* Recording disclaimer */}
                         {browserSupportsRecording &&
                             !window.navigator.platform.includes('Win') && (
                             <div
-                                className="flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white text-left">
+                                className={`w-full flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white ${demo ? 'text-center': 'text-left'}`}>
                                 <WarningIcon className="min-w-5 w-5 min-h-5 h-5 fill-yellow-500"/>
-                                <p className="text-sm text-gray-300">
-                                        Only Chrome tab audio is supported on Mac for direct
-                                        recording. To capture meetings in other apps, record with
+                                {demo ? <p className='text-sm text-gray-300 w-full'>
+                                        Only records microphone audio. To capture system audio, record with
+                                        another tool (e.g., Zoom, OBS) and upload the file <a href="/" className="text-primary hover:text-primary-dark">here</a>.
+                                </p> :<p className='text-sm text-gray-300 w-full'>
+                                        Only records microphone audio. To capture system audio, record with
                                         another tool (e.g., Zoom, OBS) and upload the file here.
-                                </p>
+                                </p>}
                             </div>
                         )}
+                        {demo && <p className='text-gray-300'>Want to upload an existing audio file or transcript? <a href="/" className="text-primary hover:text-primary-dark">Click here</a></p>}
                     </>
                 )}
             </div>

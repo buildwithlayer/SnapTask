@@ -20,7 +20,6 @@ function App() {
 
     return (
         <div className="flex flex-col h-screen w-screen">
-            <MenuBar/>
             <Router>
                 <Routes>
                     <Route path={'/oauth/callback'} element={<OAuthCallback/>}/>
@@ -29,11 +28,17 @@ function App() {
                         element={
                             <FileProvider>
                                 <TranscriptProvider>
-                                    <Content/>
+                                    <MenuBar/>
+                                    <Content demo={false} />
                                 </TranscriptProvider>
                             </FileProvider>
                         }
                     />
+                    <Route path={'/demo'} element={<FileProvider>
+                        <TranscriptProvider>
+                            <Content demo={true} />
+                        </TranscriptProvider>
+                    </FileProvider>} />
                 </Routes>
             </Router>
             <Toaster

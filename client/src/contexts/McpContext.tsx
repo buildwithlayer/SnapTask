@@ -1,4 +1,4 @@
-import {createContext, type ReactNode, useContext} from 'react';
+import {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
 import {ClipLoader} from 'react-spinners';
 import {type Tool, useMcp, type UseMcpResult} from 'use-mcp/react';
 import Button from '../components/Button';
@@ -37,9 +37,25 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
         return includedTools.includes(tool.name);
     });
 
+    const [showErrorUI, setShowErrorUI] = useState(false);
+
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (state === 'failed') {
+            timer = setTimeout(() => setShowErrorUI(true), 1000);
+        } else {
+            setShowErrorUI(false);
+        }
+        return () => {
+            if (timer) {
+                clearTimeout(timer);
+            }
+        };
+    }, [state]);
+
     return (
         <McpContext.Provider value={{callTool, state, tools: filteredTools}}>
-            {state === 'failed' && (
+            {showErrorUI && (
                 <div className="flex flex-col items-center justify-center text-center h-full w-full gap-8">
                     <div className="flex flex-col items-center gap-1">
                         <p>Connection failed:</p>
@@ -51,7 +67,7 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
                     </div>
                 </div>
             )}
-            {state !== 'failed' && state !== 'ready' && (
+            {!showErrorUI && state !== 'ready' && (
                 <div className="flex h-full w-full items-center justify-center">
                     <ClipLoader size={56} color="white"/>
                 </div>
