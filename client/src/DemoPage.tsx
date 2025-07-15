@@ -1,8 +1,8 @@
 import Logo from './assets/snaplinear.svg?react';
-import FileUpload from "./FileUpload";
+import FileUpload from './FileUpload';
 
 const DemoPage = () => {
-return (
+    return (
         <>
             <div className="w-full h-full flex flex-col justify-start items-center overflow-auto">
                 <div
@@ -26,6 +26,6 @@ return (
             </div>
         </>
     );
-}
+};
 
-export default DemoPage
+export default DemoPage;
