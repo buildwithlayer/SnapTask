@@ -46,7 +46,11 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
         } else {
             setShowErrorUI(false);
         }
-        return () => clearTimeout(timer);
+        return () => {
+            if (timer) {
+                clearTimeout(timer);
+            }
+        };
     }, [state]);
 
     return (
