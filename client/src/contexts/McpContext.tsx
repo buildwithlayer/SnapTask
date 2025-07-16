@@ -68,19 +68,17 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
                     </div>
                 </div>
             )}
-            {!showErrorUI && state !== 'ready' && state !== "pending_auth" && (
+            {!showErrorUI && state !== 'ready' && state !== 'pending_auth' && (
                 <div className="flex h-full w-full items-center justify-center">
                     <ClipLoader size={56} color="white"/>
                 </div>
             )}
             {state === 'pending_auth' && (
-                <Button>
-                    <a href={authUrl} target="_blank" rel="opener" onClick={() => {
-                        setInterval(() => {}, 5000);
-                    }}>
-                        Log in with Linear
-                    </a>
-                </Button>
+                <div className="flex h-full w-full items-center justify-center">
+                    <Button onClick={() => {window.open(authUrl, '_blank');}}>
+                            Log in with Linear
+                    </Button>
+                </div>
             )}
             {state === 'ready' && children}
         </McpContext.Provider>
