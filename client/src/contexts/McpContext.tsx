@@ -13,7 +13,7 @@ interface McpContextType {
 const McpContext = createContext<McpContextType>({});
 
 export const McpProvider = ({children}: { children: ReactNode }) => {
-    const {authenticate, callTool, error, retry, state, tools} = useMcp({
+    const {authenticate, authUrl, callTool, error, retry, state, tools} = useMcp({
         autoReconnect: true,
         callbackUrl: import.meta.env.VITE_CALLBACK_URL,
         clientName: 'SnapLinear',
@@ -76,7 +76,7 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
             {state === 'ready' ? children : (
                 <div className="flex flex-col items-center justify-center text-center h-full w-full gap-8">
                     <div className="flex gap-4">
-                        <Button onClick={authenticate}>Authenticate Manually</Button>
+                        <a href={authUrl} target="_blank" rel="noopener noreferrer">Authenticate Manually</a>
                     </div>
                 </div>
             )}
