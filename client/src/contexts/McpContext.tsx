@@ -18,6 +18,7 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
         callbackUrl: import.meta.env.VITE_CALLBACK_URL,
         clientName: 'SnapLinear',
         debug: import.meta.env.DEV,
+        preventAutoAuth: true,
         url: 'https://mcp.linear.app/sse',
     });
 
@@ -72,7 +73,13 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
                     <ClipLoader size={56} color="white"/>
                 </div>
             )}
-            {state === 'ready' && children}
+            {state === 'ready' ? children : (
+                <div className="flex flex-col items-center justify-center text-center h-full w-full gap-8">
+                    <div className="flex gap-4">
+                        <Button onClick={authenticate}>Authenticate Manually</Button>
+                    </div>
+                </div>
+            )}
         </McpContext.Provider>
     );
 };
