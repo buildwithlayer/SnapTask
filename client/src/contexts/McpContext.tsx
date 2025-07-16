@@ -18,7 +18,6 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
         callbackUrl: import.meta.env.VITE_CALLBACK_URL,
         clientName: 'SnapLinear',
         debug: import.meta.env.DEV,
-        preventAutoAuth: true,
         url: 'https://mcp.linear.app/sse',
     });
 
@@ -75,9 +74,16 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
             )}
             {state === 'ready' ? children : (
                 <div className="flex flex-col items-center justify-center text-center h-full w-full gap-8">
-                    <div className="flex gap-4">
-                        <a href={authUrl} target="_blank" rel="noopener noreferrer">Authenticate Manually</a>
-                    </div>
+                    <p>
+                        Popup blocked?{' '}
+                        <a href={authUrl} target="_blank" rel="noopener noreferrer" onClick={() => {
+                            setInterval(() => {}, 5000);
+                        }}>
+                            Authenticate manually
+                        </a>
+                        {' or '}
+                        <button onClick={() => authenticate()}>Retry Auth</button>
+                    </p>
                 </div>
             )}
         </McpContext.Provider>
