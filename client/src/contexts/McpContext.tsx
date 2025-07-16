@@ -13,11 +13,12 @@ interface McpContextType {
 const McpContext = createContext<McpContextType>({});
 
 export const McpProvider = ({children}: { children: ReactNode }) => {
-    const {authenticate, callTool, error, retry, state, tools} = useMcp({
+    const {authenticate, authUrl, callTool, error, retry, state, tools} = useMcp({
         autoReconnect: true,
         callbackUrl: import.meta.env.VITE_CALLBACK_URL,
         clientName: 'SnapLinear',
         debug: import.meta.env.DEV,
+        preventAutoAuth: true,
         url: 'https://mcp.linear.app/sse',
     });
 
@@ -67,9 +68,16 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
                     </div>
                 </div>
             )}
-            {!showErrorUI && state !== 'ready' && (
+            {!showErrorUI && state !== 'ready' && state !== 'pending_auth' && (
                 <div className="flex h-full w-full items-center justify-center">
                     <ClipLoader size={56} color="white"/>
+                </div>
+            )}
+            {state === 'pending_auth' && (
+                <div className="flex h-full w-full items-center justify-center">
+                    <Button onClick={() => {window.open(authUrl, '_blank');}}>
+                            Log in with Linear
+                    </Button>
                 </div>
             )}
             {state === 'ready' && children}
