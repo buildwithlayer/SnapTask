@@ -18,6 +18,7 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
         callbackUrl: import.meta.env.VITE_CALLBACK_URL,
         clientName: 'SnapLinear',
         debug: import.meta.env.DEV,
+        preventAutoAuth: true,
         url: 'https://mcp.linear.app/sse',
     });
 
@@ -67,25 +68,21 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
                     </div>
                 </div>
             )}
-            {!showErrorUI && state !== 'ready' && (
+            {!showErrorUI && state !== 'ready' && state !== "pending_auth" && (
                 <div className="flex h-full w-full items-center justify-center">
                     <ClipLoader size={56} color="white"/>
                 </div>
             )}
-            {state === 'ready' ? children : (
-                <div className="flex flex-col items-center justify-center text-center h-full w-full gap-8">
-                    <p>
-                        Popup blocked?{' '}
-                        <a href={authUrl} target="_blank" rel="noopener noreferrer" onClick={() => {
-                            setInterval(() => {}, 5000);
-                        }}>
-                            Authenticate manually
-                        </a>
-                        {' or '}
-                        <button onClick={() => authenticate()}>Retry Auth</button>
-                    </p>
-                </div>
+            {state === 'pending_auth' && (
+                <Button>
+                    <a href={authUrl} target="_blank" rel="opener" onClick={() => {
+                        setInterval(() => {}, 5000);
+                    }}>
+                        Log in with Linear
+                    </a>
+                </Button>
             )}
+            {state === 'ready' && children}
         </McpContext.Provider>
     );
 };

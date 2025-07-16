@@ -10,7 +10,7 @@ export default defineConfig({
     },
     plugins: [react(), tailwindcss(), svgr()],
     server: {
-        // allowedHosts: ['f425aed715a1.ngrok-free.app'],
+        allowedHosts: ['b4be9442782e.ngrok-free.app'],
         proxy: {
             '/api': {
                 changeOrigin: true,
