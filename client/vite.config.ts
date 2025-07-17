@@ -7,17 +7,17 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig(({mode}) => {
     const env = loadEnv(mode, process.cwd());
     return {
-    build: {
-        outDir: '../dist',
-    },
-    plugins: [react(), tailwindcss(), svgr()],
-    server: {
-        allowedHosts: env.VITE_ALLOWED_HOSTS?.split(',') || [],
-        proxy: {
-            '/api': {
-                changeOrigin: true,
-                target: 'http://localhost:3001',
+        build: {
+            outDir: '../dist',
+        },
+        plugins: [react(), tailwindcss(), svgr()],
+        server: {
+            allowedHosts: env.VITE_ALLOWED_HOSTS?.split(',') || [],
+            proxy: {
+                '/api': {
+                    changeOrigin: true,
+                    target: 'http://localhost:3001',
+                },
             },
         },
-    },
-}});
+    };});

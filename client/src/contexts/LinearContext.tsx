@@ -78,7 +78,11 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 }
             }
             if (projectsResponse) {
-                const projectsContent = JSON.parse(projectsResponse.content[0].text);
+                console.log('Projects response:', projectsResponse);
+                let projectsContent = JSON.parse(projectsResponse.content[0].text);
+                if ('content' in projectsContent) {
+                    projectsContent = projectsContent.content;
+                }
                 localStorage.setItem(
                     'linear_projects',
                     JSON.stringify(projectsContent),
