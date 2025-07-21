@@ -4,6 +4,7 @@ import {serveStatic} from '@hono/node-server/serve-static';
 import {swaggerUI} from '@hono/swagger-ui';
 import {OpenAPIHono} from '@hono/zod-openapi';
 import {cors} from 'hono/cors';
+import amplitudeRouter from './routes/amplitude.js';
 import chatRouter from './routes/chat.js';
 import extractRouter from './routes/extract.js';
 import transcribeRouter from './routes/transcribe.js';
@@ -16,6 +17,7 @@ app.use('*', cors());
 app.route('/api/chat', chatRouter);
 app.route('/api/transcribe', transcribeRouter);
 app.route('/api/extract', extractRouter);
+app.route('/api/amplitude', amplitudeRouter);
 
 // API documentation
 app.doc('/api/doc', {
