@@ -12,7 +12,6 @@ function App() {
     const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
     amplitude.add(sessionReplayTracking);
 
-    console.log(`${import.meta.env.VITE_API_URL}/api/amplitude`);
     amplitude.init('5cc5c6e8863745ef94f222901951ead6', {
         autocapture: {
             elementInteractions: true,
