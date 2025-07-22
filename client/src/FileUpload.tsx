@@ -10,6 +10,7 @@ import FileIcon from './assets/file.svg?react';
 import UploadIcon from './assets/upload.svg?react';
 import WarningIcon from './assets/warning.svg?react';
 import Button from './components/Button';
+import PasteInput from './components/PasteInput';
 import RecordButton from './components/RecordButton';
 import {useFileContext} from './contexts/FileContext';
 
@@ -52,6 +53,12 @@ function FileUpload({demo}: {demo: boolean}) {
         setFile(localFile);
     }
 
+    function handleSubmitText(text: string) {
+        const blob = new Blob([text], {type: 'text/plain'});
+        const file = new File([blob], 'transcript.txt', {type: 'text/plain'});
+        setFile(file);
+    }
+
     return (
         <>
             <div className="w-full flex flex-col items-center justify-center gap-4">
@@ -83,6 +90,7 @@ function FileUpload({demo}: {demo: boolean}) {
                     </>
                 ) : (
                     <>
+                        {!demo && (<><PasteInput handleSubmit={handleSubmitText} /><p className='text-gray-600 font-medium'>OR</p></>)}
                         <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4">
                             <div className="w-full flex flex-col gap-4">
                                 {demo && recording && (<p className='text-xl text-center px-2 py-4 rounded-sm bg-gray-900 border border-gray-800'>Try saying <span className='text-emerald-300'>"Create me a task called try out SnapLinear"</span></p>)}
