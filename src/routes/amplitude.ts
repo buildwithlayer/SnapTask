@@ -2,14 +2,11 @@ import {OpenAPIHono} from '@hono/zod-openapi';
 
 const amplitudeRouter = new OpenAPIHono();
 
-// Simple catch-all proxy without OpenAPI constraints
 amplitudeRouter.all('/*', async (c) => {
     try {
         const url = new URL(c.req.url);
         const path = url.pathname.replace('/api/amplitude', '') || '/2/httpapi';
         const targetUrl = `https://api2.amplitude.com${path}${url.search}`;
-        
-        console.log(`🔄 Proxying: ${c.req.url} → ${targetUrl}`);
         
         const response = await fetch(targetUrl, {
             method: c.req.method,
