@@ -1,8 +1,8 @@
+import * as amplitude from '@amplitude/analytics-browser';
 import {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
 import {ClipLoader} from 'react-spinners';
 import {type Tool, useMcp, type UseMcpResult} from 'use-mcp/react';
 import Button from '../components/Button';
-import * as amplitude from '@amplitude/analytics-browser';
 
 
 interface McpContextType {
