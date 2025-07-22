@@ -14,7 +14,6 @@ amplitudeRouter.all('/*', async (c) => {
             body: ['GET', 'HEAD'].includes(c.req.method) ? null : await c.req.arrayBuffer(),
         });
         
-        // Return raw Response - this works with simple .all() routes
         return new Response(response.body, {
             status: response.status,
             statusText: response.statusText,
