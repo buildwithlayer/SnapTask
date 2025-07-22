@@ -1,3 +1,4 @@
+import * as amplitude from '@amplitude/analytics-browser';
 import {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
 import {ClipLoader} from 'react-spinners';
 import {type Tool, useMcp, type UseMcpResult} from 'use-mcp/react';
@@ -44,6 +45,8 @@ export const McpProvider = ({children}: { children: ReactNode }) => {
         let timer: NodeJS.Timeout;
         if (state === 'failed') {
             timer = setTimeout(() => setShowErrorUI(true), 1000);
+        } else if (state === 'ready') {
+            amplitude.track('Authenticated Successfully');
         } else {
             setShowErrorUI(false);
         }

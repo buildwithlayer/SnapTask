@@ -16,6 +16,7 @@ function App() {
         autocapture: {
             elementInteractions: true,
         },
+        serverUrl: `${import.meta.env.VITE_API_URL}/api/amplitude`,
     });
 
     return (
