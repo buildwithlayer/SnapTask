@@ -1,3 +1,4 @@
+import * as amplitude from '@amplitude/analytics-browser';
 import type {ChatCompletionMessageToolCall} from 'openai/resources/index.mjs';
 import {
     createContext,
@@ -182,6 +183,9 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
                     toast.error('Could not approve issue');
                 }
             }
+            amplitude.track('Issue Approved', {
+                issue: JSON.stringify(issues[toolCallId]),
+            });
             setApproveLoading((prev) => prev.filter((id) => id !== toolCallId));
         }
     }
@@ -199,6 +203,9 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
                     [toolCallId]: issues[toolCallId],
                 }),
             );
+            amplitude.track('Issue Rejected', {
+                issue: JSON.stringify(issues[toolCallId]),
+            });
         }
     }
 
