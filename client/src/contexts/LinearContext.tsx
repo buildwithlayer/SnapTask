@@ -96,7 +96,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                     const myIssue = (myIssuesZodParseResult.data as BaseIssue[]).pop();
 
                     if (myIssue) {
-                        const user: User | undefined = usersContent.filter((user: User) => user.id === myIssue.assigneeId).pop();
+                        const user: User | undefined = usersContent.find((user: User) => user.id === myIssue.assigneeId);
 
                         if (!user) console.warn('⚠️ User not found');
 
