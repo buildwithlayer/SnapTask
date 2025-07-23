@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import type {Tool, UseMcpResult} from 'use-mcp/react';
 import {convertTools, respondToUser} from '../utils/openaiMcp';
 import {useLinearContext} from './LinearContext';
+import {useLocalStorageContext} from './LocalStorageContext';
 import {useMcpContext} from './McpContext';
 import {useTranscriptContext} from './TranscriptContext';
 
@@ -38,6 +39,7 @@ export const MessagesProvider = ({children}: { children: ReactNode }) => {
     const {transcript} = useTranscriptContext();
     const {callTool, tools} = useMcpContext();
     const {projects, teams, users} = useLinearContext();
+    const {getLocalIncompleteToolCalls, getLocalMessages, setLocalIncompleteToolCalls, setLocalMessages} = useLocalStorageContext();
 
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -128,21 +130,22 @@ ${transcript}`,
     useEffect(() => {
         if (transcript && messages.length === 0) {
             setMessages([initialMessage]);
-            localStorage.setItem('messages', JSON.stringify([initialMessage]));
+            setLocalMessages([initialMessage]);
         }
-    }, [transcript, messages, initialMessage]);
+    }, [transcript, messages, initialMessage, setLocalMessages]);
 
     useEffect(() => {
-        const storedMessages = localStorage.getItem('messages');
-        if (storedMessages) {
-            setMessages(JSON.parse(storedMessages));
+        if (messages.length <= 1) {
+            setMessages(getLocalMessages() || []);}
+        if (incompleteToolCalls.length === 0) {
+            setIncompleteToolCalls(getLocalIncompleteToolCalls() || []);
         }
-
-        const storedToolCalls = localStorage.getItem('incompleteToolCalls');
-        if (storedToolCalls) {
-            setIncompleteToolCalls(JSON.parse(storedToolCalls));
-        }
-    }, []);
+    }, [
+        getLocalMessages,
+        getLocalIncompleteToolCalls,
+        messages.length,
+        incompleteToolCalls.length,
+    ]);
 
     async function getResponse(additionalUserMessage?: string): Promise<void> {
         setLoading(true);
@@ -165,10 +168,7 @@ ${transcript}`,
         )
             .then((newMessages) => {
                 if (newMessages.length === 0) return;
-                localStorage.setItem(
-                    'messages',
-                    JSON.stringify([...messagesToSend, ...newMessages]),
-                );
+                setLocalMessages([...messagesToSend, ...newMessages]);
                 setMessages([...messagesToSend, ...newMessages]);
 
                 const assistantMessages: ChatCompletionAssistantMessageParam[] =
@@ -183,10 +183,7 @@ ${transcript}`,
                             (msg) => msg.role === 'tool' && msg.tool_call_id === tc?.id,
                         ),
                 );
-                localStorage.setItem(
-                    'incompleteToolCalls',
-                    JSON.stringify(incompleteToolCalls || []),
-                );
+                setLocalIncompleteToolCalls(incompleteToolCalls || []);
                 setIncompleteToolCalls(incompleteToolCalls || []);
             })
             .catch((err) => {

@@ -9,6 +9,7 @@ import {
 } from 'react';
 import toast from 'react-hot-toast';
 import type {CreateComment} from '../linearTypes';
+import {useLocalStorageContext} from './LocalStorageContext';
 import {useMcpContext} from './McpContext';
 import {useMessagesContext} from './MessagesContext';
 
@@ -35,6 +36,7 @@ const CommentsContext = createContext<CommentsContextType>({
 export const CommentsProvider = ({children}: { children: ReactNode }) => {
     const {callTool} = useMcpContext();
     const {incompleteToolCalls} = useMessagesContext();
+    const {getLocalApprovedComments, getLocalCommentToolCalls, getLocalRejectedComments, setLocalApprovedComments, setLocalCommentToolCalls, setLocalRejectedComments} = useLocalStorageContext();
 
     const [commentToolCalls, setCommentToolCalls] = useState<
         ChatCompletionMessageToolCall[]
@@ -96,29 +98,21 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
             );
 
             setCommentToolCalls(commentToolCalls);
-            localStorage.setItem(
-                'commentToolCalls',
-                JSON.stringify(commentToolCalls),
-            );
+            setLocalCommentToolCalls(commentToolCalls);
         }
-    }, [incompleteToolCalls, comments]);
+    }, [incompleteToolCalls, comments, setLocalCommentToolCalls]);
 
     useEffect(() => {
-        const storedCommentToolCalls = localStorage.getItem('commentToolCalls');
-        const storedApprovedComments = localStorage.getItem('approvedComments');
-        const storedRejectedComments = localStorage.getItem('rejectedComments');
-
-        if (storedCommentToolCalls) {
-            const parsedComments = JSON.parse(storedCommentToolCalls);
-            setCommentToolCalls(parsedComments);
+        if (commentToolCalls.length === 0) {
+            setCommentToolCalls(getLocalCommentToolCalls() || []);
         }
-        if (storedApprovedComments) {
-            setApprovedComments(JSON.parse(storedApprovedComments));
+        if (Object.keys(approvedComments).length === 0) {
+            setApprovedComments(getLocalApprovedComments() || {});
         }
-        if (storedRejectedComments) {
-            setRejectedComments(JSON.parse(storedRejectedComments));
+        if (Object.keys(rejectedComments).length === 0) {
+            setRejectedComments(getLocalRejectedComments() || {});
         }
-    }, []);
+    }, [getLocalCommentToolCalls, getLocalApprovedComments, getLocalRejectedComments, commentToolCalls, approvedComments, rejectedComments]);
 
     async function approveComment(toolCallId: string) {
         if (approveLoading.includes(toolCallId)) return;
@@ -142,13 +136,10 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
                         ...prev,
                         [toolCallId]: comments[toolCallId],
                     }));
-                    localStorage.setItem(
-                        'approvedComments',
-                        JSON.stringify({
-                            ...approvedComments,
-                            [toolCallId]: comments[toolCallId],
-                        }),
-                    );
+                    setLocalApprovedComments({
+                        ...approvedComments,
+                        [toolCallId]: comments[toolCallId],
+                    });
                 } catch (error) {
                     console.error('Error approving comment:', error);
                     toast.error('Could not approve comment');
@@ -167,13 +158,10 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
                 ...prev,
                 [toolCallId]: comments[toolCallId],
             }));
-            localStorage.setItem(
-                'rejectedComments',
-                JSON.stringify({
-                    ...rejectedComments,
-                    [toolCallId]: comments[toolCallId],
-                }),
-            );
+            setLocalRejectedComments({
+                ...rejectedComments,
+                [toolCallId]: comments[toolCallId],
+            });
             amplitude.track('Comment Rejected', {
                 comment: JSON.stringify(comments[toolCallId]),
             });

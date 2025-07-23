@@ -7,6 +7,7 @@ import {
 } from 'react';
 import toast from 'react-hot-toast';
 import {useFileContext} from './FileContext';
+import {useLocalStorageContext} from './LocalStorageContext';
 
 interface TranscriptContextType {
     error?: Error;
@@ -23,17 +24,15 @@ const TranscriptContext = createContext<TranscriptContextType>({
 
 export const TranscriptProvider = ({children}: { children: ReactNode }) => {
     const {file} = useFileContext();
+    const {getLocalTranscript, setLocalTranscript} = useLocalStorageContext();
 
     const [transcript, setTranscript] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | undefined>(undefined);
 
     useEffect(() => {
-        const storedTranscript = localStorage.getItem('transcript');
-        if (storedTranscript) {
-            setTranscript(storedTranscript);
-        }
-    }, []);
+        setTranscript(getLocalTranscript() || undefined);
+    }, [getLocalTranscript]);
 
     async function transcribeFile(): Promise<void> {
         if (!file) return;
@@ -52,7 +51,7 @@ export const TranscriptProvider = ({children}: { children: ReactNode }) => {
                 .then(async (response) => {
                     if (response.ok) {
                         const data = (await response.json()) as string;
-                        localStorage.setItem('transcript', data);
+                        setLocalTranscript(data);
                         setTranscript(data);
                     } else {
                         console.error(await response.text());
@@ -82,7 +81,7 @@ export const TranscriptProvider = ({children}: { children: ReactNode }) => {
             reader.onload = () => {
                 const content = reader.result;
                 if (typeof content === 'string') {
-                    localStorage.setItem('transcript', content);
+                    setLocalTranscript(content);
                     setTranscript(content);
                 }
             };

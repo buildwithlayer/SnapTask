@@ -1,7 +1,7 @@
 import * as amplitude from '@amplitude/analytics-browser';
 import {useState} from 'react';
 import Button from './components/Button';
-import {handleReset} from './components/ResetButton';
+import {useLocalStorageContext} from './contexts/LocalStorageContext';
 
 interface SurveyQuestion {
     responseElement?: React.ReactNode;
@@ -10,6 +10,8 @@ interface SurveyQuestion {
 }
 
 const Survey = () => {
+    const {resetLocalStorage} = useLocalStorageContext();
+    
     const [currentQuestion, setCurrentQuestion] = useState<number>(0);
 
     const [freeTextResponse, setFreeTextResponse] = useState<string>('');
@@ -75,12 +77,12 @@ const Survey = () => {
                             question={questions[currentQuestion]}
                             setCurrentQuestion={setCurrentQuestion}
                         />
-                        <Button onClick={handleReset} additionalClasses='w-full' style='outlined'>Return to Home Page</Button>
+                        <Button onClick={resetLocalStorage} additionalClasses='w-full' style='outlined'>Return to Home Page</Button>
                     </div>
                 ) : (
                     <div className='flex flex-col items-center gap-8'>
                         <h2 className='text-2xl font-bold'>Thank you for your feedback!</h2>
-                        <Button onClick={handleReset} additionalClasses='w-full'>Return to Home Page</Button>
+                        <Button onClick={resetLocalStorage} additionalClasses='w-full'>Return to Home Page</Button>
                     </div>
                 )}
             </div>
