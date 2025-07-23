@@ -176,18 +176,21 @@ export interface BaseTeam {
     updatedAt: string;
 }
 
+export const BaseTeamSchema = z.object({
+    createdAt: z.string(),
+    id: z.string(),
+    name: z.string(),
+    updatedAt: z.string(),
+});
+
 export interface Team extends BaseTeam {
     issueLabels: IssueLabel[];
     issueStatuses: IssueStatus[];
 }
 
-export const TeamSchema = z.object({
-    createdAt: z.string(),
-    id: z.string(),
+export const TeamSchema = BaseTeamSchema.extend({
     issueLabels: z.array(IssueLabelSchema),
     issueStatuses: z.array(IssueStatusSchema),
-    name: z.string(),
-    updatedAt: z.string(),
 });
 
 export interface User {

@@ -8,7 +8,7 @@ import {
 } from 'react';
 import toast from 'react-hot-toast';
 import z from 'zod';
-import {type BaseIssue, type BaseTeam, type Project, type Team, type User, UserSchema} from '../linearTypes';
+import {type BaseIssue, BaseIssueSchema, type BaseTeam, BaseTeamSchema, type Project, ProjectSchema, type Team, type User, UserSchema} from '../linearTypes';
 import {useLocalStorageContext} from './LocalStorageContext';
 import {useMcpContext} from './McpContext';
 
@@ -52,21 +52,48 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 ]);
 
             if (usersResponse) {
-                const userParseResult = z.array(UserSchema).safeParse(
-                    JSON.parse(usersResponse.content[0].text),
-                );
-                if (userParseResult.error) {
-                    console.error('Error parsing users:', userParseResult.error);
+                let usersParseResult;
+                try {
+                    usersParseResult = JSON.parse(usersResponse.content[0].text);
+                } catch (error) {
+                    console.error('Error parsing users:', error);
                     toast.error('Failed to parse users data.');
-                    setError(userParseResult.error);
+                    setError(error as Error);
                     return;
                 }
-                const usersContent = userParseResult.data as User[];
+                const usersZodParseResult = z.array(UserSchema).safeParse(
+                    usersParseResult,
+                );
+                if (usersZodParseResult.error) {
+                    console.error('Error parsing users:', usersZodParseResult.error);
+                    toast.error('Failed to parse users data.');
+                    setError(usersZodParseResult.error);
+                    return;
+                }
+                const usersContent = usersZodParseResult.data as User[];
                 setLocalLinearUsers(usersContent);
                 setUsers(usersContent);
 
                 if (myIssuesResponse) {
-                    const myIssue = (JSON.parse(myIssuesResponse.content[0].text) as BaseIssue[]).pop();
+                    let myIssuesParseResult;
+                    try {
+                        myIssuesParseResult = JSON.parse(myIssuesResponse.content[0].text);
+                    } catch (error) {
+                        console.error('Error parsing my issues:', error);
+                        toast.error('Failed to parse my issues data.');
+                        setError(error as Error);
+                        return;
+                    }
+                    const myIssuesZodParseResult = z.array(BaseIssueSchema).safeParse(
+                        myIssuesParseResult,
+                    );
+                    if (myIssuesZodParseResult.error) {
+                        console.error('Error parsing my issues:', myIssuesZodParseResult.error);
+                        toast.error('Failed to parse my issues data.');
+                        setError(myIssuesZodParseResult.error);
+                        return;
+                    }
+                    const myIssue = (myIssuesZodParseResult.data as BaseIssue[]).pop();
 
                     if (myIssue) {
                         const user: User | undefined = usersContent.filter((user: User) => user.id === myIssue.assigneeId).pop();
@@ -90,15 +117,51 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 }
             }
             if (projectsResponse) {
-                let projectsContent = JSON.parse(projectsResponse.content[0].text);
-                if ('content' in projectsContent) {
-                    projectsContent = projectsContent.content;
+                let projectsParseResult;
+                try {
+                    projectsParseResult = JSON.parse(projectsResponse.content[0].text);
+                } catch (error) {
+                    console.error('Error parsing projects:', error);
+                    toast.error('Failed to parse projects data.');
+                    setError(error as Error);
+                    return;
                 }
+                if ('content' in projectsParseResult) {
+                    projectsParseResult = projectsParseResult.content;
+                }
+                const projectsZodParseResult = z.array(ProjectSchema).safeParse(
+                    projectsParseResult,
+                );
+                if (projectsZodParseResult.error) {
+                    console.error('Error parsing projects:', projectsZodParseResult.error);
+                    toast.error('Failed to parse projects data.');
+                    setError(projectsZodParseResult.error);
+                    return;
+                }
+                const projectsContent = projectsZodParseResult.data as Project[];
                 setLocalLinearProjects(projectsContent);
                 setProjects(projectsContent);
             }
             if (teamsResponse) {
-                const teamsContent = JSON.parse(teamsResponse.content[0].text);
+                let teamsParseResult;
+                try {
+                    teamsParseResult = JSON.parse(teamsResponse.content[0].text);
+                } catch (error) {
+                    console.error('Error parsing teams:', error);
+                    toast.error('Failed to parse teams data.');
+                    setError(error as Error);
+                    return;
+                }
+                const teamsZodParseResult = z.array(BaseTeamSchema).safeParse(
+                    teamsParseResult,
+                );
+                if (teamsZodParseResult.error) {
+                    console.error('Error parsing teams:', teamsZodParseResult.error);
+                    toast.error('Failed to parse teams data.');
+                    setError(teamsZodParseResult.error);
+                    return;
+                }
+                const teamsContent = teamsZodParseResult.data as BaseTeam[];
                 const teams = await Promise.all(
                     teamsContent.map(async (baseTeam: BaseTeam) => {
                         const team: Team = {
@@ -112,8 +175,12 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                         const getIssueStatuses = await callTool('list_issue_statuses', {
                             teamId: team.id,
                         });
-                        team.issueLabels = JSON.parse(getIssueLabels.content[0].text);
-                        team.issueStatuses = JSON.parse(getIssueStatuses.content[0].text);
+                        try {
+                            team.issueLabels = JSON.parse(getIssueLabels.content[0].text);
+                            team.issueStatuses = JSON.parse(getIssueStatuses.content[0].text);
+                        } catch (error) {
+                            console.error('Error parsing team data:', error);
+                        }
 
                         return team;
                     }),
