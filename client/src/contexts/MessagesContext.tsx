@@ -184,6 +184,7 @@ ${transcript}`,
                         ),
                 );
                 setLocalIncompleteToolCalls(incompleteToolCalls || []);
+                setIncompleteToolCalls(incompleteToolCalls || []);
             })
             .catch((err) => {
                 console.error(err);
