@@ -6,7 +6,6 @@ import {
     useEffect,
     useState,
 } from 'react';
-import toast from 'react-hot-toast';
 import z from 'zod';
 import {type BaseIssue, BaseIssueSchema, type BaseTeam, BaseTeamSchema, type Project, ProjectSchema, type Team, type User, UserSchema} from '../linearTypes';
 import {useLocalStorageContext} from './LocalStorageContext';
@@ -57,7 +56,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                     usersParseResult = JSON.parse(usersResponse.content[0].text);
                 } catch (error) {
                     console.error('Error parsing users:', error);
-                    toast.error('Failed to parse users data.');
                     setError(error as Error);
                     return;
                 }
@@ -66,7 +64,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 );
                 if (usersZodParseResult.error) {
                     console.error('Error parsing users:', usersZodParseResult.error);
-                    toast.error('Failed to parse users data.');
                     setError(usersZodParseResult.error);
                     return;
                 }
@@ -80,7 +77,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                         myIssuesParseResult = JSON.parse(myIssuesResponse.content[0].text);
                     } catch (error) {
                         console.error('Error parsing my issues:', error);
-                        toast.error('Failed to parse my issues data.');
                         setError(error as Error);
                         return;
                     }
@@ -89,7 +85,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                     );
                     if (myIssuesZodParseResult.error) {
                         console.error('Error parsing my issues:', myIssuesZodParseResult.error);
-                        toast.error('Failed to parse my issues data.');
                         setError(myIssuesZodParseResult.error);
                         return;
                     }
@@ -122,7 +117,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                     projectsParseResult = JSON.parse(projectsResponse.content[0].text);
                 } catch (error) {
                     console.error('Error parsing projects:', error);
-                    toast.error('Failed to parse projects data.');
                     setError(error as Error);
                     return;
                 }
@@ -134,7 +128,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 );
                 if (projectsZodParseResult.error) {
                     console.error('Error parsing projects:', projectsZodParseResult.error);
-                    toast.error('Failed to parse projects data.');
                     setError(projectsZodParseResult.error);
                     return;
                 }
@@ -148,7 +141,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                     teamsParseResult = JSON.parse(teamsResponse.content[0].text);
                 } catch (error) {
                     console.error('Error parsing teams:', error);
-                    toast.error('Failed to parse teams data.');
                     setError(error as Error);
                     return;
                 }
@@ -157,7 +149,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 );
                 if (teamsZodParseResult.error) {
                     console.error('Error parsing teams:', teamsZodParseResult.error);
-                    toast.error('Failed to parse teams data.');
                     setError(teamsZodParseResult.error);
                     return;
                 }
@@ -190,7 +181,6 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
             }
         } catch (error) {
             console.error('Error fetching Linear data:', error);
-            toast.error('Failed to fetch Linear data. Please try again later.');
             setError(error as Error);
         }
 
