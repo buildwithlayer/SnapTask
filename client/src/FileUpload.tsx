@@ -14,7 +14,7 @@ import PasteInput from './components/PasteInput';
 import RecordButton from './components/RecordButton';
 import {useFileContext} from './contexts/FileContext';
 
-function FileUpload({demo}: {demo: boolean}) {
+function FileUpload({demo, splitTestVersion}: {demo: boolean, splitTestVersion?: string}) {
     const {setFile} = useFileContext();
 
     const browserSupportsRecording = Boolean(
@@ -99,6 +99,7 @@ function FileUpload({demo}: {demo: boolean}) {
                                         isRecording={recording}
                                         setIsRecording={setRecording}
                                         handleRecordingComplete={setLocalFile}
+                                        splitTestVersion={splitTestVersion}
                                     />
                                 )}
                             </div>
@@ -126,18 +127,15 @@ function FileUpload({demo}: {demo: boolean}) {
                                 </div>)}
                         </div>
                         {/* Recording disclaimer */}
-                        {browserSupportsRecording &&
+                        {!demo && browserSupportsRecording &&
                             !window.navigator.platform.includes('Win') && (
                             <div
                                 className={`w-full flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white ${demo ? 'text-center': 'text-left'}`}>
                                 <WarningIcon className="min-w-5 w-5 min-h-5 h-5 fill-yellow-500"/>
-                                {demo ? <p className='text-sm text-gray-300 w-full'>
-                                        Only records microphone audio. To capture system audio, record with
-                                        another tool (e.g., Zoom, OBS) and upload the file <a href="/" className="text-primary hover:text-primary-dark">here</a>.
-                                </p> :<p className='text-sm text-gray-300 w-full'>
+                                <p className='text-sm text-gray-300 w-full'>
                                         Only records microphone audio. To capture system audio, record with
                                         another tool (e.g., Zoom, OBS) and upload the file here.
-                                </p>}
+                                </p>
                             </div>
                         )}
                         {demo && <p className='text-gray-300'>Want to upload an existing audio file or transcript? <a href="/" className="text-primary hover:text-primary-dark">Click here</a></p>}
