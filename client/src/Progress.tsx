@@ -83,8 +83,7 @@ const Progress = () => {
                     loading={transcriptLoading}
                     start={
                         file !== undefined &&
-                        !transcript &&
-                        !localStorage.getItem('transcript')
+                        !transcript
                     }
                     error={transcriptError}
                     fn={transcribeFile}

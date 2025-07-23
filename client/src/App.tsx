@@ -7,6 +7,7 @@ import {FileProvider} from './contexts/FileContext.tsx';
 import {TranscriptProvider} from './contexts/TranscriptContext.tsx';
 import MenuBar from './MenuBar.tsx';
 import OAuthCallback from './OAuthCallback.tsx';
+import { LocalStorageProvider } from './contexts/LocalStorageContext.tsx';
 
 function App() {
     const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
@@ -21,27 +22,29 @@ function App() {
 
     return (
         <div className="flex flex-col h-screen w-screen">
-            <Router>
-                <Routes>
-                    <Route path={'/oauth/callback'} element={<OAuthCallback/>}/>
-                    <Route
-                        path={'/'}
-                        element={
-                            <FileProvider>
-                                <TranscriptProvider>
-                                    <MenuBar/>
-                                    <Content demo={false} />
-                                </TranscriptProvider>
-                            </FileProvider>
-                        }
-                    />
-                    <Route path={'/demo'} element={<FileProvider>
-                        <TranscriptProvider>
-                            <Content demo={true} />
-                        </TranscriptProvider>
-                    </FileProvider>} />
-                </Routes>
-            </Router>
+            <LocalStorageProvider>
+                <Router>
+                    <Routes>
+                        <Route path={'/oauth/callback'} element={<OAuthCallback/>}/>
+                        <Route
+                            path={'/'}
+                            element={
+                                <FileProvider>
+                                    <TranscriptProvider>
+                                        <MenuBar/>
+                                        <Content demo={false} />
+                                    </TranscriptProvider>
+                                </FileProvider>
+                            }
+                        />
+                        <Route path={'/demo'} element={<FileProvider>
+                            <TranscriptProvider>
+                                <Content demo={true} />
+                            </TranscriptProvider>
+                        </FileProvider>} />
+                    </Routes>
+                </Router>
+            </LocalStorageProvider>
             <Toaster
                 position="bottom-right"
                 toastOptions={{

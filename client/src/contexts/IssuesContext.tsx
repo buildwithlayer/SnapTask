@@ -16,6 +16,7 @@ import {
 import {useLinearContext} from './LinearContext';
 import {useMcpContext} from './McpContext';
 import {useMessagesContext} from './MessagesContext';
+import { useLocalStorageContext } from './LocalStorageContext';
 
 interface IssuesContextType {
     approveIssue: (toolCallId: string) => Promise<void>;
@@ -41,6 +42,7 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
     const {callTool} = useMcpContext();
     const {incompleteToolCalls} = useMessagesContext();
     const {teams} = useLinearContext();
+    const {getLocalIssueToolCalls, setLocalIssueToolCalls, getLocalApprovedIssues, setLocalApprovedIssues, getLocalRejectedIssues, setLocalRejectedIssues} = useLocalStorageContext();
 
     const [issueToolCalls, setIssueToolCalls] = useState<
         ChatCompletionMessageToolCall[]
@@ -110,26 +112,28 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
             );
 
             setIssueToolCalls(issueToolCalls);
-            localStorage.setItem('issueToolCalls', JSON.stringify(issueToolCalls));
+            setLocalIssueToolCalls(issueToolCalls);
         }
     }, [incompleteToolCalls, issues]);
 
     useEffect(() => {
-        const storedIssueToolCalls = localStorage.getItem('issueToolCalls');
-        const storedApprovedIssues = localStorage.getItem('approvedIssues');
-        const storedRejectedIssues = localStorage.getItem('rejectedIssues');
-
-        if (storedIssueToolCalls) {
-            const parsedIssues = JSON.parse(storedIssueToolCalls);
-            setIssueToolCalls(parsedIssues);
+        if (issueToolCalls.length === 0) {
+            setIssueToolCalls(getLocalIssueToolCalls() || []);
         }
-        if (storedApprovedIssues) {
-            setApprovedIssues(JSON.parse(storedApprovedIssues));
+        if (Object.keys(approvedIssues).length === 0) {
+            setApprovedIssues(getLocalApprovedIssues() || {});
         }
-        if (storedRejectedIssues) {
-            setRejectedIssues(JSON.parse(storedRejectedIssues));
+        if (Object.keys(rejectedIssues).length === 0) {
+            setRejectedIssues(getLocalRejectedIssues() || {});
         }
-    }, []);
+    }, [
+        getLocalIssueToolCalls,
+        getLocalApprovedIssues,
+        getLocalRejectedIssues,
+        issueToolCalls,
+        approvedIssues,
+        rejectedIssues,
+    ]);
 
     async function approveIssue(toolCallId: string) {
         if (approveLoading.includes(toolCallId)) return;
@@ -171,13 +175,10 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
                         ...prev,
                         [toolCallId]: issues[toolCallId],
                     }));
-                    localStorage.setItem(
-                        'approvedIssues',
-                        JSON.stringify({
-                            ...approvedIssues,
-                            [toolCallId]: issues[toolCallId],
-                        }),
-                    );
+                    setLocalApprovedIssues({
+                        ...approvedIssues,
+                        [toolCallId]: issues[toolCallId],
+                    });
                 } catch (error) {
                     console.error('Error approving issue:', error);
                     toast.error('Could not approve issue');
@@ -196,13 +197,10 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
                 ...prev,
                 [toolCallId]: issues[toolCallId],
             }));
-            localStorage.setItem(
-                'rejectedIssues',
-                JSON.stringify({
-                    ...rejectedIssues,
-                    [toolCallId]: issues[toolCallId],
-                }),
-            );
+            setLocalRejectedIssues({
+                ...rejectedIssues,
+                [toolCallId]: issues[toolCallId],
+            });
             amplitude.track('Issue Rejected', {
                 issue: JSON.stringify(issues[toolCallId]),
             });

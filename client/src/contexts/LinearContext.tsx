@@ -7,8 +7,10 @@ import {
     useState,
 } from 'react';
 import toast from 'react-hot-toast';
-import type {BaseIssue, BaseTeam, Project, Team, User} from '../linearTypes';
+import {ProjectSchema, TeamSchema, UserSchema, type BaseIssue, type BaseTeam, type Project, type Team, type User} from '../linearTypes';
 import {useMcpContext} from './McpContext';
+import z, { set } from 'zod';
+import { useLocalStorageContext } from './LocalStorageContext';
 
 interface LinearContextType {
     error?: Error;
@@ -27,6 +29,7 @@ const LinearContext = createContext<LinearContextType>({
 
 export const LinearProvider = ({children}: { children: ReactNode }) => {
     const {callTool, state} = useMcpContext();
+    const {getLocalLinearUsers, setLocalLinearUsers, getLocalLinearProjects, setLocalLinearProjects, getLocalLinearTeams, setLocalLinearTeams} = useLocalStorageContext();
 
     const [users, setUsers] = useState<User[] | undefined>(undefined);
     const [projects, setProjects] = useState<Project[] | undefined>(undefined);
@@ -49,15 +52,24 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 ]);
 
             if (usersResponse) {
-                const usersContent = JSON.parse(usersResponse.content[0].text);
-                localStorage.setItem('linear_users', JSON.stringify(usersContent));
+                const userParseResult = z.array(UserSchema).safeParse(
+                    JSON.parse(usersResponse.content[0].text),
+                );
+                if (userParseResult.error) {
+                    console.error('Error parsing users:', userParseResult.error);
+                    toast.error('Failed to parse users data.');
+                    setError(userParseResult.error);
+                    return;
+                }
+                const usersContent = userParseResult.data as User[];
+                setLocalLinearUsers(usersContent);
                 setUsers(usersContent);
 
                 if (myIssuesResponse) {
                     const myIssue = (JSON.parse(myIssuesResponse.content[0].text) as BaseIssue[]).pop();
 
                     if (myIssue) {
-                        const user: User = usersContent.filter((user: User) => user.id === myIssue.assigneeId).pop();
+                        const user: User | undefined = usersContent.filter((user: User) => user.id === myIssue.assigneeId).pop();
 
                         if (!user) console.warn('⚠️ User not found');
 
@@ -78,15 +90,11 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 }
             }
             if (projectsResponse) {
-                console.log('Projects response:', projectsResponse);
                 let projectsContent = JSON.parse(projectsResponse.content[0].text);
                 if ('content' in projectsContent) {
                     projectsContent = projectsContent.content;
                 }
-                localStorage.setItem(
-                    'linear_projects',
-                    JSON.stringify(projectsContent),
-                );
+                setLocalLinearProjects(projectsContent);
                 setProjects(projectsContent);
             }
             if (teamsResponse) {
@@ -110,7 +118,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                         return team;
                     }),
                 );
-                localStorage.setItem('linear_teams', JSON.stringify(teams));
+                setLocalLinearTeams(teams);
                 setTeams(teams);
             }
         } catch (error) {
@@ -123,20 +131,16 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
     }
 
     useEffect(() => {
-        const storedUsers = localStorage.getItem('linear_users');
-        const storedProjects = localStorage.getItem('linear_projects');
-        const storedTeams = localStorage.getItem('linear_teams');
-
-        if (storedUsers) {
-            setUsers(JSON.parse(storedUsers));
+        if (!users || users.length === 0) {
+        setUsers(getLocalLinearUsers());
         }
-        if (storedProjects) {
-            setProjects(JSON.parse(storedProjects));
+        if (!projects || projects.length === 0) {
+            setProjects(getLocalLinearProjects());
         }
-        if (storedTeams) {
-            setTeams(JSON.parse(storedTeams));
+        if (!teams || teams.length === 0) {
+            setTeams(getLocalLinearTeams());
         }
-    }, []);
+    }, [getLocalLinearProjects, getLocalLinearTeams, getLocalLinearUsers, users, projects, teams]);
 
     return (
         <LinearContext.Provider
