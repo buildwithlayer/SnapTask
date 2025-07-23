@@ -14,9 +14,9 @@ import {
     type UpdateIssue,
 } from '../linearTypes';
 import {useLinearContext} from './LinearContext';
+import {useLocalStorageContext} from './LocalStorageContext';
 import {useMcpContext} from './McpContext';
 import {useMessagesContext} from './MessagesContext';
-import { useLocalStorageContext } from './LocalStorageContext';
 
 interface IssuesContextType {
     approveIssue: (toolCallId: string) => Promise<void>;
@@ -42,7 +42,7 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
     const {callTool} = useMcpContext();
     const {incompleteToolCalls} = useMessagesContext();
     const {teams} = useLinearContext();
-    const {getLocalIssueToolCalls, setLocalIssueToolCalls, getLocalApprovedIssues, setLocalApprovedIssues, getLocalRejectedIssues, setLocalRejectedIssues} = useLocalStorageContext();
+    const {getLocalApprovedIssues, getLocalIssueToolCalls, getLocalRejectedIssues, setLocalApprovedIssues, setLocalIssueToolCalls, setLocalRejectedIssues} = useLocalStorageContext();
 
     const [issueToolCalls, setIssueToolCalls] = useState<
         ChatCompletionMessageToolCall[]
@@ -114,7 +114,7 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
             setIssueToolCalls(issueToolCalls);
             setLocalIssueToolCalls(issueToolCalls);
         }
-    }, [incompleteToolCalls, issues]);
+    }, [incompleteToolCalls, issues, setLocalIssueToolCalls]);
 
     useEffect(() => {
         if (issueToolCalls.length === 0) {

@@ -9,9 +9,9 @@ import {
 } from 'react';
 import toast from 'react-hot-toast';
 import type {CreateComment} from '../linearTypes';
+import {useLocalStorageContext} from './LocalStorageContext';
 import {useMcpContext} from './McpContext';
 import {useMessagesContext} from './MessagesContext';
-import { useLocalStorageContext } from './LocalStorageContext';
 
 interface CommentsContextType {
     approveComment: (toolCallId: string) => Promise<void>;
@@ -36,7 +36,7 @@ const CommentsContext = createContext<CommentsContextType>({
 export const CommentsProvider = ({children}: { children: ReactNode }) => {
     const {callTool} = useMcpContext();
     const {incompleteToolCalls} = useMessagesContext();
-    const {getLocalCommentToolCalls, setLocalCommentToolCalls, getLocalApprovedComments, setLocalApprovedComments, getLocalRejectedComments, setLocalRejectedComments} = useLocalStorageContext();
+    const {getLocalApprovedComments, getLocalCommentToolCalls, getLocalRejectedComments, setLocalApprovedComments, setLocalCommentToolCalls, setLocalRejectedComments} = useLocalStorageContext();
 
     const [commentToolCalls, setCommentToolCalls] = useState<
         ChatCompletionMessageToolCall[]
@@ -100,7 +100,7 @@ export const CommentsProvider = ({children}: { children: ReactNode }) => {
             setCommentToolCalls(commentToolCalls);
             setLocalCommentToolCalls(commentToolCalls);
         }
-    }, [incompleteToolCalls, comments]);
+    }, [incompleteToolCalls, comments, setLocalCommentToolCalls]);
 
     useEffect(() => {
         if (commentToolCalls.length === 0) {

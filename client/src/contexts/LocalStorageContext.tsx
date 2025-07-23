@@ -5,86 +5,54 @@ import {
     type ReactNode,
     useContext,
 } from 'react';
-import { CreateCommentSchema, CreateIssueSchema, ProjectSchema, TeamSchema, UserSchema, type CreateComment, type CreateIssue, type Project, type Team, type UpdateIssue, type User } from '../linearTypes';
 import z from 'zod';
+import {type CreateComment, CreateCommentSchema, type CreateIssue, CreateIssueSchema, type Project, ProjectSchema, type Team, TeamSchema, type UpdateIssue, type User, UserSchema} from '../linearTypes';
 
 interface LocalStorageContextType {
-    getLocalTranscript: () => string | undefined;
-    setLocalTranscript: (transcript: string) => void;
-    getLocalMessages: () => OpenAI.ChatCompletionMessageParam[] | undefined;
-    setLocalMessages: (messages: OpenAI.ChatCompletionMessageParam[]) => void;
-    getLocalIncompleteToolCalls: () => OpenAI.ChatCompletionMessageToolCall[] | undefined;
-    setLocalIncompleteToolCalls: (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => void;
-    getLocalIssueToolCalls: () => ChatCompletionMessageToolCall[] | undefined;
-    setLocalIssueToolCalls: (issueToolCalls: ChatCompletionMessageToolCall[]) => void;
-    getLocalApprovedIssues: () => Record<string, CreateIssue | UpdateIssue> | undefined;
-    setLocalApprovedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => void;
-    getLocalRejectedIssues: () => Record<string, CreateIssue | UpdateIssue> | undefined;
-    setLocalRejectedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => void;
-    getLocalCommentToolCalls: () => ChatCompletionMessageToolCall[] | undefined;
-    setLocalCommentToolCalls: (commentToolCalls: ChatCompletionMessageToolCall[]) => void;
     getLocalApprovedComments: () => Record<string, CreateComment> | undefined;
-    setLocalApprovedComments: (comments: Record<string, CreateComment>) => void;
-    getLocalRejectedComments: () => Record<string, CreateComment> | undefined;
-    setLocalRejectedComments: (comments: Record<string, CreateComment>) => void;
-    getLocalLinearUsers: () => User[] | undefined;
-    setLocalLinearUsers: (users: User[]) => void;
+    getLocalApprovedIssues: () => Record<string, CreateIssue | UpdateIssue> | undefined;
+    getLocalCommentToolCalls: () => ChatCompletionMessageToolCall[] | undefined;
+    getLocalIncompleteToolCalls: () => OpenAI.ChatCompletionMessageToolCall[] | undefined;
+    getLocalIssueToolCalls: () => ChatCompletionMessageToolCall[] | undefined;
     getLocalLinearProjects: () => Project[] | undefined;
-    setLocalLinearProjects: (projects: Project[]) => void;
     getLocalLinearTeams: () => Team[] | undefined;
-    setLocalLinearTeams: (teams: Team[]) => void;
-    resetLocalStorage: () => void;
+    getLocalLinearUsers: () => User[] | undefined;
+    getLocalMessages: () => OpenAI.ChatCompletionMessageParam[] | undefined;
+    getLocalRejectedComments: () => Record<string, CreateComment> | undefined;
+    getLocalRejectedIssues: () => Record<string, CreateIssue | UpdateIssue> | undefined;
+    getLocalTranscript: () => string | undefined;
     hardReset: () => void;
+    resetLocalStorage: () => void;
+    setLocalApprovedComments: (comments: Record<string, CreateComment>) => void;
+    setLocalApprovedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => void;
+    setLocalCommentToolCalls: (commentToolCalls: ChatCompletionMessageToolCall[]) => void;
+    setLocalIncompleteToolCalls: (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => void;
+    setLocalIssueToolCalls: (issueToolCalls: ChatCompletionMessageToolCall[]) => void;
+    setLocalLinearProjects: (projects: Project[]) => void;
+    setLocalLinearTeams: (teams: Team[]) => void;
+    setLocalLinearUsers: (users: User[]) => void;
+    setLocalMessages: (messages: OpenAI.ChatCompletionMessageParam[]) => void;
+    setLocalRejectedComments: (comments: Record<string, CreateComment>) => void;
+    setLocalRejectedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => void;
+    setLocalTranscript: (transcript: string) => void;
 }
 
 const LocalStorageContext = createContext<LocalStorageContextType>({
-    getLocalTranscript: () => undefined,
-    setLocalTranscript: (transcript: string) => {
-        localStorage.setItem('transcript', transcript);
-    },
-    getLocalMessages: () => undefined,
-    setLocalMessages: (messages: OpenAI.ChatCompletionMessageParam[]) => {
-        localStorage.setItem('messages', JSON.stringify(messages));
-    },
-    getLocalIncompleteToolCalls: () => undefined,
-    setLocalIncompleteToolCalls: (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('incompleteToolCalls', JSON.stringify(toolCalls));
-    },
-    getLocalIssueToolCalls: () => undefined,
-    setLocalIssueToolCalls: (issueToolCalls: ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('issueToolCalls', JSON.stringify(issueToolCalls));
-    },
-    getLocalApprovedIssues: () => ({}),
-    setLocalApprovedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => {
-        localStorage.setItem('approvedIssues', JSON.stringify(issues));
-    },
-    getLocalRejectedIssues: () => ({}),
-    setLocalRejectedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => {
-        localStorage.setItem('rejectedIssues', JSON.stringify(issues));
-    },
-    getLocalCommentToolCalls: () => undefined,
-    setLocalCommentToolCalls: (commentToolCalls: ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('commentToolCalls', JSON.stringify(commentToolCalls));
-    },
     getLocalApprovedComments: () => ({}),
-    setLocalApprovedComments: (comments: Record<string, CreateComment>) => {
-        localStorage.setItem('approvedComments', JSON.stringify(comments));
-    },
-    getLocalRejectedComments: () => ({}),
-    setLocalRejectedComments: (comments: Record<string, CreateComment>) => {
-        localStorage.setItem('rejectedComments', JSON.stringify(comments));
-    },
-    getLocalLinearUsers: () => undefined,
-    setLocalLinearUsers: (users: User[]) => {
-        localStorage.setItem('linearUsers', JSON.stringify(users));
-    },
+    getLocalApprovedIssues: () => ({}),
+    getLocalCommentToolCalls: () => undefined,
+    getLocalIncompleteToolCalls: () => undefined,
+    getLocalIssueToolCalls: () => undefined,
     getLocalLinearProjects: () => undefined,
-    setLocalLinearProjects: (projects: Project[]) => {
-        localStorage.setItem('linearProjects', JSON.stringify(projects));
-    },
     getLocalLinearTeams: () => undefined,
-    setLocalLinearTeams: (teams: Team[]) => {
-        localStorage.setItem('linearTeams', JSON.stringify(teams));
+    getLocalLinearUsers: () => undefined,
+    getLocalMessages: () => undefined,
+    getLocalRejectedComments: () => ({}),
+    getLocalRejectedIssues: () => ({}),
+    getLocalTranscript: () => undefined,
+    hardReset: () => {
+        localStorage.clear();
+        window.location.pathname = '/';
     },
     resetLocalStorage: () => {
         [
@@ -104,16 +72,48 @@ const LocalStorageContext = createContext<LocalStorageContextType>({
 
         window.location.pathname = '/';
     },
-    hardReset: () => {
-        localStorage.clear();
-        window.location.pathname = '/';
+    setLocalApprovedComments: (comments: Record<string, CreateComment>) => {
+        localStorage.setItem('approvedComments', JSON.stringify(comments));
+    },
+    setLocalApprovedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => {
+        localStorage.setItem('approvedIssues', JSON.stringify(issues));
+    },
+    setLocalCommentToolCalls: (commentToolCalls: ChatCompletionMessageToolCall[]) => {
+        localStorage.setItem('commentToolCalls', JSON.stringify(commentToolCalls));
+    },
+    setLocalIncompleteToolCalls: (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => {
+        localStorage.setItem('incompleteToolCalls', JSON.stringify(toolCalls));
+    },
+    setLocalIssueToolCalls: (issueToolCalls: ChatCompletionMessageToolCall[]) => {
+        localStorage.setItem('issueToolCalls', JSON.stringify(issueToolCalls));
+    },
+    setLocalLinearProjects: (projects: Project[]) => {
+        localStorage.setItem('linearProjects', JSON.stringify(projects));
+    },
+    setLocalLinearTeams: (teams: Team[]) => {
+        localStorage.setItem('linearTeams', JSON.stringify(teams));
+    },
+    setLocalLinearUsers: (users: User[]) => {
+        localStorage.setItem('linearUsers', JSON.stringify(users));
+    },
+    setLocalMessages: (messages: OpenAI.ChatCompletionMessageParam[]) => {
+        localStorage.setItem('messages', JSON.stringify(messages));
+    },
+    setLocalRejectedComments: (comments: Record<string, CreateComment>) => {
+        localStorage.setItem('rejectedComments', JSON.stringify(comments));
+    },
+    setLocalRejectedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => {
+        localStorage.setItem('rejectedIssues', JSON.stringify(issues));
+    },
+    setLocalTranscript: (transcript: string) => {
+        localStorage.setItem('transcript', transcript);
     },
 });
 
 export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
     const getLocalTranscript = () => {
         return localStorage.getItem('transcript') || undefined;
-    }
+    };
 
     const setLocalTranscript = (transcript: string) => {
         localStorage.setItem('transcript', transcript);
@@ -318,32 +318,32 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
     return (
         <LocalStorageContext.Provider
             value={{
-                getLocalTranscript,
-                setLocalTranscript,
-                getLocalMessages,
-                setLocalMessages,
-                getLocalIncompleteToolCalls,
-                setLocalIncompleteToolCalls,
-                getLocalIssueToolCalls,
-                setLocalIssueToolCalls,
-                getLocalApprovedIssues,
-                setLocalApprovedIssues,
-                getLocalRejectedIssues,
-                setLocalRejectedIssues,
-                getLocalCommentToolCalls,
-                setLocalCommentToolCalls,
                 getLocalApprovedComments,
-                setLocalApprovedComments,
-                getLocalRejectedComments,
-                setLocalRejectedComments,
-                getLocalLinearUsers,
-                setLocalLinearUsers,
+                getLocalApprovedIssues,
+                getLocalCommentToolCalls,
+                getLocalIncompleteToolCalls,
+                getLocalIssueToolCalls,
                 getLocalLinearProjects,
-                setLocalLinearProjects,
                 getLocalLinearTeams,
-                setLocalLinearTeams,
-                resetLocalStorage,
+                getLocalLinearUsers,
+                getLocalMessages,
+                getLocalRejectedComments,
+                getLocalRejectedIssues,
+                getLocalTranscript,
                 hardReset,
+                resetLocalStorage,
+                setLocalApprovedComments,
+                setLocalApprovedIssues,
+                setLocalCommentToolCalls,
+                setLocalIncompleteToolCalls,
+                setLocalIssueToolCalls,
+                setLocalLinearProjects,
+                setLocalLinearTeams,
+                setLocalLinearUsers,
+                setLocalMessages,
+                setLocalRejectedComments,
+                setLocalRejectedIssues,
+                setLocalTranscript,
             }}
         >
             {children}

@@ -7,10 +7,10 @@ import {
     useState,
 } from 'react';
 import toast from 'react-hot-toast';
-import {ProjectSchema, TeamSchema, UserSchema, type BaseIssue, type BaseTeam, type Project, type Team, type User} from '../linearTypes';
+import z from 'zod';
+import {type BaseIssue, type BaseTeam, type Project, type Team, type User, UserSchema} from '../linearTypes';
+import {useLocalStorageContext} from './LocalStorageContext';
 import {useMcpContext} from './McpContext';
-import z, { set } from 'zod';
-import { useLocalStorageContext } from './LocalStorageContext';
 
 interface LinearContextType {
     error?: Error;
@@ -29,7 +29,7 @@ const LinearContext = createContext<LinearContextType>({
 
 export const LinearProvider = ({children}: { children: ReactNode }) => {
     const {callTool, state} = useMcpContext();
-    const {getLocalLinearUsers, setLocalLinearUsers, getLocalLinearProjects, setLocalLinearProjects, getLocalLinearTeams, setLocalLinearTeams} = useLocalStorageContext();
+    const {getLocalLinearProjects, getLocalLinearTeams, getLocalLinearUsers, setLocalLinearProjects, setLocalLinearTeams, setLocalLinearUsers} = useLocalStorageContext();
 
     const [users, setUsers] = useState<User[] | undefined>(undefined);
     const [projects, setProjects] = useState<Project[] | undefined>(undefined);
@@ -132,7 +132,7 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
 
     useEffect(() => {
         if (!users || users.length === 0) {
-        setUsers(getLocalLinearUsers());
+            setUsers(getLocalLinearUsers());
         }
         if (!projects || projects.length === 0) {
             setProjects(getLocalLinearProjects());

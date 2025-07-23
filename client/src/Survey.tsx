@@ -1,7 +1,7 @@
 import * as amplitude from '@amplitude/analytics-browser';
 import {useState} from 'react';
 import Button from './components/Button';
-import { useLocalStorageContext } from './contexts/LocalStorageContext';
+import {useLocalStorageContext} from './contexts/LocalStorageContext';
 
 interface SurveyQuestion {
     responseElement?: React.ReactNode;

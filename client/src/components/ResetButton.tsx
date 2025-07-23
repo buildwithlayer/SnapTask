@@ -1,5 +1,5 @@
 import RestartIcon from '../assets/restart.svg?react';
-import { useLocalStorageContext } from '../contexts/LocalStorageContext';
+import {useLocalStorageContext} from '../contexts/LocalStorageContext';
 import Button from './Button';
 
 const ResetButton = () => {

@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export interface BaseIssue {
     assignee?: string;
@@ -103,12 +103,12 @@ export const UpdateIssueSchema = z.object({
     estimate: z.number().optional(),
     id: z.string(),
     labelIds: z.array(z.string()).optional(),
+    originalIssue: BaseIssueSchema,
     parentId: z.string().optional(),
     priority: z.number().optional(),
     projectId: z.string().optional(),
     stateId: z.string().optional(),
     title: z.string().optional(),
-    originalIssue: BaseIssueSchema,
 });
 
 export function baseIssueToCreateIssue(
@@ -165,8 +165,8 @@ export interface CreateComment extends BaseCreateComment {
 
 export const CreateCommentSchema = z.object({
     body: z.string(),
-    issueId: z.string(),
     issue: BaseIssueSchema,
+    issueId: z.string(),
 });
 
 export interface BaseTeam {
@@ -184,10 +184,10 @@ export interface Team extends BaseTeam {
 export const TeamSchema = z.object({
     createdAt: z.string(),
     id: z.string(),
-    name: z.string(),
-    updatedAt: z.string(),
     issueLabels: z.array(IssueLabelSchema),
     issueStatuses: z.array(IssueStatusSchema),
+    name: z.string(),
+    updatedAt: z.string(),
 });
 
 export interface User {
@@ -214,7 +214,7 @@ export const UserSchema = z.object({
     name: z.string(),
     status: z.string(),
     updatedAt: z.string(),
-})
+});
 
 export interface Project {
     createdAt: string;

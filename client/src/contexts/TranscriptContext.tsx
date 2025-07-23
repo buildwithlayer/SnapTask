@@ -7,7 +7,7 @@ import {
 } from 'react';
 import toast from 'react-hot-toast';
 import {useFileContext} from './FileContext';
-import { useLocalStorageContext } from './LocalStorageContext';
+import {useLocalStorageContext} from './LocalStorageContext';
 
 interface TranscriptContextType {
     error?: Error;
@@ -32,7 +32,7 @@ export const TranscriptProvider = ({children}: { children: ReactNode }) => {
 
     useEffect(() => {
         setTranscript(getLocalTranscript() || undefined);
-    }, []);
+    }, [getLocalTranscript]);
 
     async function transcribeFile(): Promise<void> {
         if (!file) return;

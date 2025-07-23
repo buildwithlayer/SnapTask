@@ -12,9 +12,9 @@ import toast from 'react-hot-toast';
 import type {Tool, UseMcpResult} from 'use-mcp/react';
 import {convertTools, respondToUser} from '../utils/openaiMcp';
 import {useLinearContext} from './LinearContext';
+import {useLocalStorageContext} from './LocalStorageContext';
 import {useMcpContext} from './McpContext';
 import {useTranscriptContext} from './TranscriptContext';
-import { useLocalStorageContext } from './LocalStorageContext';
 
 interface MessagesContextType {
     awaitingResponse: boolean;
@@ -39,7 +39,7 @@ export const MessagesProvider = ({children}: { children: ReactNode }) => {
     const {transcript} = useTranscriptContext();
     const {callTool, tools} = useMcpContext();
     const {projects, teams, users} = useLinearContext();
-    const {getLocalMessages, setLocalMessages, getLocalIncompleteToolCalls, setLocalIncompleteToolCalls} = useLocalStorageContext();
+    const {getLocalIncompleteToolCalls, getLocalMessages, setLocalIncompleteToolCalls, setLocalMessages} = useLocalStorageContext();
 
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -132,11 +132,11 @@ ${transcript}`,
             setMessages([initialMessage]);
             setLocalMessages([initialMessage]);
         }
-    }, [transcript, messages, initialMessage]);
+    }, [transcript, messages, initialMessage, setLocalMessages]);
 
     useEffect(() => {
         if (messages.length <= 1) {
-        setMessages(getLocalMessages() || []);}
+            setMessages(getLocalMessages() || []);}
         if (incompleteToolCalls.length === 0) {
             setIncompleteToolCalls(getLocalIncompleteToolCalls() || []);
         }
