@@ -38,7 +38,7 @@ const DemoPage = () => {
                         <h1 className='text-center font-bold text-4xl/tight md:text-6xl/tight max-w-[900px]'>
                             Turn your meetings into actionable tasks in Linear
                         </h1>
-                        <img src={demoHero} alt="Meeting being converted to Linear tasks" className="w-full max-w-[800px]" />
+                        <img src={demoHero} alt="Meeting being converted to Linear tasks" className="max-h-[300px]" />
                         <FileUpload demo={true} splitTestVersion={splitTestVersion} />
                         <div className="flex flex-col gap-2">
                             <p>Don't use Linear? Let us know which service you want us to expand to!</p>
