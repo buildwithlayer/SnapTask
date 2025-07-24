@@ -70,6 +70,8 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                 const usersContent = usersZodParseResult.data as User[];
                 setLocalLinearUsers(usersContent);
                 setUsers(usersContent);
+                const identify = new amplitude.Identify();
+                identify.set('team_emails', usersContent.map((user: User) => user.email).join(','));
 
                 if (myIssuesResponse) {
                     let myIssuesParseResult;
@@ -98,18 +100,15 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                         else {
                             amplitude.setUserId(user.email);
 
-                            const identify = new amplitude.Identify();
                             identify.set('email', user.email);
                             identify.set('name', user.name);
                             identify.set('displayName', user.displayName);
                             identify.set('isAdmin', user.isAdmin);
-                            identify.set('linear_user_id', user.id);
-                            identify.set('team_emails', usersContent.map((user: User) => user.email).join(','));
-
-                            amplitude.identify(identify);
-                        }
+                            identify.set('linear_user_id', user.id);                        }
                     }
                 }
+
+                amplitude.identify(identify);
             }
             if (projectsResponse) {
                 let projectsParseResult;
