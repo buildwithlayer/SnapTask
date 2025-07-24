@@ -30,15 +30,17 @@ const DemoPage = () => {
             <div className="w-full h-full flex flex-col justify-start items-center overflow-auto bg-linear-to-b from-primary/30 to-black">
                 <div
                     className="w-full h-full flex flex-col justify-start items-center px-4 text-center md:text-left">
-                    <div className="max-w-content-max-width w-full flex flex-col items-center gap-12 py-[72px]">
-                        <div className="flex items-center gap-4">
-                            <Logo className="w-8 h-8 fill-white"/>
-                            <h1 className='font-bold text-4xl'>SnapLinear</h1>
+                    <div className="max-w-content-max-width w-full flex flex-col items-center gap-10 py-[32px]">
+                        <div className="flex flex-col gap-8 items-center">
+                            <div className="flex items-center gap-4">
+                                <Logo className="w-8 h-8 fill-white"/>
+                                <h1 className='font-bold text-4xl'>SnapLinear</h1>
+                            </div>
+                            <h1 className='text-center font-bold text-4xl/tight md:text-6xl/tight max-w-[900px]'>
+                                Turn your meetings into actionable tasks in Linear
+                            </h1>
                         </div>
-                        <h1 className='text-center font-bold text-4xl/tight md:text-6xl/tight max-w-[900px]'>
-                            Turn your meetings into actionable tasks in Linear
-                        </h1>
-                        <img src={demoHero} alt="Meeting being converted to Linear tasks" className="max-h-[300px]" />
+                        <img src={demoHero} alt="Meeting being converted to Linear tasks" className="max-h-[250px]" />
                         <FileUpload demo={true} splitTestVersion={splitTestVersion} />
                         <div className="flex flex-col gap-2">
                             <p>Don't use Linear? Let us know which service you want us to expand to!</p>
