@@ -63,8 +63,8 @@ const OtherServiceOption = ({serviceIcon, serviceName}: {serviceIcon: React.Reac
 
     function handleSubmit() {
         const identify = new amplitude.Identify();
+        amplitude.setUserId(email);
         identify.set('email', email);
-        identify.set('linear_user_id', email);
         amplitude.identify(identify);
         amplitude.track('Other Integration Requested', {
             email: email,
