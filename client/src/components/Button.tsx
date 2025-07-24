@@ -8,6 +8,7 @@ interface ButtonProps {
     loading?: boolean;
     onClick?: () => void;
     style?: 'contained' | 'outlined' | 'text';
+    type?: 'button' | 'reset' | 'submit';
 }
 
 const Button = ({
@@ -17,11 +18,13 @@ const Button = ({
     loading = false,
     onClick,
     style = 'contained',
+    type = 'button',
 }: ButtonProps) => {
     return (
         <button
             disabled={disabled || loading}
             onClick={onClick}
+            type={type}
             className={`${
                 style === 'contained' &&
                 'bg-primary text-white hover:bg-primary-dark disabled:bg-gray-500 disabled:text-gray-700'
