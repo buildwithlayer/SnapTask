@@ -5,30 +5,30 @@ const AuthenticatedRequest = z.object({
     authToken: z.string(),
 });
 
-const ProcessTranscriptRequest = AuthenticatedRequest.extend({
+export const ProcessTranscriptRequest = AuthenticatedRequest.extend({
     transcript: z.string(),
 });
 
-type ProcessTranscriptRequest = z.infer<typeof ProcessTranscriptRequest>;
+export type ProcessTranscriptRequest = z.infer<typeof ProcessTranscriptRequest>;
 
-const ProcessTranscriptResponse = z.object({
+export const ProcessTranscriptResponse = z.object({
     createTasks: z.array(CreateSnapTask).optional(),
     updateTasks: z.array(UpdateSnapTask).optional(),
 });
 
-const CreateTaskRequest = AuthenticatedRequest.extend({
+export type ProcessTranscriptResponse = z.infer<typeof ProcessTranscriptResponse>;
+
+export const CreateTaskRequest = AuthenticatedRequest.extend({
     createTask: CreateSnapTask,
 });
 
-type CreateTaskRequest = z.infer<typeof CreateTaskRequest>;
+export type CreateTaskRequest = z.infer<typeof CreateTaskRequest>;
 
-type ProcessTranscriptResponse = z.infer<typeof ProcessTranscriptResponse>;
-
-const UpdateTaskRequest = AuthenticatedRequest.extend({
+export const UpdateTaskRequest = AuthenticatedRequest.extend({
     updateTask: UpdateSnapTask,
 });
 
-type UpdateTaskRequest = z.infer<typeof UpdateTaskRequest>;
+export type UpdateTaskRequest = z.infer<typeof UpdateTaskRequest>;
 
 export abstract class TaskManagerClient {
     public abstract processTranscript(request: ProcessTranscriptRequest): Promise<ProcessTranscriptResponse>;
