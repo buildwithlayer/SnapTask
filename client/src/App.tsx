@@ -14,7 +14,7 @@ function App() {
     const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
     amplitude.add(sessionReplayTracking);
 
-    amplitude.init('5cc5c6e8863745ef94f222901951ead6', {
+    amplitude.init('fc93ad6d63a825b3acfb0aae93ea926f', {
         autocapture: {
             elementInteractions: true,
         },
