@@ -1,41 +1,30 @@
 # SnapLinear
 
-> Convert your meeting recordings or transcripts into actionable Linear issues & comments — powered by AI.
+> Convert your meeting recordings or transcripts into Linear issues & comments — powered by AI.
 
-## Table of Contents
+![SnapTask Demo](./assets/demo.gif)
 
-- [🎯 What is SnapLinear?](#-what-is-snaplinear)
-- [✨ Features](#-features)
-- [🚀 Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Configuration](#configuration)
-  - [Running Locally](#running-locally)
-- [🛠️ Usage](#️-usage)
-- [🤝 Contributing](#-contributing)
 
----
+## 🌐 Hosted Demo
+To try it out instantly, visit [https://snaplinear.app/](https://snaplinear.app/)  🚀
+
+> **⚠️ Note:** The live site has been rebranded as **SnapTask**. You may see references to both SnapLinear and SnapTask in this repository and documentation.
+
 
 ## 🎯 What is SnapLinear?
 
-SnapLinear is an open-source tool that listens to your meetings (via audio upload or transcript) and automatically suggests well-scoped issues or comments in [Linear](https://linear.app). Skip the copy-paste — review AI-generated tasks and push them straight into your workflow.
+SnapTask is an open-source tool that listens to your meetings (via audio upload or transcript) and automatically suggests well-scoped issues or comments in [Linear](https://linear.app).
 
-## ✨ Features
+It is built using the [Linear MCP](https://linear.app/docs/mcp) server, which allows it to be used with any Linear workspace.
 
-- 🎙 Audio & transcript upload
-- 🤖 AI-powered transcription (via AssemblyAI)
-- 📋 Automatic action-item extraction
-- 🔄 Native Linear integration via Linear MCP server (create issues or comments)
-- ✔️ Approve or reject suggestions
-- ⚡️ Lightweight, configurable front-end (React + Vite) & back-end (Node.js + Hono)
+It searches through your Linear workspace to find the best matching projects, teams, and users to create issues in.  It also looks for existing issues with similar titles and creates them if they don't exist.
 
-## 🚀 Getting Started
+## 🚀 Running Locally
 
 ### Prerequisites
 
 - Node.js v14+
 - A [Linear](https://linear.app) account
-- (Optional) [ngrok](https://ngrok.com/) for testing audio recording locally
 
 ### Installation
 
@@ -49,7 +38,6 @@ SnapLinear is an open-source tool that listens to your meetings (via audio uploa
 2. **Install dependencies**
    ```bash
    npm install        # root
-   cd client && npm install
    ```
 
 ### Configuration
@@ -69,12 +57,6 @@ Copy the example env files and fill in your keys:
   VITE_CALLBACK_URL=http://localhost:5173/oauth/callback
   ```
 
-> **If testing OAuth with ngrok:**
->
-> 1. `ngrok http 5173`
-> 2. Update `VITE_CALLBACK_URL` to your ngrok URL (`https://xxxxx.ngrok.io/oauth/callback`)
-> 3. Add that same URL to `server.allowedHosts` in `client/vite.config.ts`
-
 ### Running Locally
 
 From the root directory:
@@ -85,15 +67,6 @@ npm run dev:all
 
 - ✅ Starts the back-end on `http://localhost:3001`
 - ✅ Starts the front-end on `http://localhost:5173`
-
----
-
-## 🛠️ Usage
-
-1. **Upload** an audio file or transcript OR **Record** audio directly from the site.
-2. **Transcribe** (if audio).
-3. **Review** AI-generated action items.
-4. **Approve**, then **send** to your Linear workspace.
 
 ---
 

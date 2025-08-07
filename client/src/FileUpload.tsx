@@ -93,7 +93,7 @@ function FileUpload({demo, splitTestVersion}: {demo: boolean, splitTestVersion?:
                         {!demo && (<><PasteInput handleSubmit={handleSubmitText} /><p className='text-gray-600 font-medium'>OR</p></>)}
                         <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4">
                             <div className="w-full flex flex-col gap-4">
-                                {demo && recording && (<p className='text-xl text-center px-2 py-4 rounded-sm bg-gray-900 border border-gray-800'>Try saying <span className='text-emerald-300'>"Create me a task called try out SnapLinear"</span></p>)}
+                                {demo && recording && (<p className='text-xl text-center px-2 py-4 rounded-sm bg-gray-900 border border-gray-800'>Try saying <span className='text-emerald-300'>"Create me a task called try out SnapTask"</span></p>)}
                                 {browserSupportsRecording && (
                                     <RecordButton
                                         isRecording={recording}

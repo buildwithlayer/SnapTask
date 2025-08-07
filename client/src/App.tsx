@@ -8,7 +8,6 @@ import {LocalStorageProvider} from './contexts/LocalStorageContext.tsx';
 import {TranscriptProvider} from './contexts/TranscriptContext.tsx';
 import MenuBar from './MenuBar.tsx';
 import OAuthCallback from './OAuthCallback.tsx';
-import RebrandBanner from './RebrandBanner.tsx';
 
 function App() {
     const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
@@ -33,7 +32,6 @@ function App() {
                                 <FileProvider>
                                     <TranscriptProvider>
                                         <MenuBar/>
-                                        <RebrandBanner />
                                         <Content demo={false} />
                                     </TranscriptProvider>
                                 </FileProvider>
@@ -41,7 +39,6 @@ function App() {
                         />
                         <Route path={'/demo'} element={<FileProvider>
                             <TranscriptProvider>
-                                <RebrandBanner />
                                 <Content demo={true} />
                             </TranscriptProvider>
                         </FileProvider>} />
