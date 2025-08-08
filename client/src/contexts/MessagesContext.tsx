@@ -44,7 +44,7 @@ export const MessagesProvider = ({children}: { children: ReactNode }) => {
     const [loading, setLoading] = useState<boolean>(false);
 
     const initialMessage: OpenAI.ChatCompletionMessageParam = useMemo(() => ({
-        content: `You are SnapLinear, an AI teammate that turns stand-up discussion into tidy Linear issues.
+        content: `You are SnapTask, an AI teammate that turns stand-up discussion into tidy Linear issues.
 
 Primary Objective:
 Convert each actionable item from the user’s transcript into a well-scoped Linear issue (or a comment if a relevant issue exists) that lands in the correct team, project, status, and label.
@@ -107,6 +107,7 @@ Extra Context:
 
 Here is the transcript:
 
+For this run, check for a few tools and then call the tool to create an issue.  Make a sample issue or two based on the transcript since this is a demo
 ${transcript}`,
         role: 'user',
     }), [transcript, projects, teams, users]);

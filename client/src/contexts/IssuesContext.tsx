@@ -149,7 +149,7 @@ export const IssuesProvider = ({children}: { children: ReactNode }) => {
                         ...args,
                         description:
                             args.description +
-                            '\n\nCreated with [SnapLinear](https://www.snaplinear.app/?utm_source=snaplinear-tasklink&utm_medium=linear+task&utm_campaign=snaplinear)',
+                            '\n\nCreated with [SnapTask](https://www.snaplinear.app/?utm_source=snaplinear-tasklink&utm_medium=linear+task&utm_campaign=snaplinear)',
                         labelIds: args.labelIds
                             ? args.labelIds.map(
                                 (labelId: string) =>

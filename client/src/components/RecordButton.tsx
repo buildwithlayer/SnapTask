@@ -9,10 +9,9 @@ interface RecordButtonProps {
     handleRecordingComplete: (file: FileWithPath) => void;
     isRecording: boolean;
     setIsRecording: (isRecording: boolean) => void;
-    splitTestVersion?: string;
 }
 
-const RecordButton = ({handleRecordingComplete, isRecording, setIsRecording, splitTestVersion}: RecordButtonProps) => {
+const RecordButton = ({handleRecordingComplete, isRecording, setIsRecording}: RecordButtonProps) => {
     const browserSupportsRecording = Boolean(
         navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
     );
@@ -100,7 +99,7 @@ const RecordButton = ({handleRecordingComplete, isRecording, setIsRecording, spl
                 ) : (
                     <>
                         <MicrophoneIcon fill="white"/>
-                        <span>{splitTestVersion === 'Demo_CTA_Try' ? 'Try It Now' : 'Record Audio'}</span>
+                        <span>Record Audio</span>
                     </>
                 )}
             </Button>
