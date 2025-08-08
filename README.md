@@ -6,7 +6,7 @@
 
 
 ## 🌐 Hosted Demo
-To try it out instantly, visit [https://snaplinear.app/](https://snaplinear.app/)  🚀
+To try it out instantly, visit [https://snaptask.io/](https://snaptask.io/)  🚀
 
 > **⚠️ Note:** The live site has been rebranded as **SnapTask**. You may see references to both SnapLinear and SnapTask in this repository and documentation.
 
