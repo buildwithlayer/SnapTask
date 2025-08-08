@@ -18,7 +18,7 @@ const Survey = () => {
 
     function handleFreeTextResponse() {
         amplitude.track('survey_response', {
-            question: 'What could we add or improve to make SnapLinear more useful for you?',
+            question: 'What could we add or improve to make SnapTask more useful for you?',
             response: freeTextResponse,
         });
         setCurrentQuestion((prev) => prev + 1);
@@ -39,7 +39,7 @@ const Survey = () => {
                 {label: '9', value: 9},
                 {label: '10', value: 10},
             ],
-            text: 'How likely is it that you would recommend SnapLinear to a friend or colleague?',
+            text: 'How likely is it that you would recommend SnapTask to a friend or colleague?',
         },
         {
             responseOptions: [
@@ -57,7 +57,7 @@ const Survey = () => {
                     <Button onClick={handleFreeTextResponse}>Submit Feedback</Button>
                 </div>
             ),
-            text: 'What could we add or improve to make SnapLinear more useful for you?',
+            text: 'What could we add or improve to make SnapTask more useful for you?',
         },
     ];
 
@@ -67,7 +67,7 @@ const Survey = () => {
                 {questions[currentQuestion] ? (
                     <div className='flex flex-col items-center gap-8 w-full'>
                         <div className="flex flex-col items-center gap-2 text-center">
-                            <h1 className="text-2xl font-bold">Help us improve SnapLinear</h1>
+                            <h1 className="text-2xl font-bold">Help us improve SnapTask</h1>
                             <p className="text-gray-300">
                         Your feedback is valuable to us. Please take a moment to fill out this
                         survey.
