@@ -1,4 +1,5 @@
-import Logo from './assets/snaplinear.svg?react';
+import Logo from './assets/snaptask.svg?react';
+import {IntegrationDropdown} from './components/IntegrationOption';
 
 function MenuBar() {
     return (
@@ -9,9 +10,12 @@ function MenuBar() {
                     <Logo className="w-8 h-8 fill-white"/>
                     <div className="font-bold text-xl">SnapTask</div>
                 </div>
-                <a href="https://forms.gle/NWSYQrSxKL1AwiWF7" target='_blank' rel="noopener noreferrer" className='py-1 hover:border-b-2 border-gray-300'>
-                    Contact Support
-                </a>
+                <div className="flex items-center gap-10">
+                    <a href="https://forms.gle/NWSYQrSxKL1AwiWF7" target='_blank' rel="noopener noreferrer" className='py-1 hover:border-b-2 border-gray-300'>
+                        Contact Support
+                    </a>
+                    <IntegrationDropdown />
+                </div>
             </div>
         </div>
     );
