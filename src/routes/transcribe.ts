@@ -5,7 +5,7 @@ import {File} from 'buffer';
 const transcribeRouter = new OpenAPIHono();
 
 const client = new AssemblyAI({
-    apiKey: process.env.ASSEMBLYAI_API_KEY || 'NO API KEY PROVIDED',
+    apiKey: import.meta.env.VITE_ASSEMBLYAI_API_KEY || 'NO API KEY PROVIDED',
 });
 
 const transcribeFileRoute = createRoute({

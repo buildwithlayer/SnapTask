@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: import.meta.env.VITE_OPENAI_API_KEY,
 });
 
 const EXTRACT_SUMMARY_PROMPT = `
@@ -23,7 +23,7 @@ export const extractSummary = async (transcript: string): Promise<string> => {
             },
         ],
         model: 'o3-mini',
-        temperature: 0.15,
+        temperature: 0.0,
     });
 
     return completion.choices[0].message.content || '';

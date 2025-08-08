@@ -7,7 +7,7 @@ import {chatRequestSchema, errorResponseSchema} from '../schemas/chat.js';
 const chatRouter = new OpenAPIHono();
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: import.meta.env.VITE_OPENAI_API_KEY,
 });
 
 const chatCompletionRoute = createRoute({
