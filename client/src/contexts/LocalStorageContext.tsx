@@ -6,6 +6,7 @@ import {
     useContext,
 } from 'react';
 import z from 'zod';
+import {type Integration, integrations} from '../components/IntegrationOption';
 import {type CreateComment, CreateCommentSchema, type CreateIssue, CreateIssueSchema, type Project, ProjectSchema, type Team, TeamSchema, type UpdateIssue, type User, UserSchema} from '../linearTypes';
 
 interface LocalStorageContextType {
@@ -13,6 +14,7 @@ interface LocalStorageContextType {
     getLocalApprovedIssues: () => Record<string, CreateIssue | UpdateIssue> | undefined;
     getLocalCommentToolCalls: () => ChatCompletionMessageToolCall[] | undefined;
     getLocalIncompleteToolCalls: () => OpenAI.ChatCompletionMessageToolCall[] | undefined;
+    getLocalIntegration: () => Integration | null;
     getLocalIssueToolCalls: () => ChatCompletionMessageToolCall[] | undefined;
     getLocalLinearProjects: () => Project[] | undefined;
     getLocalLinearTeams: () => Team[] | undefined;
@@ -27,6 +29,7 @@ interface LocalStorageContextType {
     setLocalApprovedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => void;
     setLocalCommentToolCalls: (commentToolCalls: ChatCompletionMessageToolCall[]) => void;
     setLocalIncompleteToolCalls: (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => void;
+    setLocalIntegration: (integration: Integration) => void;
     setLocalIssueToolCalls: (issueToolCalls: ChatCompletionMessageToolCall[]) => void;
     setLocalLinearProjects: (projects: Project[]) => void;
     setLocalLinearTeams: (teams: Team[]) => void;
@@ -42,6 +45,7 @@ const LocalStorageContext = createContext<LocalStorageContextType>({
     getLocalApprovedIssues: () => ({}),
     getLocalCommentToolCalls: () => undefined,
     getLocalIncompleteToolCalls: () => undefined,
+    getLocalIntegration: () => null,
     getLocalIssueToolCalls: () => undefined,
     getLocalLinearProjects: () => undefined,
     getLocalLinearTeams: () => undefined,
@@ -56,6 +60,7 @@ const LocalStorageContext = createContext<LocalStorageContextType>({
     },
     resetLocalStorage: () => {
         [
+            'selectedIntegration',
             'transcript',
             'messages',
             'incompleteToolCalls',
@@ -84,6 +89,9 @@ const LocalStorageContext = createContext<LocalStorageContextType>({
     setLocalIncompleteToolCalls: (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => {
         localStorage.setItem('incompleteToolCalls', JSON.stringify(toolCalls));
     },
+    setLocalIntegration: (integration: Integration) => {
+        localStorage.setItem('selectedIntegration', integration.name);
+    },
     setLocalIssueToolCalls: (issueToolCalls: ChatCompletionMessageToolCall[]) => {
         localStorage.setItem('issueToolCalls', JSON.stringify(issueToolCalls));
     },
@@ -111,6 +119,18 @@ const LocalStorageContext = createContext<LocalStorageContextType>({
 });
 
 export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
+    const getLocalIntegration = () => {
+        const integrationName = localStorage.getItem('selectedIntegration');
+        if (integrationName) {
+            return integrations.find((i) => i.name === integrationName) || null;
+        }
+        return null;
+    };
+
+    const setLocalIntegration = (integration: Integration) => {
+        localStorage.setItem('selectedIntegration', integration.name);
+    };
+
     const getLocalTranscript = () => {
         return localStorage.getItem('transcript') || undefined;
     };
@@ -293,6 +313,7 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
 
     const resetLocalStorage = () => {
         [
+            'selectedIntegration',
             'transcript',
             'messages',
             'incompleteToolCalls',
@@ -322,6 +343,7 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
                 getLocalApprovedIssues,
                 getLocalCommentToolCalls,
                 getLocalIncompleteToolCalls,
+                getLocalIntegration,
                 getLocalIssueToolCalls,
                 getLocalLinearProjects,
                 getLocalLinearTeams,
@@ -336,6 +358,7 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
                 setLocalApprovedIssues,
                 setLocalCommentToolCalls,
                 setLocalIncompleteToolCalls,
+                setLocalIntegration,
                 setLocalIssueToolCalls,
                 setLocalLinearProjects,
                 setLocalLinearTeams,

@@ -4,6 +4,7 @@ import {Toaster} from 'react-hot-toast';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Content from './Content.tsx';
 import {FileProvider} from './contexts/FileContext.tsx';
+import {IntegrationProvider} from './contexts/IntegrationContext.tsx';
 import {LocalStorageProvider} from './contexts/LocalStorageContext.tsx';
 import {TranscriptProvider} from './contexts/TranscriptContext.tsx';
 import MenuBar from './MenuBar.tsx';
@@ -29,12 +30,14 @@ function App() {
                         <Route
                             path={'/'}
                             element={
-                                <FileProvider>
-                                    <TranscriptProvider>
-                                        <MenuBar/>
-                                        <Content />
-                                    </TranscriptProvider>
-                                </FileProvider>
+                                <IntegrationProvider>
+                                    <FileProvider>
+                                        <TranscriptProvider>
+                                            <MenuBar/>
+                                            <Content />
+                                        </TranscriptProvider>
+                                    </FileProvider>
+                                </IntegrationProvider>
                             }
                         />
                     </Routes>
