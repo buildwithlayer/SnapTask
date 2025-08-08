@@ -22,7 +22,7 @@ const LandingPage = () => {
                     <div className="w-full h-full flex flex-col justify-center items-center px-4">
                         <div
                             className="max-w-content-max-width w-full h-full flex flex-col items-center gap-16 text-center py-[56px]">
-                            <FileUpload demo={false} />
+                            <FileUpload />
                         </div>
                     </div>
                 </div>

@@ -32,16 +32,11 @@ function App() {
                                 <FileProvider>
                                     <TranscriptProvider>
                                         <MenuBar/>
-                                        <Content demo={false} />
+                                        <Content />
                                     </TranscriptProvider>
                                 </FileProvider>
                             }
                         />
-                        <Route path={'/demo'} element={<FileProvider>
-                            <TranscriptProvider>
-                                <Content demo={true} />
-                            </TranscriptProvider>
-                        </FileProvider>} />
                     </Routes>
                 </Router>
             </LocalStorageProvider>

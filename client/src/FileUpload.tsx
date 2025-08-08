@@ -14,7 +14,7 @@ import PasteInput from './components/PasteInput';
 import RecordButton from './components/RecordButton';
 import {useFileContext} from './contexts/FileContext';
 
-function FileUpload({demo, splitTestVersion}: {demo: boolean, splitTestVersion?: string}) {
+function FileUpload() {
     const {setFile} = useFileContext();
 
     const browserSupportsRecording = Boolean(
@@ -90,47 +90,44 @@ function FileUpload({demo, splitTestVersion}: {demo: boolean, splitTestVersion?:
                     </>
                 ) : (
                     <>
-                        {!demo && (<><PasteInput handleSubmit={handleSubmitText} /><p className='text-gray-600 font-medium'>OR</p></>)}
+                        <PasteInput handleSubmit={handleSubmitText} /><p className='text-gray-600 font-medium'>OR</p>
                         <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4">
                             <div className="w-full flex flex-col gap-4">
-                                {demo && recording && (<p className='text-xl text-center px-2 py-4 rounded-sm bg-gray-900 border border-gray-800'>Try saying <span className='text-emerald-300'>"Create me a task called try out SnapTask"</span></p>)}
                                 {browserSupportsRecording && (
                                     <RecordButton
                                         isRecording={recording}
                                         setIsRecording={setRecording}
                                         handleRecordingComplete={setLocalFile}
-                                        splitTestVersion={splitTestVersion}
                                     />
                                 )}
                             </div>
-                            {!demo && (
-                                <div
-                                    {...getRootProps()}
-                                    className="w-full flex items-center justify-center"
+                            <div
+                                {...getRootProps()}
+                                className="w-full flex items-center justify-center"
+                            >
+                                <input {...getInputProps()} />
+                                <Button
+                                    additionalClasses="!gap-1.5 !py-3 w-full"
+                                    disabled={recording}
                                 >
-                                    <input {...getInputProps()} />
-                                    <Button
-                                        additionalClasses="!gap-1.5 !py-3 w-full"
-                                        disabled={recording}
-                                    >
-                                        <UploadIcon
-                                            className={`w-6 h-6 ${
-                                                recording ? 'fill-gray-800' : 'fill-white'
-                                            }`}
-                                        />
-                                        <span>
-                                            {isDragActive
-                                                ? 'Drop the file here'
-                                                : 'Upload Audio or Transcript'}
-                                        </span>
-                                    </Button>
-                                </div>)}
+                                    <UploadIcon
+                                        className={`w-6 h-6 ${
+                                            recording ? 'fill-gray-800' : 'fill-white'
+                                        }`}
+                                    />
+                                    <span>
+                                        {isDragActive
+                                            ? 'Drop the file here'
+                                            : 'Upload Audio or Transcript'}
+                                    </span>
+                                </Button>
+                            </div>
                         </div>
                         {/* Recording disclaimer */}
-                        {!demo && browserSupportsRecording &&
+                        {browserSupportsRecording &&
                             !window.navigator.platform.includes('Win') && (
                             <div
-                                className={`w-full flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white ${demo ? 'text-center': 'text-left'}`}>
+                                className={'w-full flex items-center gap-4 p-4 bg-yellow-500/10 rounded-md text-white text-left'}>
                                 <WarningIcon className="min-w-5 w-5 min-h-5 h-5 fill-yellow-500"/>
                                 <p className='text-sm text-gray-300 w-full'>
                                         Only records microphone audio. To capture system audio, record with
@@ -138,7 +135,6 @@ function FileUpload({demo, splitTestVersion}: {demo: boolean, splitTestVersion?:
                                 </p>
                             </div>
                         )}
-                        {demo && <p className='text-gray-300'>Want to upload an existing audio file or transcript? <a href="/" className="text-primary hover:text-primary-dark">Click here</a></p>}
                     </>
                 )}
             </div>
