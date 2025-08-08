@@ -1,4 +1,4 @@
-# SnapLinear
+# SnapTask
 
 > Convert your meeting recordings or transcripts into Linear issues & comments — powered by AI.
 
@@ -8,10 +8,8 @@
 ## 🌐 Hosted Demo
 To try it out instantly, visit [https://snaptask.io/](https://snaptask.io/)  🚀
 
-> **⚠️ Note:** The live site has been rebranded as **SnapTask**. You may see references to both SnapLinear and SnapTask in this repository and documentation.
 
-
-## 🎯 What is SnapLinear?
+## 🎯 What is SnapTask?
 
 SnapTask is an open-source tool that listens to your meetings (via audio upload or transcript) and automatically suggests well-scoped issues or comments in [Linear](https://linear.app).
 
@@ -31,8 +29,8 @@ It searches through your Linear workspace to find the best matching projects, te
 1. **Clone the repo**
 
    ```bash
-   git clone https://github.com/buildwithlayer/SnapLinear.git
-   cd SnapLinear
+   git clone https://github.com/buildwithlayer/SnapTask.git
+   cd SnapTask
    ```
 
 2. **Install dependencies**
