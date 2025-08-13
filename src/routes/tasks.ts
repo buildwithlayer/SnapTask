@@ -1,5 +1,6 @@
 import {createRoute, OpenAPIHono} from '@hono/zod-openapi';
 import {LinearClient} from '../utils/linearClient.js';
+import {MockClient} from '../utils/mockClient.js';
 import {CreateTaskRequest, TaskManagerClient, UpdateTaskRequest} from '../utils/taskManagerClient.js';
 
 const tasksRouter = new OpenAPIHono();
@@ -18,7 +19,9 @@ const createTaskRoute = createRoute({
         },
     },
     responses: {
-        204: {},
+        204: {
+            description: 'No content',
+        },
     },
 });
 
@@ -26,14 +29,19 @@ tasksRouter.openapi(createTaskRoute, async (c) => {
     const request = c.req.valid('json');
 
     let taskManagerClient: TaskManagerClient;
-    if (request.authProvider === 'linear') {
+    switch (request.authProvider) {
+    case 'linear':
         taskManagerClient = new LinearClient(request.authToken);
-    } else {
+        break;
+    case 'mock':
+        taskManagerClient = new MockClient(request.authToken);
+        break;
+    default:
         throw new Error(`Invalid authProvider: ${request.authProvider}`);
     }
 
     await taskManagerClient.createTask(request);
-    return c.bdy(null, 204);
+    return c.body(null, 204);
 });
 
 const updateTaskRoute = createRoute({
@@ -50,7 +58,9 @@ const updateTaskRoute = createRoute({
         },
     },
     responses: {
-        204: {},
+        204: {
+            description: 'No content',
+        },
     },
 });
 
@@ -58,14 +68,19 @@ tasksRouter.openapi(updateTaskRoute, async (c) => {
     const request = c.req.valid('json');
 
     let taskManagerClient: TaskManagerClient;
-    if (request.authProvider === 'linear') {
+    switch (request.authProvider) {
+    case 'linear':
         taskManagerClient = new LinearClient(request.authToken);
-    } else {
+        break;
+    case 'mock':
+        taskManagerClient = new MockClient(request.authToken);
+        break;
+    default:
         throw new Error(`Invalid authProvider: ${request.authProvider}`);
     }
 
     await taskManagerClient.updateTask(request);
-    return c.bdy(null, 204);
+    return c.body(null, 204);
 });
 
 export default tasksRouter;
