@@ -170,10 +170,10 @@ export const LinearProvider = ({children}: { children: ReactNode }) => {
                             issueStatuses: [],
                         };
                         const getIssueLabels = await callTool('list_issue_labels', {
-                            teamId: team.id,
+                            team: team.id,
                         });
                         const getIssueStatuses = await callTool('list_issue_statuses', {
-                            teamId: team.id,
+                            team: team.id,
                         });
                         try {
                             team.issueLabels = JSON.parse(getIssueLabels.content[0].text);

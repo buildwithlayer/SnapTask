@@ -1,5 +1,6 @@
 import {CommentsProvider} from './contexts/CommentsContext';
 import {useFileContext} from './contexts/FileContext';
+import {useIntegrationContext} from './contexts/IntegrationContext';
 import {IssuesProvider} from './contexts/IssuesContext';
 import {LinearProvider} from './contexts/LinearContext';
 import {McpProvider} from './contexts/McpContext';
@@ -8,15 +9,18 @@ import {useTranscriptContext} from './contexts/TranscriptContext';
 import LandingPage from './LandingPage';
 import Progress from './Progress';
 import Review from './Review';
+import SubmitAudioPage from './SubmitAudioPage';
 
 const Content = () => {
     const {file} = useFileContext();
     const {transcript} = useTranscriptContext();
+    const {integration} = useIntegrationContext();
 
     return (
         <div className="w-full h-full flex justify-center bg-gray-950 text-white overflow-hidden">
-            {!file && !transcript && <LandingPage />}
-            {(file || transcript) && (
+            {!integration && <LandingPage />}
+            {integration && !file && !transcript && <SubmitAudioPage integration={integration} />}
+            {integration && (file || transcript) && (
                 <McpProvider>
                     <LinearProvider>
                         <MessagesProvider>
