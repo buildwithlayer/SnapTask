@@ -1,45 +1,26 @@
-import {CommentsProvider} from './contexts/CommentsContext';
-import {useFileContext} from './contexts/FileContext';
-import {IssuesProvider} from './contexts/IssuesContext';
-import {LinearProvider} from './contexts/LinearContext';
-import {McpProvider} from './contexts/McpContext';
-import {MessagesContext, MessagesProvider} from './contexts/MessagesContext';
-import {useTranscriptContext} from './contexts/TranscriptContext';
-import DemoPage from './DemoPage';
+import { useProgressContext } from './contexts/ProgressContext';
+import IntegrationPage from './IntegrationPage';
 import LandingPage from './LandingPage';
 import Progress from './Progress';
-import Review from './Review';
+import Survey from './Survey';
+import Tasks from './Tasks';
 
-const Content = ({demo}: {demo: boolean}) => {
-    const {file} = useFileContext();
-    const {transcript} = useTranscriptContext();
+export interface Integration {
+    color: string;
+    icon: React.ReactNode;
+    name: 'Linear' | 'Mock';
+}
 
+const Content = () => {
+    const {step} = useProgressContext();
+    
     return (
         <div className="w-full h-full flex justify-center bg-gray-950 text-white overflow-hidden">
-            {!file && !transcript && (demo ? <DemoPage /> : <LandingPage />)}
-            {(file || transcript) && (
-                <McpProvider>
-                    <LinearProvider>
-                        <MessagesProvider>
-                            <MessagesContext.Consumer>
-                                {({incompleteToolCalls}) => (
-                                    <>
-                                        {incompleteToolCalls.length > 0 ? (
-                                            <IssuesProvider>
-                                                <CommentsProvider>
-                                                    <Review/>
-                                                </CommentsProvider>
-                                            </IssuesProvider>
-                                        ) : (
-                                            <Progress/>
-                                        )}
-                                    </>
-                                )}
-                            </MessagesContext.Consumer>
-                        </MessagesProvider>
-                    </LinearProvider>
-                </McpProvider>
-            )}
+            {step === 'select-integration' && <LandingPage />}
+            {step === 'upload' && <IntegrationPage />}
+            {(step === 'transcribing' || step === 'generating') && <Progress />}
+            {step === 'reviewing' && <Tasks />}
+            {step === 'done' && <Survey />}
         </div>
     );
 };

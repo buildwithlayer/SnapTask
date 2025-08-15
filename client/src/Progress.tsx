@@ -1,13 +1,8 @@
-import {useEffect, useState} from 'react';
-import Markdown from 'react-markdown';
+import {useEffect} from 'react';
 import {ClipLoader} from 'react-spinners';
-import remarkGfm from 'remark-gfm';
-import UpArrowIcon from './assets/uparrow.svg?react';
-import Button from './components/Button';
 import ResetButton from './components/ResetButton';
 import {useFileContext} from './contexts/FileContext';
-import {useLinearContext} from './contexts/LinearContext';
-import {useMessagesContext} from './contexts/MessagesContext';
+import {useTasksContext} from './contexts/TasksContext';
 import {useTranscriptContext} from './contexts/TranscriptContext';
 
 interface Step {
@@ -29,50 +24,11 @@ const Progress = () => {
         transcript,
     } = useTranscriptContext();
     const {
-        error: linearError,
-        fetchLinearData,
-        loading: linearLoading,
-        projects,
-        teams,
-        users,
-    } = useLinearContext();
-    const {
-        awaitingResponse,
-        error: messagesError,
-        getResponse,
-        loading: messagesLoading,
-        messages,
-        readToolCallStack,
-    } = useMessagesContext();
-
-    const currentlyCallingTool = readToolCallStack?.length
-        ? readToolCallStack[readToolCallStack.length - 1]
-        : undefined;
-    const currentlyCallingToolArguments = currentlyCallingTool?.function.arguments
-        ? JSON.parse(currentlyCallingTool.function.arguments)
-        : undefined;
-    const currentlyCallingString = currentlyCallingTool
-        ? `Calling ${currentlyCallingTool.function.name}${
-            currentlyCallingTool.function.name === 'list_issues' &&
-            currentlyCallingToolArguments &&
-            'query' in currentlyCallingToolArguments
-                ? ` with query "${currentlyCallingToolArguments.query}"`
-                : ''
-        }...`
-        : 'Thinking...';
-
-    const [userMessage, setUserMessage] = useState<string>('');
-    const [inputFocused, setInputFocused] = useState<boolean>(false);
-
-    const sendDisabled =
-        userMessage.trim() === '' || messages[messages.length - 1]?.role === 'user';
-
-    function handleSendMessage() {
-        if (!sendDisabled) {
-            getResponse(userMessage);
-            setUserMessage('');
-        }
-    }
+        generateError: tasksGenerateError,
+        generateLoading: tasksGenerateLoading,
+        generateTasks,
+        createTasks,
+    } = useTasksContext();
 
     return (
         <div className="w-full h-full max-w-content-max-width px-4">
@@ -90,99 +46,16 @@ const Progress = () => {
                     complete={transcript !== undefined && !transcriptError}
                 />
                 <Step
-                    label={'Getting Linear Workspace Data'}
-                    loading={linearLoading}
-                    start={transcript !== undefined && messages.length === 1}
-                    error={linearError}
-                    fn={fetchLinearData}
-                    complete={
-                        users !== undefined &&
-                        projects !== undefined &&
-                        teams !== undefined &&
-                        !linearError
-                    }
-                />
-                <Step
-                    label={'Generating Linear Action Items'}
-                    loading={messagesLoading}
+                    label={'Generating Tasks'}
+                    loading={tasksGenerateLoading}
                     start={
-                        users !== undefined &&
-                        projects !== undefined &&
-                        teams !== undefined &&
-                        messages.length === 1
+                        transcript !== undefined &&
+                        createTasks.length === 0
                     }
-                    error={messagesError}
-                    fn={getResponse}
-                    complete={messages.length > 1 && !messagesError}
-                    additionalMessage={
-                        messages.length > 1 ? undefined : currentlyCallingString
-                    }
+                    error={tasksGenerateError}
+                    fn={generateTasks}
+                    complete={createTasks.length > 0 && !tasksGenerateError}
                 />
-                {awaitingResponse && (
-                    <div className="flex flex-col h-full w-full justify-between pt-4 overflow-hidden gap-4">
-                        <div className="flex flex-col gap-4 w-full max-h-full overflow-y-auto">
-                            {messages
-                                .filter(
-                                    (message, index) =>
-                                        index > 0 &&
-                                        (typeof message.content === 'string' ||
-                                            message.content?.some(
-                                                (content) => content.type === 'text',
-                                            )) &&
-                                        (message.role === 'assistant' || message.role === 'user'),
-                                )
-                                .map((message, index) => {
-                                    return (
-                                        <div
-                                            className={`max-w-full w-fit rounded-md p-4 ${
-                                                message.role === 'assistant'
-                                                    ? 'bg-gray-800 self-start'
-                                                    : 'bg-primary self-end'
-                                            }`}
-                                            key={index}
-                                        >
-                                            {typeof message.content === 'string' ? (
-                                                <Markdown remarkPlugins={[remarkGfm]} key={index}>{message.content}</Markdown>
-                                            ) : (
-                                                message.content
-                                                    ?.filter((content) => content.type === 'text')
-                                                    .map((content, idx) => (
-                                                        <p key={idx}>{content.text}</p>
-                                                    ))
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                        </div>
-                        <div
-                            className={`flex items-center p-2 pr-3 rounded-full bg-gray-900 border ${
-                                inputFocused ? 'border-primary' : 'border-gray-700'
-                            }`}
-                        >
-                            <input
-                                type="text"
-                                value={userMessage}
-                                onChange={(e) => setUserMessage(e.target.value)}
-                                className="w-full text-white px-4 outline-none"
-                                placeholder="Send Message..."
-                                onFocus={() => setInputFocused(true)}
-                                onBlur={() => setInputFocused(false)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        handleSendMessage();
-                                    }
-                                }}
-                            />
-                            <Button
-                                onClick={handleSendMessage}
-                                additionalClasses="!p-2 rounded-full"
-                                disabled={sendDisabled}
-                            >
-                                <UpArrowIcon className="w-6 h-6 fill-white"/>
-                            </Button>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );

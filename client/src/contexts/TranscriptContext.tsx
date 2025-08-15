@@ -8,6 +8,7 @@ import {
 import toast from 'react-hot-toast';
 import {useFileContext} from './FileContext';
 import {useLocalStorageContext} from './LocalStorageContext';
+import { useProgressContext } from './ProgressContext';
 
 interface TranscriptContextType {
     error?: Error;
@@ -24,6 +25,7 @@ const TranscriptContext = createContext<TranscriptContextType>({
 
 export const TranscriptProvider = ({children}: { children: ReactNode }) => {
     const {file} = useFileContext();
+    const {setStep} = useProgressContext();
     const {getLocalTranscript, setLocalTranscript} = useLocalStorageContext();
 
     const [transcript, setTranscript] = useState<string | undefined>(undefined);
@@ -35,7 +37,10 @@ export const TranscriptProvider = ({children}: { children: ReactNode }) => {
     }, [getLocalTranscript]);
 
     async function transcribeFile(): Promise<void> {
-        if (!file) return;
+        if (!file) {
+            setStep("upload");
+            return;
+        }
 
         setTranscript(undefined);
         setLoading(true);
@@ -53,6 +58,7 @@ export const TranscriptProvider = ({children}: { children: ReactNode }) => {
                         const data = (await response.json()) as string;
                         setLocalTranscript(data);
                         setTranscript(data);
+                        setStep('generating');
                     } else {
                         console.error(await response.text());
                         toast.error('Could not transcribe audio');
@@ -89,6 +95,7 @@ export const TranscriptProvider = ({children}: { children: ReactNode }) => {
             reader.readAsText(file);
 
             setLoading(false);
+            setStep('generating');
         }
     }
 

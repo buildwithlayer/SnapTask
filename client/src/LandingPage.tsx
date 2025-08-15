@@ -1,4 +1,19 @@
-import FileUpload from './FileUpload';
+import LinearIcon from './assets/linear.svg?react';
+import type {Integration} from './Content';
+import {useIntegrationContext} from './contexts/IntegrationContext';
+
+export const integrations: Integration[] = [
+    {
+        color: 'blue',
+        icon: <LinearIcon className='fill-white h-6 w-6' />,
+        name: 'Linear',
+    },
+    {
+        color: 'green',
+        icon: <div className='h-6 w-6 bg-green-500 rounded-md'></div>,
+        name: 'Mock',
+    },
+];
 
 const LandingPage = () => {
     return (
@@ -14,59 +29,32 @@ const LandingPage = () => {
                             </h1>
                             <h2 className="text-xl text-gray-300">
                                 Automatically extract action items from meetings and send them
-                                to Linear — no manual note-taking required.
+                                to your project management tool — no manual note-taking required.
                             </h2>
                         </div>
                     </div>
                 </div>
-                <div className="w-full h-full flex flex-col items-center justify-center gap-12 bg-gray-950">
-                    <div className="w-full h-full flex flex-col justify-center items-center px-4">
-                        <div
-                            className="max-w-content-max-width w-full h-full flex flex-col items-center gap-16 text-center py-[56px]">
-                            <FileUpload demo={false} />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full text-left pb-1">
-                                <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
-                                    <h3 className="font-semibold whitespace-pre">
-                                        🔍{'  '}Smart Action Item Detection
-                                    </h3>
-                                    <p className="text-gray-300">
-                                        Our AI listens to meetings or reads transcripts to identify
-                                        and extract clear, actionable tasks.
-                                    </p>
-                                </div>
-                                <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
-                                    <h3 className="font-semibold whitespace-pre">
-                                        🔄{'  '}Seamless Linear Integration
-                                    </h3>
-                                    <p className="text-gray-300">
-                                        Automatically create Linear issues or comments directly from
-                                        your meeting content — no copy-paste needed.
-                                    </p>
-                                </div>
-                                <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
-                                    <h3 className="font-semibold whitespace-pre">
-                                        ⚡{'  '}Ready in Seconds
-                                    </h3>
-                                    <p className="text-gray-300">
-                                        No setup, no onboarding. Just upload or record, and get structured,
-                                        ready-to-use action items instantly.
-                                    </p>
-                                </div>
-                                <div className="bg-gray-900 p-4 rounded flex flex-col gap-2">
-                                    <h3 className="font-semibold whitespace-pre">
-                                        🎧{'  '}Flexible Input Options
-                                    </h3>
-                                    <p className="text-gray-300">
-                                        Record a meeting directly in your browser or upload your own
-                                        audio/transcript files (.mp3, .wav, .txt, and more).
-                                    </p>
-                                </div>
-                            </div>
+                <div className="w-full h-full p-4 flex justify-center">
+                    <div className="max-w-content-max-width w-full h-full flex flex-col items-center gap-12 bg-gray-950 py-12">
+                        <div className="w-full flex flex-col items-center gap-3 bg-gray-850 p-4 rounded-md">
+                            <p className='text-gray-300'>Select an integration to get started</p>
+                            {integrations.map((integration) => <IntegrationOption key={integration.name} integration={integration} />)}
                         </div>
                     </div>
                 </div>
             </div>
         </>
+    );
+};
+
+const IntegrationOption = ({integration}: { integration: Integration; }) => {
+    const {setIntegration} = useIntegrationContext();
+
+    return (
+        <div className="w-full flex items-center justify-center gap-3 bg-gray-800 p-4 rounded-md cursor-pointer hover:bg-gray-700" onClick={() => setIntegration(integration)}>
+            {integration.icon}
+            <h3 className="font-semibold">{integration.name}</h3>
+        </div>
     );
 };
 

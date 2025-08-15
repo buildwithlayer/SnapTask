@@ -1,116 +1,77 @@
-import {OpenAI} from 'openai/client';
-import type {ChatCompletionMessageToolCall} from 'openai/resources/index.mjs';
 import {
     createContext,
     type ReactNode,
     useContext,
 } from 'react';
-import z from 'zod';
-import {type CreateComment, CreateCommentSchema, type CreateIssue, CreateIssueSchema, type Project, ProjectSchema, type Team, TeamSchema, type UpdateIssue, type User, UserSchema} from '../linearTypes';
+// TODO: Duplicate these types/schemas if doesn't work in prod
+import {CreateSnapTask as CreateSnapTaskZodSchema, CreateSnapTask} from '../../../src/schemas/snapTask';
+import type {Integration} from '../Content';
+import {integrations} from '../LandingPage';
+import type { ProgressStep } from './ProgressContext';
 
 interface LocalStorageContextType {
-    getLocalApprovedComments: () => Record<string, CreateComment> | undefined;
-    getLocalApprovedIssues: () => Record<string, CreateIssue | UpdateIssue> | undefined;
-    getLocalCommentToolCalls: () => ChatCompletionMessageToolCall[] | undefined;
-    getLocalIncompleteToolCalls: () => OpenAI.ChatCompletionMessageToolCall[] | undefined;
-    getLocalIssueToolCalls: () => ChatCompletionMessageToolCall[] | undefined;
-    getLocalLinearProjects: () => Project[] | undefined;
-    getLocalLinearTeams: () => Team[] | undefined;
-    getLocalLinearUsers: () => User[] | undefined;
-    getLocalMessages: () => OpenAI.ChatCompletionMessageParam[] | undefined;
-    getLocalRejectedComments: () => Record<string, CreateComment> | undefined;
-    getLocalRejectedIssues: () => Record<string, CreateIssue | UpdateIssue> | undefined;
+    getLocalProgressStep: () => ProgressStep;
+    getLocalIntegration: () => Integration | undefined;
+    getLocalTasks: () => CreateSnapTask[] | undefined;
     getLocalTranscript: () => string | undefined;
-    hardReset: () => void;
-    resetLocalStorage: () => void;
-    setLocalApprovedComments: (comments: Record<string, CreateComment>) => void;
-    setLocalApprovedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => void;
-    setLocalCommentToolCalls: (commentToolCalls: ChatCompletionMessageToolCall[]) => void;
-    setLocalIncompleteToolCalls: (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => void;
-    setLocalIssueToolCalls: (issueToolCalls: ChatCompletionMessageToolCall[]) => void;
-    setLocalLinearProjects: (projects: Project[]) => void;
-    setLocalLinearTeams: (teams: Team[]) => void;
-    setLocalLinearUsers: (users: User[]) => void;
-    setLocalMessages: (messages: OpenAI.ChatCompletionMessageParam[]) => void;
-    setLocalRejectedComments: (comments: Record<string, CreateComment>) => void;
-    setLocalRejectedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => void;
+    setLocalProgressStep: (step: ProgressStep) => void;
+    setLocalIntegration: (integration: Integration | undefined) => void;
+    setLocalTasks: (tasks: CreateSnapTask[]) => void;
     setLocalTranscript: (transcript: string) => void;
+    resetLocalStorage: () => void;
 }
 
 const LocalStorageContext = createContext<LocalStorageContextType>({
-    getLocalApprovedComments: () => ({}),
-    getLocalApprovedIssues: () => ({}),
-    getLocalCommentToolCalls: () => undefined,
-    getLocalIncompleteToolCalls: () => undefined,
-    getLocalIssueToolCalls: () => undefined,
-    getLocalLinearProjects: () => undefined,
-    getLocalLinearTeams: () => undefined,
-    getLocalLinearUsers: () => undefined,
-    getLocalMessages: () => undefined,
-    getLocalRejectedComments: () => ({}),
-    getLocalRejectedIssues: () => ({}),
+    getLocalProgressStep: () => 'select-integration',
+    getLocalIntegration: () => undefined,
+    getLocalTasks: () => undefined,
     getLocalTranscript: () => undefined,
-    hardReset: () => {
-        localStorage.clear();
-        window.location.pathname = '/';
+    setLocalProgressStep: (step: ProgressStep) => {
+        localStorage.setItem('progressStep', step);
     },
-    resetLocalStorage: () => {
-        [
-            'transcript',
-            'messages',
-            'incompleteToolCalls',
-            'issueToolCalls',
-            'approvedIssues',
-            'rejectedIssues',
-            'commentToolCalls',
-            'approvedComments',
-            'rejectedComments',
-            'linearUsers',
-            'linearProjects',
-            'linearTeams',
-        ].forEach((k) => localStorage.removeItem(k));
-
-        window.location.pathname = '/';
+    setLocalIntegration: (integration: Integration | undefined) => {
+        if (integration) {
+            localStorage.setItem('integration', integration.name);
+        } else {
+            localStorage.removeItem('integration');
+        }
     },
-    setLocalApprovedComments: (comments: Record<string, CreateComment>) => {
-        localStorage.setItem('approvedComments', JSON.stringify(comments));
-    },
-    setLocalApprovedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => {
-        localStorage.setItem('approvedIssues', JSON.stringify(issues));
-    },
-    setLocalCommentToolCalls: (commentToolCalls: ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('commentToolCalls', JSON.stringify(commentToolCalls));
-    },
-    setLocalIncompleteToolCalls: (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('incompleteToolCalls', JSON.stringify(toolCalls));
-    },
-    setLocalIssueToolCalls: (issueToolCalls: ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('issueToolCalls', JSON.stringify(issueToolCalls));
-    },
-    setLocalLinearProjects: (projects: Project[]) => {
-        localStorage.setItem('linearProjects', JSON.stringify(projects));
-    },
-    setLocalLinearTeams: (teams: Team[]) => {
-        localStorage.setItem('linearTeams', JSON.stringify(teams));
-    },
-    setLocalLinearUsers: (users: User[]) => {
-        localStorage.setItem('linearUsers', JSON.stringify(users));
-    },
-    setLocalMessages: (messages: OpenAI.ChatCompletionMessageParam[]) => {
-        localStorage.setItem('messages', JSON.stringify(messages));
-    },
-    setLocalRejectedComments: (comments: Record<string, CreateComment>) => {
-        localStorage.setItem('rejectedComments', JSON.stringify(comments));
-    },
-    setLocalRejectedIssues: (issues: Record<string, CreateIssue | UpdateIssue>) => {
-        localStorage.setItem('rejectedIssues', JSON.stringify(issues));
+    setLocalTasks: (tasks: CreateSnapTask[]) => {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
     },
     setLocalTranscript: (transcript: string) => {
         localStorage.setItem('transcript', transcript);
     },
+        resetLocalStorage: () => {
+        localStorage.clear();
+        window.location.pathname = '/';
+    },
 });
 
 export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
+
+    const getLocalProgressStep = () => {
+        const step = localStorage.getItem('progressStep') as ProgressStep | null;
+        return step || 'select-integration';
+    }
+
+    const setLocalProgressStep = (step: ProgressStep) => {
+        localStorage.setItem('progressStep', step);
+    };
+
+    const getLocalIntegration = () => {
+        const integrationName = localStorage.getItem('integration');
+        return integrations.find((integration) => integration.name === integrationName) || undefined;
+    };
+
+    const setLocalIntegration = (integration: Integration | undefined) => {
+        if (integration) {
+            localStorage.setItem('integration', integration.name);
+        } else {
+            localStorage.removeItem('integration');
+        }
+    };
+
     const getLocalTranscript = () => {
         return localStorage.getItem('transcript') || undefined;
     };
@@ -119,198 +80,24 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
         localStorage.setItem('transcript', transcript);
     };
 
-    const getLocalMessages = () => {
-        const messages = localStorage.getItem('messages');
+    const getLocalTasks = () => {
+        const tasks = localStorage.getItem('tasks');
+        if (!tasks) return undefined;
+
         try {
-            if (!messages) return undefined;
-            return JSON.parse(messages) as OpenAI.ChatCompletionMessageParam[];
-        } catch (error) {
-            console.error('Error parsing messages from localStorage:', error);
+            const jsonTasks = JSON.parse(tasks);
+            return CreateSnapTaskZodSchema.array().parse(jsonTasks);
+        } catch (e) {
+            console.error('Error parsing tasks from localStorage', e);
             return undefined;
         }
     };
 
-    const setLocalMessages = (messages: OpenAI.ChatCompletionMessageParam[]) => {
-        localStorage.setItem('messages', JSON.stringify(messages));
-    };
-
-    const getLocalIncompleteToolCalls = () => {
-        const toolCalls = localStorage.getItem('incompleteToolCalls');
-        try {
-            if (!toolCalls) return undefined;
-            return JSON.parse(toolCalls) as OpenAI.ChatCompletionMessageToolCall[];
-        } catch (error) {
-            console.error('Error parsing incompleteToolCalls from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalIncompleteToolCalls = (toolCalls: OpenAI.ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('incompleteToolCalls', JSON.stringify(toolCalls));
-    };
-
-    const getLocalIssueToolCalls = () => {
-        const issueToolCalls = localStorage.getItem('issueToolCalls');
-        try {
-            if (!issueToolCalls) return undefined;
-            return JSON.parse(issueToolCalls) as ChatCompletionMessageToolCall[];
-        } catch (error) {
-            console.error('Error parsing issueToolCalls from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalIssueToolCalls = (issueToolCalls: ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('issueToolCalls', JSON.stringify(issueToolCalls));
-    };
-
-    const getLocalApprovedIssues = () => {
-        const approvedIssues = localStorage.getItem('approvedIssues');
-        try {
-            const parsedIssues = JSON.parse(approvedIssues || '{}');
-            const approvedIssuesParseResult = z.record(CreateIssueSchema).safeParse(parsedIssues);
-            return approvedIssuesParseResult.success ? approvedIssuesParseResult.data : undefined;
-        } catch (error) {
-            console.error('Error parsing approvedIssues from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalApprovedIssues = (issues: Record<string, CreateIssue | UpdateIssue>) => {
-        localStorage.setItem('approvedIssues', JSON.stringify(issues));
-    };
-
-    const getLocalRejectedIssues = () => {
-        const rejectedIssues = localStorage.getItem('rejectedIssues');
-        try {
-            const parsedIssues = JSON.parse(rejectedIssues || '{}');
-            const rejectedIssuesParseResult = z.record(CreateIssueSchema).safeParse(parsedIssues);
-            return rejectedIssuesParseResult.success ? rejectedIssuesParseResult.data : undefined;
-        } catch (error) {
-            console.error('Error parsing rejectedIssues from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalRejectedIssues = (issues: Record<string, CreateIssue | UpdateIssue>) => {
-        localStorage.setItem('rejectedIssues', JSON.stringify(issues));
-    };
-
-    const getLocalCommentToolCalls = () => {
-        const commentToolCalls = localStorage.getItem('commentToolCalls');
-        try {
-            if (!commentToolCalls) return undefined;
-            return JSON.parse(commentToolCalls) as ChatCompletionMessageToolCall[];
-        } catch (error) {
-            console.error('Error parsing commentToolCalls from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalCommentToolCalls = (commentToolCalls: ChatCompletionMessageToolCall[]) => {
-        localStorage.setItem('commentToolCalls', JSON.stringify(commentToolCalls));
-    };
-
-    const getLocalApprovedComments = () => {
-        const approvedComments = localStorage.getItem('approvedComments');
-        try {
-            const parsedComments = JSON.parse(approvedComments || '{}');
-            const approvedCommentsParseResult = z.record(CreateCommentSchema).safeParse(parsedComments);
-            return approvedCommentsParseResult.success ? approvedCommentsParseResult.data : undefined;
-        } catch (error) {
-            console.error('Error parsing approvedComments from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalApprovedComments = (comments: Record<string, CreateComment>) => {
-        localStorage.setItem('approvedComments', JSON.stringify(comments));
-    };
-
-    const getLocalRejectedComments = () => {
-        const rejectedComments = localStorage.getItem('rejectedComments');
-        try {
-            const parsedComments = JSON.parse(rejectedComments || '{}');
-            const rejectedCommentsParseResult = z.record(CreateCommentSchema).safeParse(parsedComments);
-            return rejectedCommentsParseResult.success ? rejectedCommentsParseResult.data : undefined;
-        } catch (error) {
-            console.error('Error parsing rejectedComments from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalRejectedComments = (comments: Record<string, CreateComment>) => {
-        localStorage.setItem('rejectedComments', JSON.stringify(comments));
-    };
-
-    const getLocalLinearUsers = () => {
-        const linearUsers = localStorage.getItem('linearUsers');
-        try {
-            const parsedUsers = JSON.parse(linearUsers || '');
-            const linearUsersParseResult = z.array(UserSchema).safeParse(parsedUsers);
-            return linearUsersParseResult.success ? linearUsersParseResult.data : undefined;
-        } catch (error) {
-            console.error('Error parsing linearUsers from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalLinearUsers = (users: User[]) => {
-        localStorage.setItem('linearUsers', JSON.stringify(users));
-    };
-
-    const getLocalLinearProjects = () => {
-        const linearProjects = localStorage.getItem('linearProjects');
-        try {
-            const parsedProjects = JSON.parse(linearProjects || '');
-            const linearProjectsParseResult = z.array(ProjectSchema).safeParse(parsedProjects);
-            return linearProjectsParseResult.success ? linearProjectsParseResult.data : undefined;
-        } catch (error) {
-            console.error('Error parsing linearProjects from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalLinearProjects = (projects: Project[]) => {
-        localStorage.setItem('linearProjects', JSON.stringify(projects));
-    };
-
-    const getLocalLinearTeams = () => {
-        const linearTeams = localStorage.getItem('linearTeams');
-        try {
-            const parsedTeams = JSON.parse(linearTeams || '');
-            const linearTeamsParseResult = z.array(TeamSchema).safeParse(parsedTeams);
-            return linearTeamsParseResult.success ? linearTeamsParseResult.data : undefined;
-        } catch (error) {
-            console.error('Error parsing linearTeams from localStorage:', error);
-            return undefined;
-        }
-    };
-
-    const setLocalLinearTeams = (teams: Team[]) => {
-        localStorage.setItem('linearTeams', JSON.stringify(teams));
+    const setLocalTasks = (tasks: CreateSnapTask[]) => {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
     };
 
     const resetLocalStorage = () => {
-        [
-            'transcript',
-            'messages',
-            'incompleteToolCalls',
-            'issueToolCalls',
-            'approvedIssues',
-            'rejectedIssues',
-            'commentToolCalls',
-            'approvedComments',
-            'rejectedComments',
-            'linearUsers',
-            'linearProjects',
-            'linearTeams',
-        ].forEach((k) => localStorage.removeItem(k));
-
-        window.location.pathname = '/';
-    };
-
-    const hardReset = () => {
         localStorage.clear();
         window.location.pathname = '/';
     };
@@ -318,31 +105,14 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
     return (
         <LocalStorageContext.Provider
             value={{
-                getLocalApprovedComments,
-                getLocalApprovedIssues,
-                getLocalCommentToolCalls,
-                getLocalIncompleteToolCalls,
-                getLocalIssueToolCalls,
-                getLocalLinearProjects,
-                getLocalLinearTeams,
-                getLocalLinearUsers,
-                getLocalMessages,
-                getLocalRejectedComments,
-                getLocalRejectedIssues,
+                getLocalProgressStep,
+                getLocalIntegration,
+                getLocalTasks,
                 getLocalTranscript,
-                hardReset,
                 resetLocalStorage,
-                setLocalApprovedComments,
-                setLocalApprovedIssues,
-                setLocalCommentToolCalls,
-                setLocalIncompleteToolCalls,
-                setLocalIssueToolCalls,
-                setLocalLinearProjects,
-                setLocalLinearTeams,
-                setLocalLinearUsers,
-                setLocalMessages,
-                setLocalRejectedComments,
-                setLocalRejectedIssues,
+                setLocalProgressStep,
+                setLocalIntegration,
+                setLocalTasks,
                 setLocalTranscript,
             }}
         >

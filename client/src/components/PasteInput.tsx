@@ -29,7 +29,7 @@ const PasteInput = ({handleSubmit}: {handleSubmit: (text: string) => void}) => {
                 onBlur={() => setFocused(false)}
             />
             {text ? 
-                <Button additionalClasses='w-full' onClick={() => handleSubmit(text)}>Generate Linear Action Items</Button> 
+                <Button additionalClasses='w-full' onClick={() => handleSubmit(text)}>Generate Tasks</Button> 
                 : navigator.clipboard &&
                     <Button onClick={handlePaste} additionalClasses='!text-gray-900 !bg-white hover:!bg-gray-200 !gap-2'>
                         <ClipboardIcon className="w-6 h-6 fill-gray-900"/>
