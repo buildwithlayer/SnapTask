@@ -8,7 +8,7 @@ const tasksRouter = new OpenAPIHono();
 const createTaskRoute = createRoute({
     description: 'Create a new task',
     method: 'post',
-    path: '/',
+    path: '/create',
     request: {
         body: {
             content: {
@@ -47,7 +47,7 @@ tasksRouter.openapi(createTaskRoute, async (c) => {
 const updateTaskRoute = createRoute({
     description: 'Update an existing task',
     method: 'post',
-    path: '/',
+    path: '/update',
     request: {
         body: {
             content: {

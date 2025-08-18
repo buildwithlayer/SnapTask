@@ -4,6 +4,7 @@ import {swaggerUI} from '@hono/swagger-ui';
 import {OpenAPIHono} from '@hono/zod-openapi';
 import {cors} from 'hono/cors';
 import amplitudeRouter from './routes/amplitude.js';
+import authRouter from './routes/auth.js';
 import extractRouter from './routes/extract.js';
 import tasksRouter from './routes/tasks.js';
 import transcribeRouter from './routes/transcribe.js';
@@ -14,6 +15,7 @@ app.use('*', cors());
 
 // API routes
 app.route('/api/amplitude', amplitudeRouter);
+app.route('/api/auth', authRouter);
 app.route('/api/extract', extractRouter);
 app.route('/api/tasks', tasksRouter);
 app.route('/api/transcribe', transcribeRouter);
@@ -25,12 +27,6 @@ app.doc('/api/doc', {
         version: '1.0.0',
     },
     openapi: '3.0.0',
-    servers: [
-        {
-            description: 'Development server',
-            url: 'http://localhost:3001',
-        },
-    ],
 });
 
 app.get('/api/ui', swaggerUI({url: '/api/doc'}));

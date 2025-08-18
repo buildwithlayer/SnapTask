@@ -51,7 +51,3 @@ extractRouter.openapi(summarizeRoute, async (c) => {
 });
 
 export default extractRouter;
-
-
-
-
