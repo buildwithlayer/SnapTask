@@ -226,7 +226,7 @@ export class LinearClient extends TaskManagerClient {
                 } catch (e) {
                     console.error(e);
                     messages.push({
-                        content: e as string,
+                        content: JSON.stringify(e),
                         role: 'user',
                     });
                 }
