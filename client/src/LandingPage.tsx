@@ -1,4 +1,4 @@
-import {integrations, useIntegrationContext, type Integration} from './contexts/IntegrationContext';
+import {type Integration, integrations, useIntegrationContext} from './contexts/IntegrationContext';
 
 const LandingPage = () => {
     return (

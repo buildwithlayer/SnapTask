@@ -1,10 +1,10 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import {type CreateSnapTask} from '../../../src/schemas/snapTask';
+import {UpdateWithOriginal} from '../../../src/utils/taskManagerClient';
+import {useIntegrationContext} from './IntegrationContext';
 import {useLocalStorageContext} from './LocalStorageContext';
 import {useProgressContext} from './ProgressContext';
 import {useTranscriptContext} from './TranscriptContext';
-import {UpdateWithOriginal} from '../../../src/utils/taskManagerClient';
-import { useIntegrationContext } from './IntegrationContext';
 
 type TasksContextType = {
     approveCreateTask: (taskTitle: string) => void;
@@ -40,7 +40,7 @@ const TasksContext = createContext<TasksContextType>({
 });
 
 export const TasksProvider = ({children}: { children: React.ReactNode }) => {
-    const {integration} = useIntegrationContext();
+    const {authToken, integration} = useIntegrationContext();
     const {transcript} = useTranscriptContext();
     const {setStep} = useProgressContext();
 
@@ -88,24 +88,24 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
         try {
             const task = createTasks.find(task => task.title === taskTitle);
             fetch(`${import.meta.env.VITE_API_URL}/api/tasks`, {
-                method: 'POST',
+                body: JSON.stringify({
+                    authProvider: integration?.authProvider,
+                    authToken: authToken,
+                    createTask: {
+                        ...task,
+                    },
+                }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    createTask: {
-                        ...task
-                    },
-                    authProvider: integration?.authProvider,
-                    authToken: integration?.authToken || "",
-                }),
+                method: 'POST',
             }).then(() => {
                 const newTasks = (createTasks.filter(task => task.title !== taskTitle));
                 updateCreateTasks(newTasks);
                 if (newTasks.length + updateTasks.length === 0) {
                     setStep('done');
                 }
-            })
+            });
         } catch (error) {
             setApproveCreateTaskError(error instanceof Error ? error : new Error('Unknown error'));
         } finally {
@@ -118,24 +118,24 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
         try {
             const task = updateTasks.find(task => task.updates.id === taskId);
             fetch(`${import.meta.env.VITE_API_URL}/api/tasks`, {
-                method: 'POST',
+                body: JSON.stringify({
+                    authProvider: integration?.authProvider,
+                    authToken: authToken,
+                    updateTask: {
+                        ...task?.updates,
+                    },
+                }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    updateTask: {
-                        ...task?.updates
-                    },
-                    authProvider: integration?.authProvider,
-                    authToken: integration?.authToken || "",
-                }),
+                method: 'POST',
             }).then(() => {
                 const newTasks = (updateTasks.filter(task => task.updates.id !== taskId));
                 updateUpdateTasks(newTasks);
                 if (newTasks.length + createTasks.length === 0) {
                     setStep('done');
                 }
-            })
+            });
         } catch (error) {
             setApproveUpdateTaskError(error instanceof Error ? error : new Error('Unknown error'));
         } finally {
@@ -147,7 +147,11 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
         setGenerateLoading(true);
         try {
             fetch(`${import.meta.env.VITE_API_URL}/api/extract`, {
-                body: JSON.stringify({authProvider: 'mock', authToken: '<mock_token>', transcript}),
+                body: JSON.stringify({
+                    authProvider: integration?.authProvider,
+                    authToken: authToken,
+                    transcript,
+                }),
                 headers: {
                     'Content-Type': 'application/json',
                 },

@@ -1,13 +1,44 @@
 import {useEffect} from 'react';
 import toast from 'react-hot-toast';
-import {onMcpAuthorization} from 'use-mcp';
+import {useIntegrationContext} from './contexts/IntegrationContext';
 
-function OAuthCallback() {
+export function OAuthLinearCallback() {
+    const {setAuthToken} = useIntegrationContext();
+
     useEffect(() => {
-        onMcpAuthorization().catch((err) => {
-            console.error(err);
-            toast.error(err.message);
-        });
+        const code = new URLSearchParams(window.location.search).get('code');
+        if (!code) {
+            toast.error('Authorization code not found');
+            return;
+        }
+        try {
+            const clientId = '93f267ac74cd3d021d8b119586d04842';
+            const clientSecret = '';
+            const redirectUri = 'http://localhost:5174/oauth/linear/callback';
+            fetch('https://api.linear.app/oauth/token', {
+                body: new URLSearchParams({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    code: code,
+                    grant_type: 'authorization_code',
+                    redirect_uri: redirectUri,
+                }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                method: 'POST',
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to exchange authorization code for access token');
+                }
+                return response.json();
+            }).then(data => {
+                setAuthToken(data.access_token);
+                window.location.href = '/';
+            });
+        } catch (error) {
+            toast.error('Error during OAuth callback: ' + (error instanceof Error ? error.message : 'Unknown error'));
+        }
     }, []);
 
     return (
@@ -19,5 +50,3 @@ function OAuthCallback() {
         </div>
     );
 }
-
-export default OAuthCallback;

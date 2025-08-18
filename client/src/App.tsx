@@ -10,7 +10,7 @@ import {ProgressProvider} from './contexts/ProgressContext.tsx';
 import {TasksProvider} from './contexts/TasksContext.tsx';
 import {TranscriptProvider} from './contexts/TranscriptContext.tsx';
 import MenuBar from './MenuBar.tsx';
-import OAuthCallback from './OAuthCallback.tsx';
+import {OAuthLinearCallback} from './OAuthCallback.tsx';
 
 function App() {
     const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
@@ -25,15 +25,15 @@ function App() {
 
     return (
         <div className="flex flex-col h-screen w-screen">
-            <Router>
-                <Routes>
-                    <Route path={'/oauth/callback'} element={<OAuthCallback/>}/>
-                    <Route
-                        path={'/'}
-                        element={
-                            <LocalStorageProvider>
-                                <ProgressProvider>
-                                    <IntegrationProvider>
+            <LocalStorageProvider>
+                <ProgressProvider>
+                    <IntegrationProvider>
+                        <Router>
+                            <Routes>
+                                <Route path={'/oauth/linear/callback'} element={<OAuthLinearCallback/>}/>
+                                <Route
+                                    path={'/'}
+                                    element={
                                         <FileProvider>
                                             <TranscriptProvider>
                                                 <TasksProvider>
@@ -42,13 +42,13 @@ function App() {
                                                 </TasksProvider>
                                             </TranscriptProvider>
                                         </FileProvider>
-                                    </IntegrationProvider>
-                                </ProgressProvider>
-                            </LocalStorageProvider>
-                        }
-                    />
-                </Routes>
-            </Router>
+                                    }
+                                />
+                            </Routes>
+                        </Router>
+                    </IntegrationProvider>
+                </ProgressProvider>
+            </LocalStorageProvider>
             <Toaster
                 position="bottom-right"
                 toastOptions={{

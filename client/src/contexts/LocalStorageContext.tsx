@@ -6,16 +6,18 @@ import {
 // TODO: Duplicate these types/schemas if doesn't work in prod
 import {CreateSnapTask as CreateSnapTaskZodSchema, CreateSnapTask} from '../../../src/schemas/snapTask';
 import {UpdateWithOriginal as UpdateWithOriginalZodSchema, UpdateWithOriginal} from '../../../src/utils/taskManagerClient';
+import {type Integration, integrations} from './IntegrationContext';
 import type {ProgressStep} from './ProgressContext';
-import { integrations, type Integration } from './IntegrationContext';
 
 interface LocalStorageContextType {
+    getLocalAuthToken: () => string | undefined;
     getLocalCreateTasks: () => CreateSnapTask[] | undefined;
     getLocalIntegration: () => Integration | undefined;
     getLocalProgressStep: () => ProgressStep;
     getLocalTranscript: () => string | undefined;
     getLocalUpdateTasks: () => UpdateWithOriginal[] | undefined;
     resetLocalStorage: () => void;
+    setLocalAuthToken: (token: string | undefined) => void;
     setLocalCreateTasks: (tasks: CreateSnapTask[]) => void;
     setLocalIntegration: (integration: Integration | undefined) => void;
     setLocalProgressStep: (step: ProgressStep) => void;
@@ -24,6 +26,7 @@ interface LocalStorageContextType {
 }
 
 const LocalStorageContext = createContext<LocalStorageContextType>({
+    getLocalAuthToken: () => undefined,
     getLocalCreateTasks: () => undefined,
     getLocalIntegration: () => undefined,
     getLocalProgressStep: () => 'select-integration',
@@ -32,6 +35,13 @@ const LocalStorageContext = createContext<LocalStorageContextType>({
     resetLocalStorage: () => {
         localStorage.clear();
         window.location.pathname = '/';
+    },
+    setLocalAuthToken: (token: string | undefined) => {
+        if (token) {
+            localStorage.setItem('authToken', token);
+        } else {
+            localStorage.removeItem('authToken');
+        }
     },
     setLocalCreateTasks: (tasks: CreateSnapTask[]) => {
         localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -75,6 +85,18 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
             localStorage.setItem('integration', integration.name);
         } else {
             localStorage.removeItem('integration');
+        }
+    };
+
+    const getLocalAuthToken = () => {
+        return localStorage.getItem('authToken') || undefined;
+    };
+
+    const setLocalAuthToken = (token: string | undefined) => {
+        if (token) {
+            localStorage.setItem('authToken', token);
+        } else {
+            localStorage.removeItem('authToken');
         }
     };
 
@@ -128,12 +150,14 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
     return (
         <LocalStorageContext.Provider
             value={{
+                getLocalAuthToken,
                 getLocalCreateTasks,
                 getLocalIntegration,
                 getLocalProgressStep,
                 getLocalTranscript,
                 getLocalUpdateTasks,
                 resetLocalStorage,
+                setLocalAuthToken,
                 setLocalCreateTasks,
                 setLocalIntegration,
                 setLocalProgressStep,

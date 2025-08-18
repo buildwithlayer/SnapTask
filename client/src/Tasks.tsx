@@ -32,11 +32,11 @@ interface TaskProps {
 }
 
 const Task = ({task, updates}: TaskProps) => {
-    const {approveCreateTaskLoading, approveCreateTask, deleteCreateTask, approveUpdateTask, deleteUpdateTask} = useTasksContext();
+    const {approveCreateTask, approveCreateTaskLoading, approveUpdateTask, deleteCreateTask, deleteUpdateTask} = useTasksContext();
     return <div className='w-full flex flex-col gap-4 p-4 border border-gray-700 rounded-md bg-gray-900'>
         <div className="flex flex-col">
-            {task.title && !updates?.title && <h3 className={`font-medium text-xl`}>{task.title}</h3>}
-            {updates?.title && <h3 className={`font-medium text-xl text-amber-500`}><span className='line-through text-white'>{task.title}</span> {updates.title}</h3>}
+            {task.title && !updates?.title && <h3 className={'font-medium text-xl'}>{task.title}</h3>}
+            {updates?.title && <h3 className={'font-medium text-xl text-amber-500'}><span className='line-through text-white'>{task.title}</span> {updates.title}</h3>}
             {task.description && !updates?.description && <p>{task.description}</p>}
             {updates?.description && <p className='text-amber-500'><span className='line-through text-white'>{task.description}</span> {updates.description}</p>}
         </div>
@@ -54,11 +54,11 @@ const Task = ({task, updates}: TaskProps) => {
 
 interface PropertyBadgeProps {
     icon: React.ReactNode
-    value?: string
     updatedValue?: string
+    value?: string
 }
 
-const PropertyBadge = ({icon, value, updatedValue}: PropertyBadgeProps) => {
+const PropertyBadge = ({icon, updatedValue, value}: PropertyBadgeProps) => {
     return (
         <>
             {(updatedValue || value) && <div className={`flex items-center gap-2 px-2 py-1 border rounded-md w-fit ${updatedValue ? 'border-amber-500' : 'border-gray-700'}`}>
@@ -68,6 +68,6 @@ const PropertyBadge = ({icon, value, updatedValue}: PropertyBadgeProps) => {
             </div>}
         </>
     );
-}
+};
 
 export default Tasks;
