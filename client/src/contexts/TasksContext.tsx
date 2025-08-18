@@ -158,20 +158,17 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                 method: 'POST',
             })
 
-            try {
+            if (response.ok) {
                 const data = await response.json();
-                if (response.ok) {
-                    setCreateTasks(data.createTasks);
-                    setLocalCreateTasks(data.createTasks);
-                    setUpdateTasks(data.updateTasks);
-                    setLocalUpdateTasks(data.updateTasks);
-                    setStep('reviewing');
-                } else {
-                    console.error('Error generating createTasks:', data);
-                    setGenerateError(new Error(data.message || 'Unknown error'));
-                }
-            } catch (e) {
-                throw new Error('Failed to parse response from server');
+                setCreateTasks(data.createTasks);
+                setLocalCreateTasks(data.createTasks);
+                setUpdateTasks(data.updateTasks);
+                setLocalUpdateTasks(data.updateTasks);
+                setStep('reviewing');
+            } else {
+                const data = await response.json();
+                console.error('Error generating createTasks:', data);
+                throw new Error(data.message || 'Unknown error');
             }
 
         } catch (error) {
