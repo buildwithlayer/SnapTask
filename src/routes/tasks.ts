@@ -1,4 +1,5 @@
 import {createRoute, OpenAPIHono} from '@hono/zod-openapi';
+import {AsanaClient} from '../utils/asanaClient.js';
 import {LinearClient} from '../utils/linearClient.js';
 import {MockClient} from '../utils/mockClient.js';
 import {CreateTaskRequest, TaskManagerClient, UpdateTaskRequest} from '../utils/taskManagerClient.js';
@@ -30,6 +31,9 @@ tasksRouter.openapi(createTaskRoute, async (c) => {
 
     let taskManagerClient: TaskManagerClient;
     switch (request.authProvider) {
+    case 'asana':
+        taskManagerClient = new AsanaClient(request.authToken);
+        break;
     case 'linear':
         taskManagerClient = new LinearClient(request.authToken);
         break;
@@ -69,6 +73,9 @@ tasksRouter.openapi(updateTaskRoute, async (c) => {
 
     let taskManagerClient: TaskManagerClient;
     switch (request.authProvider) {
+    case 'asana':
+        taskManagerClient = new AsanaClient(request.authToken);
+        break;
     case 'linear':
         taskManagerClient = new LinearClient(request.authToken);
         break;

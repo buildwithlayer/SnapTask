@@ -4,7 +4,7 @@ import {CreateSnapTask, SnapTask, UpdateSnapTask} from '../schemas/snapTask.js';
 import {extractDiscussionTopics} from './taskManagerClient.prompts.js';
 
 const AuthenticatedRequest = z.object({
-    authProvider: z.enum(['linear', 'mock']),
+    authProvider: z.enum(['asana', 'linear', 'mock']),
     authToken: z.string(),
 });
 
