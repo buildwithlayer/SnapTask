@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import {serve} from '@hono/node-server';
 import {serveStatic} from '@hono/node-server/serve-static';
 import {swaggerUI} from '@hono/swagger-ui';
 import {OpenAPIHono} from '@hono/zod-openapi';
@@ -47,13 +46,4 @@ app.get('*', serveStatic({
     path: './dist/index.html',
 }));
 
-serve(
-    {
-        fetch: app.fetch,
-        port: 3001,
-    },
-    (info) => {
-        console.log(`Server is running on http://localhost:${info.port}`);
-        console.log(`API Documentation: http://localhost:${info.port}/api/ui`);
-    },
-);
+export default app;
