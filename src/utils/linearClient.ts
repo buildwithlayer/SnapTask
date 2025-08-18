@@ -1,4 +1,4 @@
-import {Issue, LinearClient as ApiClient} from '@linear/sdk';
+import {Issue, IssueSearchResult, LinearClient as ApiClient} from '@linear/sdk';
 import OpenAI from 'openai';
 import {z} from 'zod';
 import type {IssueCreateInput, IssueUpdateInput} from '@linear/sdk/dist/_generated_documents.js';
@@ -125,7 +125,7 @@ export class LinearClient extends TaskManagerClient {
         };
     }
 
-    private linearIssueToSnapTask(linearIssue: Issue, context: Context): SnapTask {
+    private linearIssueToSnapTask(linearIssue: Issue | IssueSearchResult, context: Context): SnapTask {
         const snapTask: SnapTask = {
             id: linearIssue.id,
             title: linearIssue.title,
@@ -167,8 +167,9 @@ export class LinearClient extends TaskManagerClient {
     public async processDiscussionTopic(topic: string, context: Context): Promise<ProcessTranscriptResponse> {
         const response: ProcessTranscriptResponse = {};
 
-        const existingTasks = await this.apiClient.paginate(this.apiClient.issueSearch, {query: topic})
-            .then(issues => issues.map(issue => this.linearIssueToSnapTask(issue, context)));
+        const existingTasks: SnapTask[] = await this.apiClient.searchIssues(topic)
+            .then(payload => payload.nodes)
+            .then(nodes => nodes.map(node => this.linearIssueToSnapTask(node, context)));
 
         const maxTries = 3;
         let curTry = 0;
