@@ -1,6 +1,6 @@
+import devServer from '@hono/vite-dev-server';
 import {defineConfig} from 'vite';
 import build from '@hono/vite-build';
-import devServer from '@hono/vite-dev-server';
 
 export default defineConfig({
     plugins: [

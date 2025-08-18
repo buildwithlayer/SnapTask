@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import z from 'zod';
-import {CreateSnapTask, UpdateSnapTask} from '../schemas/snapTask.js';
+import {CreateSnapTask, SnapTask, UpdateSnapTask} from '../schemas/snapTask.js';
 import {extractDiscussionTopics} from './taskManagerClient.prompts.js';
 
 const AuthenticatedRequest = z.object({
@@ -14,9 +14,16 @@ export const ProcessTranscriptRequest = AuthenticatedRequest.extend({
 
 export type ProcessTranscriptRequest = z.infer<typeof ProcessTranscriptRequest>;
 
+export const UpdateWithOriginal = z.object({
+    original: SnapTask,
+    updates: UpdateSnapTask,
+});
+
+export type UpdateWithOriginal = z.infer<typeof UpdateWithOriginal>;
+
 export const ProcessTranscriptResponse = z.object({
     createTasks: z.array(CreateSnapTask).optional(),
-    updateTasks: z.array(UpdateSnapTask).optional(),
+    updateTasks: z.array(UpdateWithOriginal).optional(),
 });
 
 export type ProcessTranscriptResponse = z.infer<typeof ProcessTranscriptResponse>;

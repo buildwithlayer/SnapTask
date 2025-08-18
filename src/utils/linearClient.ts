@@ -15,7 +15,7 @@ import {
     type ProcessTranscriptRequest,
     type ProcessTranscriptResponse,
     TaskManagerClient,
-    type UpdateTaskRequest,
+    type UpdateTaskRequest, UpdateWithOriginal,
 } from './taskManagerClient.js';
 
 const Project = z.object({
@@ -272,13 +272,19 @@ export class LinearClient extends TaskManagerClient {
 
                             if (response.updateTasks) {
                                 response.updateTasks.push({
-                                    id: existingTask.id,
-                                    ...update.updated_task,
+                                    original: existingTask,
+                                    updates: {
+                                        id: existingTask.id,
+                                        ...update.updated_task,
+                                    },
                                 });
                             } else {
                                 response.updateTasks = [{
-                                    id: existingTask.id,
-                                    ...update.updated_task,
+                                    original: existingTask,
+                                    updates: {
+                                        id: existingTask.id,
+                                        ...update.updated_task,
+                                    },
                                 }];
                             }
                         }
@@ -311,7 +317,7 @@ export class LinearClient extends TaskManagerClient {
             }
 
             const updatedTasks = existingTasks.map(task => {
-                const update = response.updateTasks?.find(update => update.id === task.id);
+                const update = response.updateTasks?.find(update => update.original.id === task.id);
                 if (update === undefined) {
                     return task;
                 }
@@ -395,7 +401,7 @@ export class LinearClient extends TaskManagerClient {
             const discussionTopics = await this.extractDiscussionTopics(request.transcript);
 
             const createTasks: CreateSnapTask[] = [];
-            const updateTasks: UpdateSnapTask[] = [];
+            const updateTasks: UpdateWithOriginal[] = [];
 
             for (const topic of discussionTopics) {
                 const topicResponse = await this.processDiscussionTopic(topic, context);

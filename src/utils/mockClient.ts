@@ -35,24 +35,60 @@ export class MockClient extends TaskManagerClient {
             ],
             updateTasks: [
                 {
-                    id: 'DEADBEEF',
-                    status: 'Done',
+                    original: {
+                        assignee: {
+                            id: 'DEADBEEF',
+                            name: 'John',
+                        },
+                        description: 'There is a bug in the front-end where the log-in button is disabled on first visit.',
+                        due_date: new Date().toDateString(),
+                        id: 'DEADBEEF',
+                        priority: 1,
+                        project: {
+                            id: 'FEEBDAED',
+                            name: 'Default',
+                        },
+                        status: 'To Do',
+                        title: 'Fix Log-In Button Disabled Bug',
+                    },
+                    updates: {
+                        id: 'DEADBEEF',
+                        status: 'Done',
+                    },
                 },
                 {
-                    assignee: {
-                        id: 'DEADBEEF',
-                        name: 'John',
-                    },
-                    description: 'There is a bug in the front-end where the log-in button is disappears when the user clicks it.',
-                    due_date: new Date().toDateString(),
-                    id: 'FEEBDAED',
-                    priority: 1,
-                    project: {
+                    original: {
+                        assignee: {
+                            id: 'DEADBEEF',
+                            name: 'John',
+                        },
+                        description: 'There is a bug in the front-end where the log-in button is disabled on first visit.',
+                        due_date: new Date().toDateString(),
                         id: 'FEEBDAED',
-                        name: 'Default',
+                        priority: 1,
+                        project: {
+                            id: 'FEEBDAED',
+                            name: 'Default',
+                        },
+                        status: 'To Do',
+                        title: 'Fix Log-In Button Disabled Bug',
                     },
-                    status: 'To Do',
-                    title: 'Fix Log-In Button Disappearing Bug',
+                    updates: {
+                        assignee: {
+                            id: 'DEADBEEF',
+                            name: 'John',
+                        },
+                        description: 'There is a bug in the front-end where the log-in button is disappears when the user clicks it.',
+                        due_date: new Date().toDateString(),
+                        id: 'FEEBDAED',
+                        priority: 1,
+                        project: {
+                            id: 'FEEBDAED',
+                            name: 'Default',
+                        },
+                        status: 'To Do',
+                        title: 'Fix Log-In Button Disappearing Bug',
+                    },
                 },
             ],
         });
