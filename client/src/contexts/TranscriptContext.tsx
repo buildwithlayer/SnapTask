@@ -8,7 +8,7 @@ import {
 import toast from 'react-hot-toast';
 import {useFileContext} from './FileContext';
 import {useLocalStorageContext} from './LocalStorageContext';
-import { useProgressContext } from './ProgressContext';
+import {useProgressContext} from './ProgressContext';
 
 interface TranscriptContextType {
     error?: Error;
@@ -38,7 +38,7 @@ export const TranscriptProvider = ({children}: { children: ReactNode }) => {
 
     async function transcribeFile(): Promise<void> {
         if (!file) {
-            setStep("upload");
+            setStep('upload');
             return;
         }
 

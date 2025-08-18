@@ -1,7 +1,31 @@
 import {createContext, useContext, useEffect, useState} from 'react';
-import type {Integration} from '../Content';
 import {useLocalStorageContext} from './LocalStorageContext';
-import { useProgressContext } from './ProgressContext';
+import {useProgressContext} from './ProgressContext';
+import LinearIcon from '../assets/linear.svg?react';
+
+export interface Integration {
+    color: string;
+    icon: React.ReactNode;
+    name: 'Linear' | 'Mock';
+    authProvider: string;
+    authToken?: string;
+}
+
+export const integrations: Integration[] = [
+    {
+        color: 'blue',
+        icon: <LinearIcon className='fill-white h-6 w-6' />,
+        name: 'Linear',
+        authProvider: 'linear',
+    },
+    {
+        color: 'green',
+        icon: <div className='h-6 w-6 bg-green-500 rounded-md'></div>,
+        name: 'Mock',
+        authProvider: 'mock',
+    },
+];
+
 
 type IntegrationContextType = {
     integration?: Integration;

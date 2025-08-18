@@ -1,19 +1,19 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useLocalStorageContext } from "./LocalStorageContext";
+import {createContext, useContext, useEffect, useState} from 'react';
+import {useLocalStorageContext} from './LocalStorageContext';
 
-export type ProgressStep = 'select-integration' | 'upload' | 'transcribing' | 'generating' | 'reviewing' | 'done';
+export type ProgressStep = 'done' | 'generating' | 'reviewing' | 'select-integration' | 'transcribing' | 'upload';
 
 interface ProgressContextType {
-    step: ProgressStep;
     setStep: (step: ProgressStep) => void;
+    step: ProgressStep;
 }
 
 const ProgressContext = createContext<ProgressContextType>({
-    step: 'select-integration',
     setStep: () => {},
+    step: 'select-integration',
 });
 
-export const ProgressProvider = ({ children }: { children: React.ReactNode }) => {
+export const ProgressProvider = ({children}: { children: React.ReactNode }) => {
     const {getLocalProgressStep, setLocalProgressStep} = useLocalStorageContext();
     const [step, setStep] = useState<ProgressStep>('select-integration');
 
@@ -27,7 +27,7 @@ export const ProgressProvider = ({ children }: { children: React.ReactNode }) =>
     }, []);
 
     return (
-        <ProgressContext.Provider value={{ step, setStep: updateStep }}>
+        <ProgressContext.Provider value={{setStep: updateStep, step}}>
             {children}
         </ProgressContext.Provider>
     );

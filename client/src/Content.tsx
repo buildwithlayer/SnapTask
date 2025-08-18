@@ -1,15 +1,9 @@
-import { useProgressContext } from './contexts/ProgressContext';
+import {useProgressContext} from './contexts/ProgressContext';
 import IntegrationPage from './IntegrationPage';
 import LandingPage from './LandingPage';
 import Progress from './Progress';
 import Survey from './Survey';
 import Tasks from './Tasks';
-
-export interface Integration {
-    color: string;
-    icon: React.ReactNode;
-    name: 'Linear' | 'Mock';
-}
 
 const Content = () => {
     const {step} = useProgressContext();

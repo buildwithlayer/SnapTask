@@ -24,10 +24,10 @@ const Progress = () => {
         transcript,
     } = useTranscriptContext();
     const {
+        createTasks,
         generateError: tasksGenerateError,
         generateLoading: tasksGenerateLoading,
         generateTasks,
-        createTasks,
     } = useTasksContext();
 
     return (

@@ -1,6 +1,6 @@
 import {createContext, type ReactNode, useContext, useState} from 'react';
 import type {FileWithPath} from 'react-dropzone';
-import { useProgressContext } from './ProgressContext';
+import {useProgressContext} from './ProgressContext';
 
 interface FileContextType {
     file?: FileWithPath;

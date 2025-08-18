@@ -5,29 +5,36 @@ import {
 } from 'react';
 // TODO: Duplicate these types/schemas if doesn't work in prod
 import {CreateSnapTask as CreateSnapTaskZodSchema, CreateSnapTask} from '../../../src/schemas/snapTask';
-import type {Integration} from '../Content';
-import {integrations} from '../LandingPage';
-import type { ProgressStep } from './ProgressContext';
+import {UpdateWithOriginal as UpdateWithOriginalZodSchema, UpdateWithOriginal} from '../../../src/utils/taskManagerClient';
+import type {ProgressStep} from './ProgressContext';
+import { integrations, type Integration } from './IntegrationContext';
 
 interface LocalStorageContextType {
-    getLocalProgressStep: () => ProgressStep;
+    getLocalCreateTasks: () => CreateSnapTask[] | undefined;
     getLocalIntegration: () => Integration | undefined;
-    getLocalTasks: () => CreateSnapTask[] | undefined;
+    getLocalProgressStep: () => ProgressStep;
     getLocalTranscript: () => string | undefined;
-    setLocalProgressStep: (step: ProgressStep) => void;
-    setLocalIntegration: (integration: Integration | undefined) => void;
-    setLocalTasks: (tasks: CreateSnapTask[]) => void;
-    setLocalTranscript: (transcript: string) => void;
+    getLocalUpdateTasks: () => UpdateWithOriginal[] | undefined;
     resetLocalStorage: () => void;
+    setLocalCreateTasks: (tasks: CreateSnapTask[]) => void;
+    setLocalIntegration: (integration: Integration | undefined) => void;
+    setLocalProgressStep: (step: ProgressStep) => void;
+    setLocalTranscript: (transcript: string) => void;
+    setLocalUpdateTasks: (tasks: UpdateWithOriginal[]) => void;
 }
 
 const LocalStorageContext = createContext<LocalStorageContextType>({
-    getLocalProgressStep: () => 'select-integration',
+    getLocalCreateTasks: () => undefined,
     getLocalIntegration: () => undefined,
-    getLocalTasks: () => undefined,
+    getLocalProgressStep: () => 'select-integration',
     getLocalTranscript: () => undefined,
-    setLocalProgressStep: (step: ProgressStep) => {
-        localStorage.setItem('progressStep', step);
+    getLocalUpdateTasks: () => undefined,
+    resetLocalStorage: () => {
+        localStorage.clear();
+        window.location.pathname = '/';
+    },
+    setLocalCreateTasks: (tasks: CreateSnapTask[]) => {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
     },
     setLocalIntegration: (integration: Integration | undefined) => {
         if (integration) {
@@ -36,15 +43,14 @@ const LocalStorageContext = createContext<LocalStorageContextType>({
             localStorage.removeItem('integration');
         }
     },
-    setLocalTasks: (tasks: CreateSnapTask[]) => {
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+    setLocalProgressStep: (step: ProgressStep) => {
+        localStorage.setItem('progressStep', step);
     },
     setLocalTranscript: (transcript: string) => {
         localStorage.setItem('transcript', transcript);
     },
-        resetLocalStorage: () => {
-        localStorage.clear();
-        window.location.pathname = '/';
+    setLocalUpdateTasks: (tasks: UpdateWithOriginal[]) => {
+        localStorage.setItem('updateTasks', JSON.stringify(tasks));
     },
 });
 
@@ -53,7 +59,7 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
     const getLocalProgressStep = () => {
         const step = localStorage.getItem('progressStep') as ProgressStep | null;
         return step || 'select-integration';
-    }
+    };
 
     const setLocalProgressStep = (step: ProgressStep) => {
         localStorage.setItem('progressStep', step);
@@ -80,21 +86,38 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
         localStorage.setItem('transcript', transcript);
     };
 
-    const getLocalTasks = () => {
+    const getLocalCreateTasks = () => {
         const tasks = localStorage.getItem('tasks');
         if (!tasks) return undefined;
 
         try {
-            const jsonTasks = JSON.parse(tasks);
-            return CreateSnapTaskZodSchema.array().parse(jsonTasks);
+            const jsonCreateTasks = JSON.parse(tasks);
+            return CreateSnapTaskZodSchema.array().parse(jsonCreateTasks);
         } catch (e) {
             console.error('Error parsing tasks from localStorage', e);
             return undefined;
         }
     };
 
-    const setLocalTasks = (tasks: CreateSnapTask[]) => {
+    const setLocalCreateTasks = (tasks: CreateSnapTask[]) => {
         localStorage.setItem('tasks', JSON.stringify(tasks));
+    };
+
+    const getLocalUpdateTasks = () => {
+        const tasks = localStorage.getItem('updateTasks');
+        if (!tasks) return undefined;
+
+        try {
+            const jsonUpdateTasks = JSON.parse(tasks);
+            return UpdateWithOriginalZodSchema.array().parse(jsonUpdateTasks);
+        } catch (e) {
+            console.error('Error parsing updateTasks from localStorage', e);
+            return undefined;
+        }
+    };
+
+    const setLocalUpdateTasks = (tasks: UpdateWithOriginal[]) => {
+        localStorage.setItem('updateTasks', JSON.stringify(tasks));
     };
 
     const resetLocalStorage = () => {
@@ -105,15 +128,17 @@ export const LocalStorageProvider = ({children}: { children: ReactNode }) => {
     return (
         <LocalStorageContext.Provider
             value={{
-                getLocalProgressStep,
+                getLocalCreateTasks,
                 getLocalIntegration,
-                getLocalTasks,
+                getLocalProgressStep,
                 getLocalTranscript,
+                getLocalUpdateTasks,
                 resetLocalStorage,
-                setLocalProgressStep,
+                setLocalCreateTasks,
                 setLocalIntegration,
-                setLocalTasks,
+                setLocalProgressStep,
                 setLocalTranscript,
+                setLocalUpdateTasks,
             }}
         >
             {children}

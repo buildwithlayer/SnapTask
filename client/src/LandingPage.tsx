@@ -1,19 +1,4 @@
-import LinearIcon from './assets/linear.svg?react';
-import type {Integration} from './Content';
-import {useIntegrationContext} from './contexts/IntegrationContext';
-
-export const integrations: Integration[] = [
-    {
-        color: 'blue',
-        icon: <LinearIcon className='fill-white h-6 w-6' />,
-        name: 'Linear',
-    },
-    {
-        color: 'green',
-        icon: <div className='h-6 w-6 bg-green-500 rounded-md'></div>,
-        name: 'Mock',
-    },
-];
+import {integrations, useIntegrationContext, type Integration} from './contexts/IntegrationContext';
 
 const LandingPage = () => {
     return (

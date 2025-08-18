@@ -1,8 +1,7 @@
 import {useState} from 'react';
 import ExpandIcon from '../assets/expand.svg?react';
-import {useIntegrationContext} from '../contexts/IntegrationContext';
+import {integrations, useIntegrationContext} from '../contexts/IntegrationContext';
 import {useLocalStorageContext} from '../contexts/LocalStorageContext';
-import {integrations} from '../LandingPage';
 
 export const IntegrationDropdown = () => {
     const {resetLocalStorage} = useLocalStorageContext();

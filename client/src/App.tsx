@@ -6,11 +6,11 @@ import Content from './Content.tsx';
 import {FileProvider} from './contexts/FileContext.tsx';
 import {IntegrationProvider} from './contexts/IntegrationContext.tsx';
 import {LocalStorageProvider} from './contexts/LocalStorageContext.tsx';
+import {ProgressProvider} from './contexts/ProgressContext.tsx';
 import {TasksProvider} from './contexts/TasksContext.tsx';
 import {TranscriptProvider} from './contexts/TranscriptContext.tsx';
 import MenuBar from './MenuBar.tsx';
 import OAuthCallback from './OAuthCallback.tsx';
-import { ProgressProvider } from './contexts/ProgressContext.tsx';
 
 function App() {
     const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
