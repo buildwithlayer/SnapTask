@@ -12,16 +12,10 @@ export function OAuthLinearCallback() {
             return;
         }
         try {
-            const clientId = '93f267ac74cd3d021d8b119586d04842';
-            const clientSecret = '';
-            const redirectUri = 'http://localhost:5174/oauth/linear/callback';
-            fetch('https://api.linear.app/oauth/token', {
+            fetch(`${import.meta.env.VITE_API_URL}/api/auth/linear`, {
                 body: new URLSearchParams({
-                    client_id: clientId,
-                    client_secret: clientSecret,
                     code: code,
                     grant_type: 'authorization_code',
-                    redirect_uri: redirectUri,
                 }),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

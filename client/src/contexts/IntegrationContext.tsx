@@ -53,7 +53,7 @@ export const IntegrationProvider = ({children}: { children: React.ReactNode }) =
             window.location.href = (`https://linear.app/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=read,write`);
             break;
         case 'mock':
-            // Handle Mock integration
+            updateAuthToken('');
             break;
         default:
             break;
@@ -76,7 +76,7 @@ export const IntegrationProvider = ({children}: { children: React.ReactNode }) =
     }, []);
 
     useEffect(() => {
-        if (authToken && step === 'select-integration') {
+        if (authToken !== undefined && step === 'select-integration') {
             setStep('upload');
         }
     }, [authToken, step]);
