@@ -41,7 +41,7 @@ authRouter.openapi(linearRoute, async (c) => {
             redirect_uri: import.meta.env.VITE_LINEAR_REDIRECT_URI,
         }),
         headers: {
-            'Content-Type': 'application/x-www-form-urlencode',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
         method: 'POST',
     });
