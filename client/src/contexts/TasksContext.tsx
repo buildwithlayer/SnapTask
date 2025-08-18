@@ -87,7 +87,7 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
         setApproveCreateTaskLoading((prev) => [...prev, taskTitle]);
         try {
             const task = createTasks.find(task => task.title === taskTitle);
-            fetch(`${import.meta.env.VITE_API_URL}/api/tasks`, {
+            fetch(`${import.meta.env.VITE_API_URL}/api/tasks/create`, {
                 body: JSON.stringify({
                     authProvider: integration?.authProvider,
                     authToken: authToken,
@@ -117,7 +117,7 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
         setApproveUpdateTaskLoading((prev) => [...prev, taskId]);
         try {
             const task = updateTasks.find(task => task.updates.id === taskId);
-            fetch(`${import.meta.env.VITE_API_URL}/api/tasks`, {
+            fetch(`${import.meta.env.VITE_API_URL}/api/tasks/update`, {
                 body: JSON.stringify({
                     authProvider: integration?.authProvider,
                     authToken: authToken,
@@ -143,10 +143,10 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
         }
     }
 
-    function generateTasks() {
+    async function generateTasks() {
         setGenerateLoading(true);
         try {
-            fetch(`${import.meta.env.VITE_API_URL}/api/extract`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/extract`, {
                 body: JSON.stringify({
                     authProvider: integration?.authProvider,
                     authToken: authToken,
@@ -156,22 +156,24 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                     'Content-Type': 'application/json',
                 },
                 method: 'POST',
-            }).then((response) => {
+            })
+
+            try {
+                const data = await response.json();
                 if (response.ok) {
-                    response.json().then((data) => {
-                        setCreateTasks(data.createTasks);
-                        setLocalCreateTasks(data.createTasks);
-                        setUpdateTasks(data.updateTasks);
-                        setLocalUpdateTasks(data.updateTasks);
-                        setStep('reviewing');
-                    });
+                    setCreateTasks(data.createTasks);
+                    setLocalCreateTasks(data.createTasks);
+                    setUpdateTasks(data.updateTasks);
+                    setLocalUpdateTasks(data.updateTasks);
+                    setStep('reviewing');
                 } else {
-                    response.json().then((data) => {
-                        console.error('Error generating createTasks:', data);
-                        setGenerateError(new Error(data.message || 'Unknown error'));
-                    });
+                    console.error('Error generating createTasks:', data);
+                    setGenerateError(new Error(data.message || 'Unknown error'));
                 }
-            });
+            } catch (e) {
+                throw new Error('Failed to parse response from server');
+            }
+
         } catch (error) {
             console.error('Error generating createTasks:', error);
             setGenerateError(error instanceof Error ? error : new Error('Unknown error'));

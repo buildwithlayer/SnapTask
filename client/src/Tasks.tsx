@@ -1,5 +1,6 @@
 import type {CreateSnapTask, UpdateSnapTask} from '../../src/schemas/snapTask';
 import Button from './components/Button';
+import ResetButton from './components/ResetButton';
 import {useTasksContext} from './contexts/TasksContext';
 
 const Tasks = () => {
@@ -21,6 +22,12 @@ const Tasks = () => {
                         updates={task.updates}
                     />
                 ))}
+                {updateTasks.length === 0 && createTasks.length === 0 &&
+                    <div className='w-full h-full flex flex-col gap-4 items-center justify-center'>
+                        <p>No tasks detected.</p>
+                        <ResetButton />
+                    </div>
+                }
             </div>
         </div>
     );

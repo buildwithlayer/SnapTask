@@ -25,6 +25,7 @@ const Progress = () => {
     } = useTranscriptContext();
     const {
         createTasks,
+        updateTasks,
         generateError: tasksGenerateError,
         generateLoading: tasksGenerateLoading,
         generateTasks,
@@ -50,7 +51,8 @@ const Progress = () => {
                     loading={tasksGenerateLoading}
                     start={
                         transcript !== undefined &&
-                        createTasks.length === 0
+                        createTasks.length === 0 &&
+                        updateTasks.length === 0
                     }
                     error={tasksGenerateError}
                     fn={generateTasks}

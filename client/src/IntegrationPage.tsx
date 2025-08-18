@@ -10,7 +10,7 @@ const IntegrationPage = () => {
         <>
             <div className="w-full h-full flex flex-col justify-start items-center overflow-auto">
                 <div
-                    className="w-full flex flex-col justify-center items-center px-4 bg-gray-900 text-center md:text-left">
+                    className="w-full flex flex-col justify-center items-center px-4 bg-gray-900 text-left">
                     <div className="max-w-content-max-width w-full flex flex-col gap-12 py-[72px]">
                         {/* Hero Section */}
                         <div className="flex flex-col gap-4">
