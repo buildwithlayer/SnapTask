@@ -4,6 +4,7 @@ import ResetButton from './components/ResetButton';
 import {useFileContext} from './contexts/FileContext';
 import {useTasksContext} from './contexts/TasksContext';
 import {useTranscriptContext} from './contexts/TranscriptContext';
+import { useProgressContext } from './contexts/ProgressContext';
 
 interface Step {
     additionalMessage?: string;
@@ -16,6 +17,7 @@ interface Step {
 }
 
 const Progress = () => {
+    const {step} = useProgressContext();
     const {file} = useFileContext();
     const {
         error: transcriptError,
@@ -56,7 +58,7 @@ const Progress = () => {
                     }
                     error={tasksGenerateError}
                     fn={generateTasks}
-                    complete={createTasks.length > 0 && !tasksGenerateError}
+                    complete={step === "reviewing"}
                 />
             </div>
         </div>

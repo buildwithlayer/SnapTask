@@ -46,13 +46,14 @@ const IntegrationContext = createContext<IntegrationContextType>({
 });
 
 export const IntegrationProvider = ({children}: { children: React.ReactNode }) => {
-    const {getLocalAuthToken, getLocalIntegration, setLocalAuthToken, setLocalIntegration} = useLocalStorageContext();
+    const {getLocalAuthToken, getLocalIntegration, setLocalAuthToken, setLocalIntegration, resetLocalStorage} = useLocalStorageContext();
     const {setStep, step} = useProgressContext();
-    
+
     const [integration, setIntegration] = useState<Integration | undefined>(undefined);
     const [authToken, setAuthToken] = useState<string | undefined>(undefined);
 
     function updateIntegration(newIntegration: Integration | undefined) {
+        resetLocalStorage();
         switch (newIntegration?.authProvider) {
         case 'linear':
             window.location.href = (`https://linear.app/oauth/authorize?client_id=${import.meta.env.VITE_LINEAR_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_LINEAR_REDIRECT_URI}&response_type=code&scope=read,write`);
