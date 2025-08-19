@@ -5,6 +5,7 @@ import {useIntegrationContext} from './IntegrationContext';
 import {useLocalStorageContext} from './LocalStorageContext';
 import {useProgressContext} from './ProgressContext';
 import {useTranscriptContext} from './TranscriptContext';
+import toast from 'react-hot-toast';
 
 type TasksContextType = {
     approveCreateTask: (taskTitle: string) => void;
@@ -83,11 +84,11 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
         }
     }
 
-    function approveCreateTask(taskTitle: string) {
+    async function approveCreateTask(taskTitle: string) {
         setApproveCreateTaskLoading((prev) => [...prev, taskTitle]);
         try {
             const task = createTasks.find(task => task.title === taskTitle);
-            fetch(`${import.meta.env.VITE_API_URL}/api/tasks/create`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/create`, {
                 body: JSON.stringify({
                     authProvider: integration?.authProvider,
                     authToken: authToken,
@@ -99,25 +100,30 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                     'Content-Type': 'application/json',
                 },
                 method: 'POST',
-            }).then(() => {
-                const newTasks = (createTasks.filter(task => task.title !== taskTitle));
-                updateCreateTasks(newTasks);
-                if (newTasks.length + updateTasks.length === 0) {
-                    setStep('done');
-                }
-            });
+            })
+            if (!response.ok) {
+                const data = await response.json();
+                console.error('Error approving create task:', data);
+                throw new Error(data.message || 'Unknown error');
+            }
+            const newTasks = (createTasks.filter(task => task.title !== taskTitle));
+            updateCreateTasks(newTasks);
+            if (newTasks.length + updateTasks.length === 0) {
+                setStep('done');
+            }
         } catch (error) {
             setApproveCreateTaskError(error instanceof Error ? error : new Error('Unknown error'));
+            toast.error(error instanceof Error ? error.message : JSON.stringify(error));
         } finally {
             setApproveCreateTaskLoading((prev) => prev.filter((id) => id !== taskTitle));
         }
     }
 
-    function approveUpdateTask(taskId: string) {
+    async function approveUpdateTask(taskId: string) {
         setApproveUpdateTaskLoading((prev) => [...prev, taskId]);
         try {
             const task = updateTasks.find(task => task.updates.id === taskId);
-            fetch(`${import.meta.env.VITE_API_URL}/api/tasks/update`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/update`, {
                 body: JSON.stringify({
                     authProvider: integration?.authProvider,
                     authToken: authToken,
@@ -129,15 +135,20 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                     'Content-Type': 'application/json',
                 },
                 method: 'POST',
-            }).then(() => {
-                const newTasks = (updateTasks.filter(task => task.updates.id !== taskId));
-                updateUpdateTasks(newTasks);
-                if (newTasks.length + createTasks.length === 0) {
-                    setStep('done');
-                }
-            });
+            })
+            if (!response.ok) {
+                const data = await response.json();
+                console.error('Error approving update task:', data);
+                throw new Error(data.message || 'Unknown error');
+            }
+            const newTasks = (updateTasks.filter(task => task.updates.id !== taskId));
+            updateUpdateTasks(newTasks);
+            if (newTasks.length + createTasks.length === 0) {
+                setStep('done');
+            }
         } catch (error) {
             setApproveUpdateTaskError(error instanceof Error ? error : new Error('Unknown error'));
+            toast.error(error instanceof Error ? error.message : JSON.stringify(error));
         } finally {
             setApproveUpdateTaskLoading((prev) => prev.filter((id) => id !== taskId));
         }
