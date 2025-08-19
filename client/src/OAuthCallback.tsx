@@ -113,7 +113,7 @@ export function OAuthJiraCallback() {
                 }
                 return response.json();
             }).then(data => {
-                setAuthToken(data.access_token);
+                setAuthToken(`Bearer ${data.access_token}`);
                 window.location.href = '/';
             });
         } catch (error) {
