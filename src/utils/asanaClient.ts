@@ -78,8 +78,10 @@ export class AsanaClient extends TaskManagerClient {
         }));
     }
 
-    private createSnapTaskToCreateAsanaIssue(createSnapTask: CreateSnapTask): CreateTaskOperationRequest {
-        const data: TaskRequest = {};
+    private createSnapTaskToCreateAsanaIssue(createSnapTask: CreateSnapTask, context: Context): CreateTaskOperationRequest {
+        const data: TaskRequest = {
+            workspace: context.workspaceId,
+        };
 
         if (createSnapTask.assignee) {
             data.assignee = createSnapTask.assignee.id;
@@ -98,6 +100,7 @@ export class AsanaClient extends TaskManagerClient {
         }
 
         data.name = createSnapTask.title;
+        data.workspace = context.workspaceId;
 
         return {
             createTaskRequest: {
@@ -516,7 +519,8 @@ export class AsanaClient extends TaskManagerClient {
 
     async createTask(request: CreateTaskRequest): Promise<void> {
         try {
-            await this.tasksApi.createTask(this.createSnapTaskToCreateAsanaIssue(request.createTask));
+            const context = await this.getContext('');
+            await this.tasksApi.createTask(this.createSnapTaskToCreateAsanaIssue(request.createTask, context));
         } catch (e) {
             console.error(e);
             throw new Error('Error creating Asana task.');
