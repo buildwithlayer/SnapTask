@@ -10,7 +10,7 @@ import {ProgressProvider} from './contexts/ProgressContext.tsx';
 import {TasksProvider} from './contexts/TasksContext.tsx';
 import {TranscriptProvider} from './contexts/TranscriptContext.tsx';
 import MenuBar from './MenuBar.tsx';
-import {OAuthLinearCallback} from './OAuthCallback.tsx';
+import {OAuthAsanaCallback, OAuthLinearCallback} from './OAuthCallback.tsx';
 
 function App() {
     const sessionReplayTracking = sessionReplayPlugin({sampleRate: 1});
@@ -30,6 +30,7 @@ function App() {
                     <IntegrationProvider>
                         <Router>
                             <Routes>
+                                <Route path={'/oauth/asana/callback'} element={<OAuthAsanaCallback/>}/>
                                 <Route path={'/oauth/linear/callback'} element={<OAuthLinearCallback/>}/>
                                 <Route
                                     path={'/'}

@@ -1,5 +1,6 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import LinearIcon from '../assets/linear.svg?react';
+import AsanaIcon from '../assets/asana.svg?react';
 import {useLocalStorageContext} from './LocalStorageContext';
 import {useProgressContext} from './ProgressContext';
 
@@ -7,7 +8,7 @@ export interface Integration {
     authProvider: string;
     color: string;
     icon: React.ReactNode;
-    name: 'Linear' | 'Mock';
+    name: string;
 }
 
 export const integrations: Integration[] = [
@@ -16,6 +17,12 @@ export const integrations: Integration[] = [
         color: 'blue',
         icon: <LinearIcon className='fill-white h-6 w-6' />,
         name: 'Linear',
+    },
+    {
+        authProvider: 'asana',
+        color: 'orange',
+        icon: <AsanaIcon className='fill-white h-6 w-6' />,
+        name: 'Asana',
     },
     {
         authProvider: 'mock',
@@ -48,9 +55,10 @@ export const IntegrationProvider = ({children}: { children: React.ReactNode }) =
     function updateIntegration(newIntegration: Integration | undefined) {
         switch (newIntegration?.authProvider) {
         case 'linear':
-            const clientId = '93f267ac74cd3d021d8b119586d04842';
-            const redirectUrl = 'http://localhost:5174/oauth/linear/callback';
-            window.location.href = (`https://linear.app/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=read,write`);
+            window.location.href = (`https://linear.app/oauth/authorize?client_id=${import.meta.env.VITE_LINEAR_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_LINEAR_REDIRECT_URI}&response_type=code&scope=read,write`);
+            break;
+        case 'asana':
+            window.location.href = (`https://app.asana.com/-/oauth_authorize?client_id=${import.meta.env.VITE_ASANA_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_ASANA_REDIRECT_URI}&response_type=code&scope=projects:read%20tasks:read%20custom_fields:read%20tasks:write%20teams:read%20users:read`);
             break;
         case 'mock':
             updateAuthToken('');
