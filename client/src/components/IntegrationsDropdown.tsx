@@ -15,7 +15,7 @@ export const IntegrationDropdown = () => {
                 <ExpandIcon className={`fill-white w-6 h-6 ${focused ? 'rotate-180' : ''}`} />
                 {focused && (
                     <div className='absolute top-full right-0 mt-2 bg-gray-800 shadow-lg z-10 flex flex-col rounded-md overflow-hidden'>
-                        <button className='p-2 text-center text-white hover:bg-gray-850 border-b border-gray-700 cursor-pointer' onClick={() => {setFocused(false); resetLocalStorage();}}>
+                        <button className='p-2 px-4 text-center flex items-center text-gray-300 hover:bg-gray-850 border-b border-gray-700 cursor-pointer' onClick={() => {setFocused(false); resetLocalStorage();}}>
                             <span className='text-nowrap'>See All Integrations</span>
                         </button>
                         {integrations.map((intg) => (
