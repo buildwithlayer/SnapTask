@@ -102,6 +102,9 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                 method: 'POST',
             })
             if (!response.ok) {
+                if (response.status === 500) {
+                    throw new Error('Internal server error. Please try again later.');
+                }
                 const data = await response.json();
                 console.error('Error approving create task:', data);
                 throw new Error(data.message || 'Unknown error');
@@ -137,6 +140,9 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                 method: 'POST',
             })
             if (!response.ok) {
+                if (response.status === 500) {
+                    throw new Error('Internal server error. Please try again later.');
+                }
                 const data = await response.json();
                 console.error('Error approving update task:', data);
                 throw new Error(data.message || 'Unknown error');
