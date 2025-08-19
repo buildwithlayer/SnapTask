@@ -1,5 +1,18 @@
 import {z} from 'zod';
 
+export const AsanaAuthRequestSchema = z.object({
+    code: z.string(),
+    grant_type: z.string(),
+});
+
+export type AsanaAuthRequestSchema = z.infer<typeof AsanaAuthRequestSchema>;
+
+export const AsanaAuthResponseSchema = z.object({
+    access_token: z.string(),
+});
+
+export type AsanaAuthResponseSchema = z.infer<typeof AsanaAuthResponseSchema>;
+
 export const LinearAuthRequestSchema = z.object({
     code: z.string(),
     grant_type: z.string(),
