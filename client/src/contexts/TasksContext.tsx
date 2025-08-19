@@ -1,11 +1,11 @@
 import {createContext, useContext, useEffect, useState} from 'react';
+import toast from 'react-hot-toast';
 import {type CreateSnapTask} from '../../../src/schemas/snapTask';
 import {UpdateWithOriginal} from '../../../src/utils/taskManagerClient';
 import {useIntegrationContext} from './IntegrationContext';
 import {useLocalStorageContext} from './LocalStorageContext';
 import {useProgressContext} from './ProgressContext';
 import {useTranscriptContext} from './TranscriptContext';
-import toast from 'react-hot-toast';
 
 type TasksContextType = {
     approveCreateTask: (taskTitle: string) => void;
@@ -100,7 +100,7 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                     'Content-Type': 'application/json',
                 },
                 method: 'POST',
-            })
+            });
             if (!response.ok) {
                 if (response.status === 500) {
                     throw new Error('Internal server error. Please try again later.');
@@ -138,7 +138,7 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                     'Content-Type': 'application/json',
                 },
                 method: 'POST',
-            })
+            });
             if (!response.ok) {
                 if (response.status === 500) {
                     throw new Error('Internal server error. Please try again later.');
@@ -173,7 +173,7 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
                     'Content-Type': 'application/json',
                 },
                 method: 'POST',
-            })
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -202,7 +202,7 @@ export const TasksProvider = ({children}: { children: React.ReactNode }) => {
 
         const localUpdateTasks = getLocalUpdateTasks();
         setUpdateTasks(localUpdateTasks || []);
-    }, []);
+    }, [getLocalCreateTasks, getLocalUpdateTasks]);
 
     return (
         <TasksContext.Provider value={{

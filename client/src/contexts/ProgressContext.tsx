@@ -24,7 +24,7 @@ export const ProgressProvider = ({children}: { children: React.ReactNode }) => {
 
     useEffect(() => {
         setStep(getLocalProgressStep());
-    }, []);
+    }, [getLocalProgressStep]);
 
     return (
         <ProgressContext.Provider value={{setStep: updateStep, step}}>

@@ -1,7 +1,7 @@
 import {createContext, useContext, useEffect, useState} from 'react';
-import LinearIcon from '../assets/linear.svg?react';
 import AsanaIcon from '../assets/asana.svg?react';
-import JiraIcon from '../assets/jira.svg?react';
+import LinearIcon from '../assets/linear.svg?react';
+// import JiraIcon from '../assets/jira.svg?react';
 import {useLocalStorageContext} from './LocalStorageContext';
 import {useProgressContext} from './ProgressContext';
 
@@ -53,7 +53,7 @@ const IntegrationContext = createContext<IntegrationContextType>({
 });
 
 export const IntegrationProvider = ({children}: { children: React.ReactNode }) => {
-    const {getLocalAuthToken, getLocalIntegration, setLocalAuthToken, setLocalIntegration, resetLocalStorage} = useLocalStorageContext();
+    const {getLocalAuthToken, getLocalIntegration, resetLocalStorage, setLocalAuthToken, setLocalIntegration} = useLocalStorageContext();
     const {setStep, step} = useProgressContext();
 
     const [integration, setIntegration] = useState<Integration | undefined>(undefined);
@@ -92,13 +92,13 @@ export const IntegrationProvider = ({children}: { children: React.ReactNode }) =
 
         const localAuthToken = getLocalAuthToken();
         setAuthToken(localAuthToken);
-    }, []);
+    }, [getLocalAuthToken, getLocalIntegration]);
 
     useEffect(() => {
         if (authToken !== undefined && step === 'select-integration') {
             setStep('upload');
         }
-    }, [authToken, step]);
+    }, [authToken, step, setStep]);
 
     return (
         <IntegrationContext.Provider value={{authToken, integration, setAuthToken: updateAuthToken, setIntegration: updateIntegration}}>

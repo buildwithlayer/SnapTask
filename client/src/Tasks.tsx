@@ -1,12 +1,12 @@
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type {CreateSnapTask, UpdateSnapTask} from '../../src/schemas/snapTask';
+import CheckIcon from './assets/check.svg?react';
+import DeleteIcon from './assets/delete.svg?react';
 import Button from './components/Button';
 import ResetButton from './components/ResetButton';
 import ToolTypeBadge from './components/ToolTypeBadge';
-import DeleteIcon from './assets/delete.svg?react'
-import CheckIcon from './assets/check.svg?react';
 import {useTasksContext} from './contexts/TasksContext';
-import Markdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 
 const Tasks = () => {
     const {createTasks, updateTasks} = useTasksContext();

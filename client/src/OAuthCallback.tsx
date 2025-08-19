@@ -33,7 +33,7 @@ export function OAuthLinearCallback() {
         } catch (error) {
             toast.error('Error during OAuth callback: ' + (error instanceof Error ? error.message : 'Unknown error'));
         }
-    }, []);
+    }, [setAuthToken]);
 
     return (
         <div className="w-full h-full flex justify-center items-center px-4 bg-gray-900 text-white">
@@ -76,7 +76,7 @@ export function OAuthAsanaCallback() {
         } catch (error) {
             toast.error('Error during OAuth callback: ' + (error instanceof Error ? error.message : 'Unknown error'));
         }
-    }, []);
+    }, [setAuthToken]);
 
     return (
         <div className="w-full h-full flex justify-center items-center px-4 bg-gray-900 text-white">
@@ -113,13 +113,13 @@ export function OAuthJiraCallback() {
                 }
                 return response.json();
             }).then(data => {
-                setAuthToken(`Bearer ${data.access_token}`);
+                setAuthToken(data.access_token);
                 window.location.href = '/';
             });
         } catch (error) {
             toast.error('Error during OAuth callback: ' + (error instanceof Error ? error.message : 'Unknown error'));
         }
-    }, []);
+    }, [setAuthToken]);
 
     return (
         <div className="w-full h-full flex justify-center items-center px-4 bg-gray-900 text-white">

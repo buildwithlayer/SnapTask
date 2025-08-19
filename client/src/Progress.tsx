@@ -2,9 +2,9 @@ import {useEffect} from 'react';
 import {ClipLoader} from 'react-spinners';
 import ResetButton from './components/ResetButton';
 import {useFileContext} from './contexts/FileContext';
+import {useProgressContext} from './contexts/ProgressContext';
 import {useTasksContext} from './contexts/TasksContext';
 import {useTranscriptContext} from './contexts/TranscriptContext';
-import { useProgressContext } from './contexts/ProgressContext';
 
 interface Step {
     additionalMessage?: string;
@@ -27,10 +27,10 @@ const Progress = () => {
     } = useTranscriptContext();
     const {
         createTasks,
-        updateTasks,
         generateError: tasksGenerateError,
         generateLoading: tasksGenerateLoading,
         generateTasks,
+        updateTasks,
     } = useTasksContext();
 
     return (
@@ -58,7 +58,7 @@ const Progress = () => {
                     }
                     error={tasksGenerateError}
                     fn={generateTasks}
-                    complete={step === "reviewing"}
+                    complete={step === 'reviewing'}
                 />
             </div>
         </div>
