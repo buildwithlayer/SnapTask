@@ -5,6 +5,8 @@ import ToolTypeBadge from './components/ToolTypeBadge';
 import DeleteIcon from './assets/delete.svg?react'
 import CheckIcon from './assets/check.svg?react';
 import {useTasksContext} from './contexts/TasksContext';
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 const Tasks = () => {
     const {createTasks, updateTasks} = useTasksContext();
@@ -54,16 +56,16 @@ const Task = ({task, updates}: TaskProps) => {
         <div className="flex flex-col">
             {task.title && !updates?.title && <h3 className={'font-medium text-xl'}>{task.title}</h3>}
             {updates?.title && <h3 className={'font-medium text-xl text-amber-500'}><span className='line-through text-white'>{task.title}</span> {updates.title}</h3>}
-            {task.description && !updates?.description && <p>{task.description}</p>}
-            {updates?.description && <p className='text-amber-500'><span className='line-through text-white'>{task.description}</span> {updates.description}</p>}
+            {task.description && !updates?.description && <Markdown remarkPlugins={[remarkGfm]}>{task.description}</Markdown>}
+            {updates?.description && <><span className='line-through text-white'>{task.description} </span><Markdown remarkPlugins={[remarkGfm]}>{updates.description}</Markdown></>}
         </div>
         {(task.assignee || task.project || task.due_date || task.priority || task.status || updates?.assignee || updates?.project || updates?.due_date || updates?.priority || updates?.status) &&
         <div className="flex gap-2 flex-wrap">
-            <PropertyBadge icon={<span>👤</span>} value={task.assignee?.name} updatedValue={updates?.assignee?.name} />
-            <PropertyBadge icon={<span>📁</span>} value={task.project?.name} updatedValue={updates?.project?.name} />
-            <PropertyBadge icon={<span>📅</span>} value={task.due_date} updatedValue={updates?.due_date} />
-            <PropertyBadge icon={<span>⚡</span>} value={task.priority?.toString()} updatedValue={updates?.priority?.toString()} />
-            <PropertyBadge icon={<span>🚦</span>} value={task.status} updatedValue={updates?.status} />
+            <PropertyBadge icon={<span className='text-gray-400'>👤 Assignee</span>} value={task.assignee?.name} updatedValue={updates?.assignee?.name} />
+            <PropertyBadge icon={<span className='text-gray-400'>📁 Project</span>} value={task.project?.name} updatedValue={updates?.project?.name} />
+            <PropertyBadge icon={<span className='text-gray-400'>📅 Due Date</span>} value={task.due_date} updatedValue={updates?.due_date} />
+            <PropertyBadge icon={<span className='text-gray-400'>⚡ Priority</span>} value={task.priority?.toString()} updatedValue={updates?.priority?.toString()} />
+            <PropertyBadge icon={<span className='text-gray-400'>🚦 Status</span>} value={task.status} updatedValue={updates?.status} />
         </div>}
     </div>;
 };
@@ -77,7 +79,7 @@ interface PropertyBadgeProps {
 const PropertyBadge = ({icon, updatedValue, value}: PropertyBadgeProps) => {
     return (
         <>
-            {(updatedValue || value) && <div className={`flex items-center gap-2 px-2 py-1 border rounded-md w-fit ${updatedValue ? 'border-amber-500' : 'border-gray-700'}`}>
+            {(updatedValue || value) && <div className={`flex flex-wrap items-center gap-2 px-2 py-1 border rounded-md w-fit ${updatedValue ? 'border-amber-500' : 'border-gray-700'}`}>
                 {icon}
                 <span className={`text-white ${updatedValue ? 'line-through' : ''}`}>{value}</span>
                 {updatedValue && <span className='text-amber-500'>{updatedValue}</span>}
