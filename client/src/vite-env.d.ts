@@ -14,6 +14,8 @@ interface ImportMetaEnv {
     readonly VITE_LINEAR_REDIRECT_URI: string;
     readonly VITE_ASANA_CLIENT_ID: string;
     readonly VITE_ASANA_REDIRECT_URI: string;
+    readonly VITE_JIRA_CLIENT_ID: string;
+    readonly VITE_JIRA_REDIRECT_URI: string;
 }
 
 interface ImportMeta {

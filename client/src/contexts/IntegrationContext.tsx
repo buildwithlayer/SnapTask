@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import LinearIcon from '../assets/linear.svg?react';
 import AsanaIcon from '../assets/asana.svg?react';
+import JiraIcon from '../assets/jira.svg?react';
 import {useLocalStorageContext} from './LocalStorageContext';
 import {useProgressContext} from './ProgressContext';
 
@@ -21,15 +22,21 @@ export const integrations: Integration[] = [
     {
         authProvider: 'asana',
         color: 'orange',
-        icon: <AsanaIcon className='fill-white h-6 w-6' />,
+        icon: <AsanaIcon className='h-6 w-6' />,
         name: 'Asana',
     },
-    {
-        authProvider: 'mock',
-        color: 'green',
-        icon: <div className='h-6 w-6 bg-green-500 rounded-md'></div>,
-        name: 'Mock',
-    },
+    // {
+    //     authProvider: 'jira',
+    //     color: 'purple',
+    //     icon: <JiraIcon className='h-6 w-6' />,
+    //     name: 'Jira',
+    // },
+    // {
+    //     authProvider: 'mock',
+    //     color: 'green',
+    //     icon: <div className='h-6 w-6 bg-green-500 rounded-md'></div>,
+    //     name: 'Mock',
+    // },
 ];
 
 
@@ -60,6 +67,9 @@ export const IntegrationProvider = ({children}: { children: React.ReactNode }) =
             break;
         case 'asana':
             window.location.href = (`https://app.asana.com/-/oauth_authorize?client_id=${import.meta.env.VITE_ASANA_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_ASANA_REDIRECT_URI}&response_type=code&scope=projects:read%20tasks:read%20custom_fields:read%20tasks:write%20teams:read%20users:read`);
+            break;
+        case 'jira':
+            window.location.href = (`https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=${import.meta.env.VITE_JIRA_CLIENT_ID}&scope=read%3Ajira-work%20read%3Ajira-user%20write%3Ajira-work&redirect_uri=${import.meta.env.VITE_JIRA_REDIRECT_URI}&response_type=code&prompt=consent`);
             break;
         case 'mock':
             updateAuthToken('');
